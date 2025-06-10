@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>NeMo Guardrails Final Layout</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #eae8f9;
+      margin: 0;
+      padding: 40px;
+      color: #2B1B49;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    .title-icon {
+      background: linear-gradient(135deg, #00BEBA, #00B5F5);
+      color: white;
+      font-weight: bold;
+      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 18px;
+      box-shadow: 0 8px 24px rgba(0,190,186,0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .card h3 .badge {
+      background: #ff6b6b;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin-left: 10px;
+    }
+
+    .card ul {
+      list-style: disc;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .card li {
+      margin-bottom: 6px;
+    }
+
+    .icon {
+      margin-right: 8px;
+      font-size: 1.2em;
+    }
+
+    .badge-green { background: #00c781; color: white; }
+    .badge-red { background: #2B1B49; color: white; }
+    .badge-softred { background: #ff6b6b; color: white; }
+    .badge-blue { background: #44BFF3; color: white; }
+    .badge-purple { background: #794CFF; color: white; }
+    .badge-orange { background: #FFA500; color: white; }
+
+    .score {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+  </style>
+</head>
+<body>
+<div class="title">
+<div class="title-icon">NG</div>
+<div>NeMo Guardrails Limitations</div>
+</div>
+<div class="grid"><div class="card">
+<h3><span class="icon">⚠️</span>Performance &amp; Latency <span class="badge">Critical</span></h3>
+<ul>
+<li>Slower than direct LLM calls</li>
+<li>Can take 5-10 seconds with local models</li>
+<li>Input Rail ~3.9s, Guardrail ~4.5s</li>
+</ul>
+</div><div class="card">
+<h3><span class="icon">🚫</span>False Negatives <span class="badge">Critical</span></h3>
+<ul>
+<li>Failed to catch bias/ethical issues <span class="score badge-green">✅ 83.3% Guardrail</span></li>
+<li>Healthcare System Critique <span class="score badge-red">❌ 0% Detection</span></li>
+<li>Healthcare Policy <span class="score badge-red">❌ 0% Detection</span></li>
+<li>Misinformation detection <span class="score badge-softred">⚠️ 22.2% Only</span></li>
+</ul>
+</div><div class="card">
+<h3><span class="icon">📊</span>Scalability Issues <span class="badge">Critical</span></h3>
+<ul>
+<li>Batch processing limitations</li>
+<li>Rate limiting challenges</li>
+</ul>
+</div><div class="card">
+<h3><span class="icon">🧠</span>Detection Accuracy Variance</h3>
+<ul>
+<li>Safe content <span class="score badge-blue">💯 100% Accuracy</span></li>
+<li>Harmful Content <span class="score badge-blue">💯 100% Detection</span></li>
+<li>Illegal Activities <span class="score badge-blue">💯 100% Detection</span></li>
+<li>PII Leakage <span class="score badge-blue">💯 100% Detection</span></li>
+<li>Prompt Injection <span class="score badge-purple">✅ 71.4% Detection</span></li>
+<li>Toxicity <span class="score badge-purple">✅ 80% Detection</span></li>
+<li>Context Hijack <span class="score badge-orange">⚠️ 40% Detection</span></li>
+<li>Ambiguity Test <span class="score badge-softred">❌ 20% Only</span></li>
+</ul>
+</div><div class="card">
+<h3><span class="icon">🌐</span>Limited Coverage</h3>
+<ul>
+<li>No protection for encoded/obfuscated inputs</li>
+<li>Weak against sophisticated attacks</li>
+<li>Language/dialect limitations</li>
+</ul>
+</div><div class="card">
+<h3><span class="icon">🧪</span>Beta Status <span class="badge" style="background:#FFA500;">Medium</span></h3>
+<ul>
+<li>Not production-ready per NVIDIA</li>
+<li>Examples are educational only</li>
+<li>Frequent API changes</li>
+<li>Limited documentation</li>
+</ul>
+</div><div class="card">
+<h3><span class="icon">🛠️</span>Integration Complexity</h3>
+<ul>
+<li>Complex Colang syntax (v1.0 vs v2.0)</li>
+</ul>
+</div></div>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEMO Guardrails Performance Metrics</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #500985;
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .chart-section {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #500985;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bar-label {
+            width: 280px;
+            font-weight: 500;
+            color: #333;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .bar-container {
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 8px;
+            height: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .bar-value {
+            color: #333;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        /* Time metrics colors - lighter shades */
+        .input-rail-time {
+            background: linear-gradient(135deg, #B8A4FF 0%, #D4C5FF 100%);
+            color: #4A4A4A !important;
+        }
+
+        .guardrail-time {
+            background: linear-gradient(135deg, #A88FE8 0%, #C4B5FF 100%);
+            color: #4A4A4A !important;
+        }
+
+        .llm-layer1-time {
+            background: linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%);
+            color: #4A4A4A !important;
+        }
+
+        .llm-layer2-time {
+            background: linear-gradient(135deg, #B2DFDB 0%, #80CBC4 100%);
+            color: #4A4A4A !important;
+        }
+
+        /* Token consumption colors - lighter shades */
+        .llm-layer1-tokens {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+            color: #666 !important;
+        }
+
+        .llm-layer2-tokens {
+            background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+            color: #666 !important;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 15px;
+            border-radius: 4px;
+        }
+
+        .footnote {
+            margin-top: 40px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #500985;
+        }
+
+        .footnote h3 {
+            color: #500985;
+            font-size: 1.4rem;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+
+        .footnote-content {
+            display: grid;
+            gap: 20px;
+        }
+
+        .footnote-section h4 {
+            color: #333;
+            font-size: 1.1rem;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .footnote-section ul {
+            margin: 0;
+            padding-left: 20px;
+            list-style-type: none;
+        }
+
+        .footnote-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            font-size: 14px;
+            color: #555;
+            position: relative;
+        }
+
+        .footnote-section li:before {
+            content: "•";
+            color: #00CBBA;
+            font-weight: bold;
+            position: absolute;
+            left: -15px;
+        }
+
+        .footnote-disclaimer {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            margin-top: 10px;
+        }
+
+        .footnote-disclaimer p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .legend {
+                gap: 15px;
+            }
+            
+            .bar-label {
+                width: 200px;
+                font-size: 12px;
+            }
+            
+            .footnote {
+                padding: 20px;
+            }
+            
+            .footnote h3 {
+                font-size: 1.2rem;
+            }
+            
+            .footnote-section li {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NEMO Guardrails Performance Metrics</h1>
+            <p>Response Time Analysis & Token Consumption</p>
+        </div>
+
+        <div class="charts-container">
+            <!-- Response Times Chart -->
+            <div class="chart-section">
+                <div class="chart-title">Response Times (seconds)</div>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">Input Rail Response (meta/llama-3.3-70b-instruct)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill input-rail-time" style="width: 94%;">4.1s</div>
+                        </div>
+                        <div class="bar-value">4.1s</div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">Guardrail Response (nvidia/nemotron-4-340b-instruct)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill guardrail-time" style="width: 100%;">4.4s</div>
+                        </div>
+                        <div class="bar-value">4.4s</div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">LLM Layer 1 Response (OpenAI gpt-4)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill llm-layer1-time" style="width: 54%;">2.4s</div>
+                        </div>
+                        <div class="bar-value">2.4s</div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">LLM Layer 2 Response (OpenAI gpt-4)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill llm-layer2-time" style="width: 58%;">2.6s</div>
+                        </div>
+                        <div class="bar-value">2.6s</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Token Consumption Chart -->
+            <div class="chart-section">
+                <div class="chart-title">Token Consumption</div>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">LLM Layer 1 Tokens</div>
+                        <div class="bar-container">
+                            <div class="bar-fill llm-layer1-tokens" style="width: 100%;">508.4</div>
+                        </div>
+                        <div class="bar-value">508.4</div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">LLM Layer 2 Tokens</div>
+                        <div class="bar-container">
+                            <div class="bar-fill llm-layer2-tokens" style="width: 86%;">435.7</div>
+                        </div>
+                        <div class="bar-value">435.7</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend" style="display: none;">
+            <div class="legend-item">
+                <div class="legend-color input-rail-time"></div>
+                <span>Input Rail</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color guardrail-time"></div>
+                <span>Guardrail</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color llm-layer1-time"></div>
+                <span>LLM Layer 1</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color llm-layer2-time"></div>
+                <span>LLM Layer 2</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color llm-layer1-tokens"></div>
+                <span>Layer 1 Tokens</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color llm-layer2-tokens"></div>
+                <span>Layer 2 Tokens</span>
+            </div>
+        </div>
+
+        <div class="footnote">
+            <div class="footnote-content">
+                <div class="footnote-section">
+                    <ul>
+                        <li><strong>API-Based Deployment:</strong> All models accessed via cloud APIs without local GPU acceleration or high-performance computing infrastructure</li>
+                        <li><strong>Network-Dependent Performance:</strong> Response times include API latency and may vary based on network conditions and provider load</li>
+                        <li><strong>Native Capability Assessment:</strong> No output restrictions applied to capture NEMO's inherent guardrail effectiveness across different risk scenarios</li>
+                        <li><strong>Multi-Layer Processing:</strong> LLM Layer 1 handles initial input classification, Layer 2 performs output validation and safety filtering</li>
+                        <li><strong>Concurrent Multi-Category Testing:</strong> Simultaneous evaluation across Misinformation, Discrimination, Data Privacy/Security, Prompt Injection, and Jailbreak Attempt categories</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add animation on page load
+        window.addEventListener('load', function() {
+            const bars = document.querySelectorAll('.bar-fill');
+            bars.forEach((bar, index) => {
+                setTimeout(() => {
+                    bar.style.width = bar.style.width;
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

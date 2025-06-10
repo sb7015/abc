@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Safety Components and Datasets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #231E35, #2B1B49);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #F5F5F5;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #5009B5, #794CFF);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: white;
+        }
+
+        .safety-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .safety-table th {
+            background: linear-gradient(135deg, #00CBBA, #24CAFE);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+            border-bottom: 3px solid #EBE4FF;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .safety-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #E1EDFF;
+            vertical-align: top;
+            transition: background-color 0.3s ease;
+        }
+
+        .safety-table tr:hover td {
+            background-color: #EBE4FF;
+        }
+
+        .component-name {
+            font-weight: 700;
+            color: #5009B5;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .dataset-item {
+            background: #B9F9F3;
+            color: #231E35;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 2px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .link-container {
+            margin: 3px 0;
+        }
+
+        .link-item {
+            background: #794CFF;
+            color: white;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 2px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .link-item:hover {
+            background: #5009B5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(80, 9, 181, 0.3);
+        }
+
+        .description-text {
+            color: #231E35;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .safety-table {
+                font-size: 12px;
+            }
+            
+            .safety-table th,
+            .safety-table td {
+                padding: 10px 8px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .component-name {
+                font-size: 14px;
+            }
+        }
+
+        /* Key Resources Section */
+        .resources-section {
+            background: linear-gradient(135deg, #EBE4FF, #E1EDFF);
+            padding: 25px;
+            margin: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #5009B5;
+        }
+
+        .resources-section h2 {
+            color: #5009B5;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .resource-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #00CBBA;
+        }
+
+        .resource-link {
+            color: #5009B5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .resource-link:hover {
+            color: #794CFF;
+        }
+
+        /* Dataset Categories Section */
+        .categories-section {
+            background: #F5F5F5;
+            padding: 25px;
+            margin: 20px;
+            border-radius: 10px;
+        }
+
+        .categories-section h2 {
+            color: #231E35;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .category-group {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #24CAFE;
+        }
+
+        .category-title {
+            color: #5009B5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .category-item {
+            margin: 8px 0;
+            padding: 8px;
+            background: #B9F9F3;
+            border-radius: 4px;
+            color: #231E35;
+        }
+
+        .complexity-badge {
+            background: #794CFF;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ AI Safety Components and Datasets</h1>
+            <p>Comprehensive evaluation frameworks and datasets for AI safety research</p>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="safety-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Component</th>
+                        <th style="width: 25%;">Dataset(s)</th>
+                        <th style="width: 30%;">Links</th>
+                        <th style="width: 25%;">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="component-name">Content Filters</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">HarmBench</span>
+                            <span class="dataset-item">WildGuardTest</span>
+                            <span class="dataset-item">WildGuardMix</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://github.com/centerforaisafety/HarmBench" class="link-item" target="_blank">HarmBench GitHub</a>
+                                <a href="https://huggingface.co/datasets/walledai/HarmBench" class="link-item" target="_blank">HarmBench HuggingFace</a>
+                                <a href="https://allenai.org/blog/the-ai2-safety-toolkit-datasets-and-models-for-safe-and-responsible-llms-development-10abc05f6c80" class="link-item" target="_blank">WildGuard Paper</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Block harmful content (e.g., hate speech) and ensure policy compliance</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Prompt Attacks</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">QuallFire</span>
+                            <span class="dataset-item">AdvBench</span>
+                            <span class="dataset-item">JailbreakBench</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://github.com/llm-attacks/llm-attacks" class="link-item" target="_blank">AdvBench GitHub</a>
+                                <a href="https://huggingface.co/datasets/walledai/AdvBench" class="link-item" target="_blank">AdvBench HuggingFace</a>
+                                <a href="https://jailbreakbench.github.io/" class="link-item" target="_blank">JailbreakBench</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Detect & block jailbreaks (e.g., "ignore instructions")</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Denied Topics</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">XSTest</span>
+                            <span class="dataset-item">SimpleSafetyTests</span>
+                            <span class="dataset-item">Topic denial tests</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2308.01263" class="link-item" target="_blank">XSTest Paper</a>
+                                <a href="https://safetyprompts.com/" class="link-item" target="_blank">SimpleSafetyTests Info</a>
+                                <a href="https://safetyprompts.com/" class="link-item" target="_blank">SafetyPrompts Catalog</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Block sensitive domains (e.g., politics)</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Word Filters</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">Obfuscation tests</span>
+                            <span class="dataset-item">RealToxicityPrompts</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://github.com/allenai/real-toxicity-prompts" class="link-item" target="_blank">RealToxicityPrompts GitHub</a>
+                                <a href="https://huggingface.co/datasets/allenai/real-toxicity-prompts" class="link-item" target="_blank">RealToxicityPrompts HuggingFace</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Remove slurs, profanity, banned terms</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Sensitive Info Filters</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">Gretel PII</span>
+                            <span class="dataset-item">Real-case validation</span>
+                            <span class="dataset-item">Code leak simulations</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://gretel.ai/" class="link-item" target="_blank">Gretel PII Detection</a>
+                                <span class="dataset-item">Internal evaluation sets</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Detect/redact PII or API keys</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Contextual Grounding</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">TruthfulQA</span>
+                            <span class="dataset-item">HaluEval</span>
+                            <span class="dataset-item">Claim & no-answer testing</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://github.com/sylinrl/TruthfulQA" class="link-item" target="_blank">TruthfulQA GitHub</a>
+                                <a href="https://huggingface.co/datasets/truthfulqa/truthful_qa" class="link-item" target="_blank">TruthfulQA HuggingFace</a>
+                                <a href="https://github.com/RUCAIBox/HaluEval" class="link-item" target="_blank">HaluEval GitHub</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Catch hallucinations, ensure factual grounding</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Bias Detection</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">BBQ (Bias Benchmark for QA)</span>
+                            <span class="dataset-item">FairPrism</span>
+                            <span class="dataset-item">Stereotype evaluation</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://github.com/nyu-mll/BBQ" class="link-item" target="_blank">BBQ GitHub</a>
+                                <a href="https://huggingface.co/datasets/walledai/BBQ" class="link-item" target="_blank">BBQ HuggingFace</a>
+                                <a href="https://arxiv.org/abs/2307.09104" class="link-item" target="_blank">FairPrism Paper</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Detect and mitigate social biases across demographics</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Toxicity Classification</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">ToxiGen</span>
+                            <span class="dataset-item">ToxicChat</span>
+                            <span class="dataset-item">Perspective API benchmarks</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2203.09509" class="link-item" target="_blank">ToxiGen Paper</a>
+                                <a href="https://arxiv.org/abs/2310.17389" class="link-item" target="_blank">ToxicChat Paper</a>
+                                <a href="https://perspectiveapi.com/" class="link-item" target="_blank">Perspective API</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Classify toxic language and hate speech</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Red Teaming Detection</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">AnthropicRedTeam</span>
+                            <span class="dataset-item">WildTeaming</span>
+                            <span class="dataset-item">AART</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2209.07858" class="link-item" target="_blank">Anthropic Red Team Paper</a>
+                                <a href="https://allenai.org/blog/the-ai2-safety-toolkit-datasets-and-models-for-safe-and-responsible-llms-development-10abc05f6c80" class="link-item" target="_blank">WildTeaming Info</a>
+                                <a href="https://arxiv.org/abs/2311.08915" class="link-item" target="_blank">AART Paper</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Detect adversarial prompting attempts</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Refusal Behavior</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">DoNotAnswer</span>
+                            <span class="dataset-item">XSTest</span>
+                            <span class="dataset-item">ORBench</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2308.11462" class="link-item" target="_blank">DoNotAnswer Paper</a>
+                                <a href="https://arxiv.org/abs/2405.20947" class="link-item" target="_blank">ORBench Paper</a>
+                                <a href="https://safetyprompts.com/" class="link-item" target="_blank">XSTest Info</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Evaluate appropriate refusal vs over-refusal</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Privacy Protection</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">DecodingTrust</span>
+                            <span class="dataset-item">ConfAIde</span>
+                            <span class="dataset-item">PII detection sets</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://github.com/AI-secure/DecodingTrust" class="link-item" target="_blank">DecodingTrust GitHub</a>
+                                <a href="https://arxiv.org/abs/2306.11698" class="link-item" target="_blank">DecodingTrust Paper</a>
+                                <a href="https://arxiv.org/abs/2310.17218" class="link-item" target="_blank">ConfAIde Paper</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Protect personal information and privacy</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Multimodal Safety</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">MM-SafetyBench</span>
+                            <span class="dataset-item">HarmBench-Multimodal</span>
+                            <span class="dataset-item">SPA-VL</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2311.17600" class="link-item" target="_blank">MM-SafetyBench Paper</a>
+                                <a href="https://github.com/centerforaisafety/HarmBench" class="link-item" target="_blank">HarmBench Multimodal</a>
+                                <a href="https://sqrtizhang.github.io/SPA-VL/" class="link-item" target="_blank">SPA-VL Dataset</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Safety evaluation for vision-language models</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Misinformation Detection</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">SAFE dataset</span>
+                            <span class="dataset-item">MedSafetyBench</span>
+                            <span class="dataset-item">Scientific claim validation</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2404.11794" class="link-item" target="_blank">SAFE Paper</a>
+                                <a href="https://safetyprompts.com/" class="link-item" target="_blank">MedSafetyBench Info</a>
+                                <span class="dataset-item">Research evaluation sets</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Detect false or misleading information</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Alignment Evaluation</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">JudgeBench</span>
+                            <span class="dataset-item">RewardBench</span>
+                            <span class="dataset-item">LLMBar</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://arxiv.org/abs/2406.14863" class="link-item" target="_blank">JudgeBench Paper</a>
+                                <a href="https://arxiv.org/abs/2403.13787" class="link-item" target="_blank">RewardBench Paper</a>
+                                <a href="https://arxiv.org/abs/2312.11682" class="link-item" target="_blank">LLMBar Paper</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Evaluate alignment with human values</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="component-name">Safety Training Data</div>
+                        </td>
+                        <td>
+                            <span class="dataset-item">WildJailbreak</span>
+                            <span class="dataset-item">BeaverTails</span>
+                            <span class="dataset-item">Anthropic HH</span>
+                        </td>
+                        <td>
+                            <div class="link-container">
+                                <a href="https://allenai.org/blog/the-ai2-safety-toolkit-datasets-and-models-for-safe-and-responsible-llms-development-10abc05f6c80" class="link-item" target="_blank">WildJailbreak Info</a>
+                                <a href="https://arxiv.org/abs/2307.04657" class="link-item" target="_blank">BeaverTails Paper</a>
+                                <a href="https://arxiv.org/abs/2204.05862" class="link-item" target="_blank">Anthropic HH Paper</a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="description-text">Training datasets for safer AI systems</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="resources-section">
+            <h2>🔗 Key Resources</h2>
+            <div class="resource-item">
+                <a href="https://safetyprompts.com/" class="resource-link" target="_blank">SafetyPrompts.com</a> - Comprehensive catalog of 100+ safety evaluation datasets
+            </div>
+            <div class="resource-item">
+                <a href="https://arxiv.org/html/2502.16776" class="resource-link" target="_blank">AI Safety Lab Framework</a> - Integrated evaluation toolkit
+            </div>
+            <div class="resource-item">
+                <a href="https://crfm.stanford.edu/helm/" class="resource-link" target="_blank">HELM Safety</a> - Standardized safety evaluation framework
+            </div>
+            <div class="resource-item">
+                <a href="https://arxiv.org/abs/2408.03837" class="resource-link" target="_blank">WalledEval</a> - Comprehensive safety evaluation toolkit
+            </div>
+        </div>
+
+        <div class="categories-section">
+            <h2>📊 Dataset Categories</h2>
+            
+            <div class="category-group">
+                <div class="category-title">Core Safety Evaluation</div>
+                <div class="category-item">
+                    <strong>HarmBench</strong>: 400 harmful behaviors across 7 categories <span class="complexity-badge">80% complexity</span>
+                </div>
+                <div class="category-item">
+                    <strong>AdvBench</strong>: 500 adversarial prompts for jailbreak detection <span class="complexity-badge">90% complexity</span>
+                </div>
+                <div class="category-item">
+                    <strong>TruthfulQA</strong>: 817 questions testing truthfulness <span class="complexity-badge">60% complexity</span>
+                </div>
+            </div>
+
+            <div class="category-group">
+                <div class="category-title">Specialized Domains</div>
+                <div class="category-item">
+                    <strong>BBQ</strong>: Bias evaluation across 9 social dimensions <span class="complexity-badge">50% complexity</span>
+                </div>
+                <div class="category-item">
+                    <strong>RealToxicityPrompts</strong>: 100K naturally occurring toxic prompts <span class="complexity-badge">40% complexity</span>
+                </div>
+                <div class="category-item">
+                    <strong>DecodingTrust</strong>: 8 trustworthiness perspectives <span class="complexity-badge">70% complexity</span>
+                </div>
+            </div>
+
+            <div class="category-group">
+                <div class="category-title">Training & Fine-tuning</div>
+                <div class="category-item">
+                    <strong>WildGuardMix</strong>: 92K multi-task safety examples
+                </div>
+                <div class="category-item">
+                    <strong>WildJailbreak</strong>: 262K safety training examples
+                </div>
+                <div class="category-item">
+                    <strong>BeaverTails</strong>: Human preference dataset for safety alignment
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
