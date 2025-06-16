@@ -1,0 +1,157 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2025-01-15",
+    "description": "Enhanced risk scoring configuration and weights"
+  },
+  "risk_weights": {
+    "category_weights": {
+      "evasion_techniques": 0.25,
+      "financial_attacks": 0.20,
+      "insurance_attacks": 0.20,
+      "pii_extraction": 0.25,
+      "semantic_threats": 0.05,
+      "pattern_matching": 0.05
+    },
+    "severity_multipliers": {
+      "critical": 1.0,
+      "high": 0.8,
+      "medium": 0.6,
+      "low": 0.4,
+      "minimal": 0.2
+    }
+  },
+  "risk_thresholds": {
+    "threat_levels": {
+      "critical": {
+        "min_score": 0.8,
+        "max_score": 1.0,
+        "action": "BLOCK",
+        "description": "Critical threat requiring immediate blocking"
+      },
+      "high": {
+        "min_score": 0.6,
+        "max_score": 0.79,
+        "action": "REVIEW",
+        "description": "High risk requiring human review"
+      },
+      "medium": {
+        "min_score": 0.4,
+        "max_score": 0.59,
+        "action": "MONITOR",
+        "description": "Medium risk requiring monitoring"
+      },
+      "low": {
+        "min_score": 0.2,
+        "max_score": 0.39,
+        "action": "LOG",
+        "description": "Low risk requiring logging"
+      },
+      "minimal": {
+        "min_score": 0.0,
+        "max_score": 0.19,
+        "action": "ALLOW",
+        "description": "Minimal risk allowing normal processing"
+      }
+    }
+  },
+  "scoring_algorithms": {
+    "weighted_average": {
+      "enabled": true,
+      "description": "Weighted average of all risk factors",
+      "formula": "sum(category_score * category_weight) / sum(weights)"
+    },
+    "maximum_risk": {
+      "enabled": false,
+      "description": "Maximum risk score across all categories",
+      "formula": "max(all_category_scores)"
+    },
+    "composite_score": {
+      "enabled": true,
+      "description": "Composite scoring with confidence weighting",
+      "formula": "weighted_average * confidence_factor"
+    }
+  },
+  "confidence_scoring": {
+    "factors": {
+      "pattern_specificity": {
+        "weight": 0.3,
+        "description": "How specific the matched pattern is"
+      },
+      "context_relevance": {
+        "weight": 0.25,
+        "description": "Relevance to the overall context"
+      },
+      "multiple_indicators": {
+        "weight": 0.25,
+        "description": "Presence of multiple risk indicators"
+      },
+      "historical_accuracy": {
+        "weight": 0.2,
+        "description": "Historical accuracy of similar patterns"
+      }
+    },
+    "confidence_thresholds": {
+      "high_confidence": 0.7,
+      "medium_confidence": 0.5,
+      "low_confidence": 0.3
+    }
+  },
+  "business_impact_mapping": {
+    "financial_impact": {
+      "critical": {
+        "description": "Potential financial loss > $100,000",
+        "examples": ["Large-scale fraud", "System compromise", "Data breach"]
+      },
+      "high": {
+        "description": "Potential financial loss $10,000 - $100,000",
+        "examples": ["Account compromise", "Payment fraud", "Identity theft"]
+      },
+      "medium": {
+        "description": "Potential financial loss $1,000 - $10,000",
+        "examples": ["Minor fraud attempts", "Policy manipulation"]
+      },
+      "low": {
+        "description": "Potential financial loss < $1,000",
+        "examples": ["Information gathering", "Social engineering attempts"]
+      }
+    },
+    "compliance_impact": {
+      "critical": {
+        "description": "Major regulatory violations",
+        "examples": ["GDPR violations", "HIPAA breaches", "Financial regulations"]
+      },
+      "high": {
+        "description": "Significant compliance issues",
+        "examples": ["PII exposure", "Audit findings", "Policy violations"]
+      },
+      "medium": {
+        "description": "Minor compliance concerns",
+        "examples": ["Process deviations", "Documentation issues"]
+      },
+      "low": {
+        "description": "Minimal compliance impact",
+        "examples": ["Best practice deviations"]
+      }
+    }
+  },
+  "dynamic_adjustments": {
+    "context_modifiers": {
+      "time_based": {
+        "after_hours": 1.2,
+        "business_hours": 1.0,
+        "weekends": 1.1
+      },
+      "frequency_based": {
+        "multiple_attempts": 1.5,
+        "rapid_succession": 1.3,
+        "single_attempt": 1.0
+      },
+      "user_based": {
+        "new_user": 1.2,
+        "trusted_user": 0.8,
+        "flagged_user": 1.5
+      }
+    }
+  }
+}

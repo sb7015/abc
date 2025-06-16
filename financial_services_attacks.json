@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "version": "2.1",
+    "last_updated": "2025-06-16",
+    "description": "Financial services attack pattern detection, updated for euphemistic language"
+  },
+  "account_manipulation": {
+    "unauthorized_access": [
+      {
+        "name": "account_takeover_attempt",
+        "pattern": "(?i)(access|login|get\\s+into|hack|break\\s+into)\\s+.*(someone\\s+else|another\\s+person|other\\s+user).*(account|profile|banking)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Account takeover attempts"
+      },
+      {
+        "name": "credential_theft",
+        "pattern": "(?i)(steal|obtain|get|find)\\s+.*(password|credentials|login|username)\\s+.*(bank|financial|account)",
+        "risk_score": 0.9,
+        "confidence": 0.8,
+        "description": "Financial credential theft"
+      }
+    ],
+    "balance_manipulation": [
+      {
+        "name": "balance_modification",
+        "pattern": "(?i)(change|modify|increase|add|alter)\\s+.*(balance|amount|funds)\\s+.*(account|bank|financial)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Account balance manipulation"
+      },
+      {
+        "name": "transaction_reversal",
+        "pattern": "(?i)(reverse|cancel|undo|delete)\\s+.*(transaction|payment|transfer)\\s+.*(without|unauthorized|fraudulent)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Unauthorized transaction reversal"
+      }
+    ]
+  },
+  "payment_fraud": {
+    "card_fraud": [
+      {
+        "name": "card_number_generation",
+        "pattern": "(?i)(generate|create|make)\\s+.*(credit\\s+card|debit\\s+card|card\\s+number)\\s+.*(valid|working|real)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Credit card number generation"
+      },
+      {
+        "name": "cvv_cracking",
+        "pattern": "(?i)(crack|guess|find|get)\\s+.*(cvv|security\\s+code|cvc)\\s+.*(card|credit|debit)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "CVV security code cracking"
+      }
+    ],
+    "benefit_manipulation": [
+      {
+        "name": "financial_benefit_fraud",
+        "pattern": "(?i)(change|modify|fake|lie\\s+about|stretch\\s+the\\s+truth|creative\\s+accounting)\\s+.*(income|employment|status)\\s+.*(for|to\\s+get|obtain)\\s+.*(benefit|discount|rate|approval|medicaid|eligibility)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Financial benefit manipulation, including euphemistic fraud for Medicaid eligibility"
+      },
+      {
+        "name": "qualification_fraud",
+        "pattern": "(?i)(qualify|eligible|approve)\\s+.*(without|fake|false)\\s+.*(documents|proof|verification|income)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Qualification fraud attempts"
+      }
+    ]
+  },
+  "investment_fraud": {
+    "market_manipulation": [
+      {
+        "name": "pump_dump_scheme",
+        "pattern": "(?i)(pump|artificially\\s+increase|manipulate)\\s+.*(stock|price|value|market)\\s+.*(dump|sell|profit)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Pump and dump schemes"
+      },
+      {
+        "name": "insider_trading",
+        "pattern": "(?i)(insider|confidential|non-public)\\s+.*(information|knowledge|data)\\s+.*(trading|investment|profit)",
+        "risk_score": 0.9,
+        "confidence": 0.8,
+        "description": "Insider trading patterns"
+      }
+    ]
+  }
+}

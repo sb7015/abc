@@ -1,0 +1,153 @@
+{
+  "metadata": {
+    "version": "2.2",
+    "last_updated": "2025-06-15",
+    "description": "Enhanced PII detection and extraction prevention, updated for bulk data, sensitive requests, employee, and executive data"
+  },
+  "direct_pii_requests": {
+    "identification_numbers": [
+      {
+        "name": "ssn_request",
+        "pattern": "(?i)(give|provide|show|tell)\\s+.*(ssn|social\\s+security|social\\s+security\\s+number)\\s+.*(someone|person|individual|customer)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Direct SSN requests"
+      },
+      {
+        "name": "license_request",
+        "pattern": "(?i)(get|obtain|find|show)\\s+.*(driver|license|id\\s+number|identification)\\s+.*(someone|person|customer)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Driver license/ID requests"
+      },
+      {
+        "name": "passport_request",
+        "pattern": "(?i)(access|get|show|provide)\\s+.*(passport|passport\\s+number)\\s+.*(someone|person|customer)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Passport information requests"
+      },
+      {
+        "name": "medicare_id_request",
+        "pattern": "(?i)(give|show|list|provide)\\s+.*(medicare\\s+id|medicare\\s+number)\\s+.*(all|everyone|patient|customer)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Medicare ID requests, including bulk"
+      }
+    ],
+    "financial_pii": [
+      {
+        "name": "account_number_request",
+        "pattern": "(?i)(show|give|provide|access)\\s+.*(account\\s+number|routing\\s+number|bank\\s+account)\\s+.*(someone|customer|person)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Bank account number requests"
+      },
+      {
+        "name": "credit_card_request",
+        "pattern": "(?i)(get|show|provide|give)\\s+.*(credit\\s+card|card\\s+number|cvv)\\s+.*(someone|customer|person)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Credit card information requests"
+      }
+    ]
+  },
+  "indirect_pii_extraction": {
+    "verification_pretense": [
+      {
+        "name": "verification_fraud",
+        "pattern": "(?i)(verify|confirm|check)\\s+.*(identity|account|information)\\s+.*(need|require|must\\s+have)\\s+.*(ssn|social|account|card)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Verification pretense for PII extraction"
+      },
+      {
+        "name": "security_check_fraud",
+        "pattern": "(?i)(security\\s+check|security\\s+question|authentication)\\s+.*(need|require|provide)\\s+.*(personal|private|sensitive)",
+        "risk_score": 0.75,
+        "confidence": 0.7,
+        "description": "Fake security checks"
+      }
+    ],
+    "data_mining": [
+      {
+        "name": "bulk_pii_request",
+        "pattern": "(?i)(list|database|collection|all|share|provide)\\s+.*(customers|users|people|patients|policyholders)\\s+.*(personal|private|contact|identification|ssn|social\\s+security|dob|claim\\s+histories|data\\s+sharing)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Bulk PII extraction attempts, including SSNs, DOBs, claim histories, and data sharing preferences"
+      },
+      {
+        "name": "demographic_fishing",
+        "pattern": "(?i)(what\\s+is|tell\\s+me|show\\s+me)\\s+.*(age|address|phone|email)\\s+.*(this\\s+person|customer|user)",
+        "risk_score": 0.7,
+        "confidence": 0.65,
+        "description": "Demographic information fishing"
+      },
+      {
+        "name": "bulk_data_extraction",
+        "pattern": "(?i)(export|dump|retrieve|extract)\\s+.*(database|records|data)\\s+.*(patient|customer|policyholder|dependent|medicare)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Attempts to extract entire databases or sensitive records"
+      },
+      {
+        "name": "employee_pii_request",
+        "pattern": "(?i)(provide|list|show)\\s+.*(names|emails|contact)\\s+.*(employees|underwriters|staff)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Requests for employee PII, such as underwriters' contact details"
+      },
+      {
+        "name": "executive_pii_request",
+        "pattern": "(?i)(list|share|provide)\\s+.*(donations|political|executive)\\s+.*(data|records)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Requests for executive or political data, such as political donations"
+      }
+    ]
+  },
+  "medical_pii": {
+    "health_information": [
+      {
+        "name": "medical_record_request",
+        "pattern": "(?i)(access|show|get|provide)\\s+.*(medical\\s+record|health\\s+information|patient\\s+data)\\s+.*(someone|patient|person)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Medical record access requests"
+      },
+      {
+        "name": "diagnosis_information",
+        "pattern": "(?i)(what\\s+is|tell\\s+me|show)\\s+.*(diagnosis|condition|illness|disease)\\s+.*(this\\s+patient|person|someone)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Medical diagnosis information requests"
+      },
+      {
+        "name": "bulk_medical_data_request",
+        "pattern": "(?i)(list|export|show|provide)\\s+.*(medical|health|patient|claim)\\s+.*(all|everyone|group|category|minors)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Bulk medical data requests, including claims data for specific groups like minors"
+      }
+    ]
+  },
+  "location_tracking": {
+    "address_requests": [
+      {
+        "name": "home_address_request",
+        "pattern": "(?i)(where\\s+does|what\\s+is|show\\s+me)\\s+.*(address|home|live|residence)\\s+.*(this\\s+person|someone|customer)",
+        "risk_score": 0.75,
+        "confidence": 0.7,
+        "description": "Home address requests"
+      },
+      {
+        "name": "location_tracking",
+        "pattern": "(?i)(track|locate|find)\\s+.*(location|whereabouts|address)\\s+.*(person|someone|individual)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Location tracking requests"
+      }
+    ]
+  }
+}
