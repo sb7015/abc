@@ -1,0 +1,134 @@
+{
+  "metadata": {
+    "version": "2.1",
+    "last_updated": "2025-06-16",
+    "description": "Comprehensive evasion technique detection, updated for context hijacking"
+  },
+  "linguistic_evasion": {
+    "character_level_evasion": [
+      {
+        "name": "homoglyph_substitution",
+        "pattern": "[аеорсхАЕОРСХ]",
+        "risk_score": 0.8,
+        "confidence": 0.7,
+        "description": "Cyrillic character substitution"
+      },
+      {
+        "name": "unicode_confusables",
+        "pattern": "[ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ]",
+        "risk_score": 0.8,
+        "confidence": 0.7,
+        "description": "Unicode fullwidth character evasion"
+      },
+      {
+        "name": "invisible_separators",
+        "pattern": "[\\u200B\\u200C\\u200D\\u2060\\uFEFF]",
+        "risk_score": 0.9,
+        "confidence": 0.8,
+        "description": "Invisible Unicode separators"
+      }
+    ],
+    "word_level_evasion": [
+      {
+        "name": "syllable_separation",
+        "pattern": "(?i)(ig\\s*no\\s*re|by\\s*pa\\s*ss|ov\\s*er\\s*ri\\s*de|ac\\s*ce\\s*ss|ad\\s*mi\\s*n)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Syllable separation evasion"
+      },
+      {
+        "name": "reverse_word_encoding",
+        "pattern": "(?i)(erongi|ssapyb|edirrev|ssecca|nimda)",
+        "risk_score": 0.7,
+        "confidence": 0.6,
+        "description": "Reverse word encoding"
+      }
+    ]
+  },
+  "semantic_evasion": {
+    "context_manipulation": [
+      {
+        "name": "fictional_framing",
+        "pattern": "(?i)(in\\s+a\\s+story|imagine\\s+a\\s+scenario|write\\s+a\\s+fiction|create\\s+a\\s+narrative|in\\s+a\\s+movie)\\s+.*(where|someone|character)\\s+.*(access|obtain|get|steal)",
+        "risk_score": 0.7,
+        "confidence": 0.65,
+        "description": "Fictional context framing"
+      },
+      {
+        "name": "academic_research_pretense",
+        "pattern": "(?i)(for\\s+research|academic\\s+study|scientific\\s+analysis|educational\\s+purposes|thesis\\s+project)\\s+.*(how\\s+would|what\\s+if|is\\s+it\\s+possible)\\s+.*(access|obtain|extract)",
+        "risk_score": 0.75,
+        "confidence": 0.7,
+        "description": "Academic research pretense"
+      },
+      {
+        "name": "context_hijacking",
+        "pattern": "(?i)(let\\s*s\\s+talk\\s+about|instead\\s+of|done\\s+with|switch\\s+to|rather\\s+discuss)\\s+.*(stock|crypto|gambling|hacking|investment|social\\s+media)",
+        "risk_score": 0.6,
+        "confidence": 0.55,
+        "description": "Attempts to shift conversation to unrelated topics like stocks, crypto, or hacking"
+      }
+    ],
+    "indirect_requests": [
+      {
+        "name": "capability_probing",
+        "pattern": "(?i)(can\\s+you|are\\s+you\\s+able\\s+to|is\\s+it\\s+possible\\s+to|would\\s+you\\s+be\\s+able\\s+to)\\s+.*(access|show|provide|give|tell)\\s+.*(if\\s+asked|when\\s+requested|hypothetically)",
+        "risk_score": 0.6,
+        "confidence": 0.55,
+        "description": "Capability probing questions"
+      },
+      {
+        "name": "conditional_requests",
+        "pattern": "(?i)(what\\s+would\\s+happen\\s+if|suppose\\s+someone|imagine\\s+if)\\s+.*(tried\\s+to|wanted\\s+to|asked\\s+for)\\s+.*(access|information|data|credentials)",
+        "risk_score": 0.65,
+        "confidence": 0.6,
+        "description": "Conditional hypothetical requests"
+      }
+    ]
+  },
+  "technical_evasion": {
+    "encoding_obfuscation": [
+      {
+        "name": "base64_instructions",
+        "pattern": "(?i)(decode|base64|encoded)\\s*.*(aWdub3Jl|YnlwYXNz|YWNjZXNz|YWRtaW4=)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Base64 encoded instructions"
+      },
+      {
+        "name": "hex_encoding",
+        "pattern": "(?i)(hex|hexadecimal)\\s*.*(69676e6f7265|627970617373|6163636573|61646d696e)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Hexadecimal encoded instructions"
+      }
+    ],
+    "code_injection": [
+      {
+        "name": "pseudo_code_injection",
+        "pattern": "(?i)(execute|run|eval)\\s+.*(ignore|bypass|override)\\s*.*(previous|all|system)\\s*.*(instructions|commands|rules)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Pseudo-code injection attempts"
+      }
+    ]
+  },
+  "multi_turn_evasion": {
+    "conversation_priming": [
+      {
+        "name": "trust_building_sequence",
+        "pattern": "(?i)(thank\\s+you|appreciate|helpful|understand)\\s+.*(now|next|also|additionally)\\s+.*(can\\s+you|could\\s+you|would\\s+you)",
+        "risk_score": 0.5,
+        "confidence": 0.45,
+        "description": "Trust building before requests"
+      },
+      {
+        "name": "progressive_boundary_testing",
+        "pattern": "(?i)(that\\s+worked|good|excellent|perfect)\\s+.*(what\\s+about|how\\s+about|can\\s+you\\s+also)\\s+.*(more|other|additional|sensitive)",
+        "risk_score": 0.7,
+        "confidence": 0.65,
+        "description": "Progressive boundary testing"
+      }
+    ]
+  }
+}

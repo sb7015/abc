@@ -1,0 +1,171 @@
+{
+  "metadata": {
+    "version": "2.2",
+    "last_updated": "2025-06-16",
+    "description": "Insurance-specific attack pattern detection, updated for euphemistic language, specific crimes, and question formats"
+  },
+  "policy_manipulation": {
+    "demographic_fraud": [
+      {
+        "name": "age_manipulation",
+        "pattern": "(?i)(change|modify|lie\\s+about|fake|stretch\\s+the\\s+truth)\\s+.*(age|birthdate|birth\\s+date)\\s+.*(insurance|policy|premium|rate)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Age manipulation for insurance benefits, including euphemistic fraud"
+      },
+      {
+        "name": "gender_manipulation",
+        "pattern": "(?i)(change|modify|switch|fake)\\s+.*(gender|sex)\\s+.*(insurance|policy|premium|rate|benefit)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Gender manipulation for insurance benefits"
+      },
+      {
+        "name": "location_fraud",
+        "pattern": "(?i)(change|fake|lie\\s+about)\\s+.*(address|location|residence|zip\\s+code)\\s+.*(lower|reduce|cheaper)\\s+.*(premium|rate|cost)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Location fraud for better rates"
+      }
+    ],
+    "coverage_manipulation": [
+      {
+        "name": "retroactive_coverage",
+        "pattern": "(?i)(backdate|retroactive|change\\s+date)\\s+.*(policy|coverage|start\\s+date)\\s+.*(claim|accident|incident)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Retroactive coverage manipulation"
+      },
+      {
+        "name": "coverage_enhancement_fraud",
+        "pattern": "(?i)(increase|add|upgrade)\\s+.*(coverage|benefits|limits)\\s+.*(after|before)\\s+.*(claim|accident|loss)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Coverage enhancement fraud"
+      }
+    ]
+  },
+  "claims_fraud": {
+    "false_claims": [
+      {
+        "name": "staged_accident",
+        "pattern": "(?i)(stage|fake|create|how\\s+to\\s+stage)\\s+.*(accident|incident|crash|injury|break-in)\\s+.*(insurance|claim|payout)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Staged accident or break-in fraud, including question formats"
+      },
+      {
+        "name": "inflated_damages",
+        "pattern": "(?i)(inflate|exaggerate|increase)\\s+.*(damage|cost|repair|medical)\\s+.*(claim|insurance|payout)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Inflated damage claims"
+      },
+      {
+        "name": "phantom_medical_claims",
+        "pattern": "(?i)(fake|false|phantom)\\s+.*(medical|treatment|therapy|procedure)\\s+.*(claim|bill|insurance)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Phantom medical claims"
+      },
+      {
+        "name": "animal_harm_fraud",
+        "pattern": "(?i)(poison|harm|kill)\\s+.*(pet|animal)\\s+.*(claim|insurance|payout)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Fraud involving harm to animals for claims"
+      }
+    ],
+    "documentation_fraud": [
+      {
+        "name": "forged_documents",
+        "pattern": "(?i)(forge|fake|create|doctor|how\\s+to\\s+forge)\\s+.*(document|report|receipt|bill)\\s+.*(insurance|claim|medical|life\\s+insurance)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Forged insurance documents, including life insurance and question formats"
+      },
+      {
+        "name": "doctor_shopping",
+        "pattern": "(?i)(multiple|different|shop\\s+for)\\s+.*(doctors|physicians|medical)\\s+.*(same|similar)\\s+.*(claim|condition|injury)",
+        "risk_score": 0.7,
+        "confidence": 0.65,
+        "description": "Doctor shopping for claims"
+      },
+      {
+        "name": "blackmail_doctor",
+        "pattern": "(?i)(blackmail|extort|threaten)\\s+.*(doctor|physician|medical)\\s+.*(records|diagnosis|claim)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Blackmailing doctors for better medical records"
+      }
+    ],
+    "specific_crimes": [
+      {
+        "name": "bribery_adjuster",
+        "pattern": "(?i)(bribe|pay\\s+off|offer\\s+money)\\s+.*(claims\\s+adjuster|adjuster|inspector)\\s+.*(claim|approval|payout)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Bribery of claims adjusters for favorable outcomes"
+      },
+      {
+        "name": "drug_smuggling_fraud",
+        "pattern": "(?i)(smuggle|traffic|obtain\\s+illegally)\\s+.*(prescription\\s+drugs|medication)\\s+.*(bill|claim|insurance)",
+        "risk_score": 0.95,
+        "confidence": 0.9,
+        "description": "Smuggling prescription drugs and billing insurance"
+      }
+    ]
+  },
+  "underwriting_fraud": {
+    "application_fraud": [
+      {
+        "name": "material_misrepresentation",
+        "pattern": "(?i)(hide|conceal|omit|lie\\s+about|stretch\\s+the\\s+truth)\\s+.*(medical|health|condition|history)\\s+.*(application|underwriting|policy)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Material misrepresentation in applications, including euphemistic fraud"
+      },
+      {
+        "name": "risk_misrepresentation",
+        "pattern": "(?i)(understate|minimize|hide)\\s+.*(risk|exposure|activity|occupation)\\s+.*(premium|rate|approval)",
+        "risk_score": 0.8,
+        "confidence": 0.75,
+        "description": "Risk factor misrepresentation"
+      }
+    ]
+  },
+  "biased_processing": {
+    "claims_bias": [
+      {
+        "name": "biased_claims_processing",
+        "pattern": "(?i)(settle|process|approve|deny|why\\s+.*settle|should\\s+.*process)\\s+.*(faster|slower|only)\\s+.*(wealthy|poor|minority|immigrant|neighborhood)",
+        "risk_score": 0.85,
+        "confidence": 0.8,
+        "description": "Biased prioritization of claims based on socioeconomic status, including question formats"
+      },
+      {
+        "name": "discriminatory_claims_denial",
+        "pattern": "(?i)(deny|reject|why\\s+.*deny|should\\s+.*reject)\\s+.*(claim|application)\\s+.*(addict|hiv|minority|immigrant)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Discriminatory denial of claims or applications, including question formats"
+      }
+    ],
+    "underwriting_bias": [
+      {
+        "name": "biased_premium_adjustment",
+        "pattern": "(?i)(higher|lower|recommend\\s+.*higher|why\\s+.*higher)\\s+.*(premium|rate)\\s+.*(race|gender|religion|minority|disability|single\\s+mother)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Biased premium adjustments based on protected attributes, including specific demographics and question formats"
+      },
+      {
+        "name": "discriminatory_underwriting",
+        "pattern": "(?i)(approve|deny|restrict|why\\s+.*deny|should\\s+.*restrict)\\s+.*(policy|application)\\s+.*(minority|immigrant|disability|hiv)",
+        "risk_score": 0.9,
+        "confidence": 0.85,
+        "description": "Discriminatory underwriting decisions, including question formats"
+      }
+    ]
+  }
+}
