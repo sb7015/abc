@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Source Evaluation Datasets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            color: #231E33;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #5009B5, #794CFF);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .table-container {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th {
+            background-color: #f8f8f8;
+            color: #333;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #ddd;
+        }
+
+        td {
+            padding: 15px 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .dataset-name {
+            font-weight: 600;
+            color: #231E33;
+            margin-bottom: 2px;
+        }
+
+        .description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Open Source Evaluation Datasets</h1>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Dataset</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Toxicity/Content Mod</strong></td>
+                        <td>
+                            <div class="dataset-name">ToxicChat</div>
+                        </td>
+                        <td>
+                            <div class="description">Real-world user-AI interaction toxicity detection</div>
+                        </td>
+                        <td>
+                            <a href="https://huggingface.co/datasets/lmsys/toxic-chat" target="_blank">https://huggingface.co/datasets/lmsys/toxic-chat</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">WildGuardMix</div>
+                        </td>
+                        <td>
+                            <div class="description">Comprehensive safety risks and jailbreaks detection</div>
+                        </td>
+                        <td>
+                            <a href="https://safetyprompts.com/" target="_blank">https://safetyprompts.com/</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">RealToxicityPrompts</div>
+                        </td>
+                        <td>
+                            <div class="description">Neural toxic degeneration evaluation</div>
+                        </td>
+                        <td>
+                            <a href="https://huggingface.co/datasets/allenai/real-toxicity-prompts" target="_blank">https://huggingface.co/datasets/allenai/real-toxicity-prompts</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Prompt Injection / Jailbreak</strong></td>
+                        <td>
+                            <div class="dataset-name">HackAPrompt Dataset</div>
+                        </td>
+                        <td>
+                            <div class="description">Global prompt hacking competition data</div>
+                        </td>
+                        <td>
+                            <a href="https://huggingface.co/datasets/hackaprompt/hackaprompt-dataset" target="_blank">https://huggingface.co/datasets/hackaprompt/hackaprompt-dataset</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">JailbreakBench</div>
+                        </td>
+                        <td>
+                            <div class="description">Open robustness benchmark for jailbreaking</div>
+                        </td>
+                        <td>
+                            <a href="https://safetyprompts.com/" target="_blank">https://safetyprompts.com/</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">WildJailbreak</div>
+                        </td>
+                        <td>
+                            <div class="description">In-the-wild jailbreak patterns</div>
+                        </td>
+                        <td>
+                            <a href="https://safetyprompts.com/" target="_blank">https://safetyprompts.com/</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hallucination Detection</strong></td>
+                        <td>
+                            <div class="dataset-name">TruthfulQA</div>
+                        </td>
+                        <td>
+                            <div class="description">Truthfulness in language models</div>
+                        </td>
+                        <td>
+                            <a href="https://github.com/sylinrl/TruthfulQA" target="_blank">https://github.com/sylinrl/TruthfulQA</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">HaluEval</div>
+                        </td>
+                        <td>
+                            <div class="description">Large-scale hallucination evaluation</div>
+                        </td>
+                        <td>
+                            <a href="https://github.com/RUCAIBox/HaluEval" target="_blank">https://github.com/RUCAIBox/HaluEval</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">FactScore</div>
+                        </td>
+                        <td>
+                            <div class="description">Fine-grained atomic evaluation of factual precision</div>
+                        </td>
+                        <td>
+                            <a href="https://github.com/shmsw25/FActScore" target="_blank">https://github.com/shmsw25/FActScore</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>PII / Sensitive Data</strong></td>
+                        <td>
+                            <div class="dataset-name">PIILO Dataset</div>
+                        </td>
+                        <td>
+                            <div class="description">Student essay PII detection</div>
+                        </td>
+                        <td>
+                            <a href="https://www.kaggle.com/competitions/pii-detection-removal-from-educational-data" target="_blank">https://www.kaggle.com/competitions/pii-detection-removal-from-educational-data</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">Gretel Synthetic PII Finance</div>
+                        </td>
+                        <td>
+                            <div class="description">Multilingual financial document PII</div>
+                        </td>
+                        <td>
+                            <a href="https://huggingface.co/datasets/gretelai/synthetic_pii_finance_multilingual" target="_blank">https://huggingface.co/datasets/gretelai/synthetic_pii_finance_multilingual</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">CRAPII</div>
+                        </td>
+                        <td>
+                            <div class="description">Annotated PII in student writing</div>
+                        </td>
+                        <td>
+                            <a href="https://educationaldatamining.org/edm2024/proceedings/2024.EDM-posters.88/index.html" target="_blank">https://educationaldatamining.org/edm2024/proceedings/2024.EDM-posters.88/index.html</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Denied Topics</strong></td>
+                        <td>
+                            <div class="dataset-name">ETHICS Dataset</div>
+                        </td>
+                        <td>
+                            <div class="description">Moral and ethical reasoning</div>
+                        </td>
+                        <td>
+                            <a href="https://github.com/hendrycks/ethics" target="_blank">https://github.com/hendrycks/ethics</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">Social Bias Frames</div>
+                        </td>
+                        <td>
+                            <div class="description">Biased language detection</div>
+                        </td>
+                        <td>
+                            <a href="https://github.com/maartensap/social-bias-frames" target="_blank">https://github.com/maartensap/social-bias-frames</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="dataset-name">HatEval</div>
+                        </td>
+                        <td>
+                            <div class="description">Multilingual hate speech detection</div>
+                        </td>
+                        <td>
+                            <a href="https://competitions.codalab.org/competitions/19935" target="_blank">https://competitions.codalab.org/competitions/19935</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
