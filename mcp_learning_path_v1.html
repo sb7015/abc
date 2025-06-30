@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Learning Path: Topic-by-Topic Breakdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #2c3e50;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.2em;
+            font-weight: 600;
+            color: #34495e;
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c757d, #495057);
+            border-radius: 2px;
+        }
+        
+        .level {
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+        
+        .level-header {
+            font-size: 1.4em;
+            font-weight: 600;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .level-header:hover {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            transform: translateY(-1px);
+        }
+        
+        .expand-icon {
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .expand-icon.rotated {
+            transform: rotate(45deg);
+        }
+        
+        .level-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding: 0 25px;
+        }
+        
+        .level-content.expanded {
+            max-height: 2000px;
+            padding: 25px;
+            transition: max-height 0.4s ease-in;
+        }
+        
+        .topic {
+            margin-bottom: 18px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fdfdfd;
+        }
+        
+        .topic:last-child {
+            margin-bottom: 0;
+        }
+        
+        .topic-header {
+            font-weight: 500;
+            font-size: 1.05em;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.25s ease;
+            color: #495057;
+        }
+        
+        .topic-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            color: #343a40;
+        }
+        
+        .topic-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: white;
+        }
+        
+        .topic-content.expanded {
+            max-height: 500px;
+            transition: max-height 0.3s ease-in;
+        }
+        
+        .subtopics {
+            margin: 0;
+            padding: 20px 20px 20px 40px;
+        }
+        
+        .subtopics li {
+            margin-bottom: 8px;
+            list-style-type: none;
+            position: relative;
+            font-size: 0.95em;
+            color: #5a6c7d;
+            line-height: 1.5;
+        }
+        
+        .subtopics li::before {
+            content: '•';
+            color: #6c757d;
+            font-size: 1.2em;
+            position: absolute;
+            left: -20px;
+            top: 0;
+        }
+        
+        .subtopics li:hover {
+            color: #495057;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 30px;
+            }
+            
+            .level-header {
+                padding: 16px 20px;
+                font-size: 1.2em;
+            }
+            
+            .level-content.expanded {
+                padding: 20px;
+            }
+            
+            .topic-header {
+                padding: 14px 16px;
+                font-size: 1em;
+            }
+            
+            .subtopics {
+                padding: 16px 16px 16px 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>MCP Learning Path: Topic-by-Topic Breakdown</h1>
+    
+    <div class="level">
+        <div class="level-header" onclick="toggleLevel(this)">
+            <span>Beginner</span>
+            <span class="expand-icon">+</span>
+        </div>
+        <div class="level-content">
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-1: What is MCP and why it exists</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Definition of Model Context Protocol</li>
+                        <li>The "parrot problem" with LLMs</li>
+                        <li>Need for external tool integration</li>
+                        <li>MCP as "USB-C for AI applications"</li>
+                        <li>Standardization benefits</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-2: The n×m problem and how MCP solves it</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Understanding complexity before MCP (n×m connections)</li>
+                        <li>How MCP reduces to n+m complexity</li>
+                        <li>Real-world examples with multiple apps and tools</li>
+                        <li>Benefits for both tool developers and app developers</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-3: Basic architecture (Client-Server-Host)</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>MCP Server (contains tools and capabilities)</li>
+                        <li>MCP Client (applications using tools)</li>
+                        <li>Host (environment where clients run)</li>
+                        <li>Communication flow between components</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-4: Difference between MCP, Agents, and RAG</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Agents: Goal-oriented, complex orchestration</li>
+                        <li>MCP: LLM + Tools with standardized protocol</li>
+                        <li>RAG: For niche, sensitive, and private data</li>
+                        <li>When to use each approach</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-5: Understanding JSON-RPC 2.0</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>JSON-RPC 2.0 Basics</li>
+                        <li>MCP-Specific Messages</li>
+                        <li>Message Flow Examples</li>
+                        <li>Error Handling</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-6: Tool Schema Deep Dive</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>JSON Schema Fundamentals</li>
+                        <li>MCP Tool Schema Structure</li>
+                        <li>Advanced Schema Features</li>
+                        <li>Schema Examples</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-7: Error Handling Basics</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Common MCP Error Types</li>
+                        <li>Error Response Patterns</li>
+                        <li>Client-Side Error Handling</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-8: Protocol Handshake and Initialization</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Initialization Sequence</li>
+                        <li>Capability Negotiation</li>
+                        <li>Connection Lifecycle</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="level">
+        <div class="level-header" onclick="toggleLevel(this)">
+            <span>Intermediate</span>
+            <span class="expand-icon">+</span>
+        </div>
+        <div class="level-content">
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-1: Python Async Programming Basics</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Core Async Concepts</li>
+                        <li>Event Loop Understanding</li>
+                        <li>Async/Await Patterns</li>
+                        <li>Common Async Libraries</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-2: Advanced Server Capabilities - Resources</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Understanding Resources vs Tools</li>
+                        <li>Resource Types</li>
+                        <li>Resource URIs and Templates</li>
+                        <li>Resource vs Tool Decision Matrix</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-3: Advanced Server Capabilities - Prompts</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Server-Provided Prompts</li>
+                        <li>Dynamic Prompt Generation</li>
+                        <li>Prompt Categories</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-4: Multiple Server Management</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Server Registry Pattern</li>
+                        <li>Load Balancing Strategies</li>
+                        <li>Server Discovery</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-5: Transport Methods Deep Dive</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>STDIO Transport</li>
+                        <li>HTTP/HTTPS Transport</li>
+                        <li>WebSocket Transport</li>
+                        <li>Custom Transport Implementation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-6: Configuration Management</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Server Configuration Files</li>
+                        <li>Environment Variables</li>
+                        <li>Runtime Configuration Updates</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-7: Complex Tool Development</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Stateful Tools</li>
+                        <li>Long-running Tools with Progress</li>
+                        <li>Tool Dependencies and Chaining</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="level">
+        <div class="level-header" onclick="toggleLevel(this)">
+            <span>Advanced</span>
+            <span class="expand-icon">+</span>
+        </div>
+        <div class="level-content">
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-1: Security and Authentication</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Authentication Methods</li>
+                        <li>Authorization Patterns</li>
+                        <li>Security Best Practices</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-2: Performance Optimization</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Caching Strategies</li>
+                        <li>Connection Pooling</li>
+                        <li>Async Optimization</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-3: Advanced Integrations</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Database Integration Patterns</li>
+                        <li>External API Wrappers</li>
+                        <li>Cloud Service Integration</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-4: Scalable Architecture Patterns</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Microservices with MCP</li>
+                        <li>Event-Driven Architecture</li>
+                        <li>High Availability Patterns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="level">
+        <div class="level-header" onclick="toggleLevel(this)">
+            <span>Production Ready</span>
+            <span class="expand-icon">+</span>
+        </div>
+        <div class="level-content">
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-1: Deployment and DevOps</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Containerization</li>
+                        <li>Kubernetes Deployment</li>
+                        <li>CI/CD Pipelines</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-2: Monitoring and Observability</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Structured Logging</li>
+                        <li>Metrics and Monitoring</li>
+                        <li>Distributed Tracing</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-3: Enterprise Features</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Multi-tenancy</li>
+                        <li>Compliance and Governance</li>
+                        <li>Billing and Usage Tracking</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic">
+                <div class="topic-header" onclick="toggleTopic(this)">
+                    <span>Topic-4: Testing Strategies</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="topic-content">
+                    <ul class="subtopics">
+                        <li>Unit Testing MCP Components</li>
+                        <li>Integration Testing</li>
+                        <li>Load Testing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleLevel(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '+';
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '-';
+                icon.classList.add('rotated');
+            }
+        }
+        
+        function toggleTopic(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '+';
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '-';
+                icon.classList.add('rotated');
+            }
+        }
+    </script>
+</body>
+</html>
