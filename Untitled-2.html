@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocol Comparison</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        margin: 20px;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
+    thead tr {
+        background-color: #34495e;
+        color: #ffffff;
+        text-align: left;
+    }
+    th, td {
+        padding: 12px 15px;
+        border: 1px solid #dddddd;
+    }
+    th {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+    tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+    tbody tr:last-of-type {
+        border-bottom: 2px solid #34495e;
+    }
+    tbody td:first-child {
+        font-weight: bold;
+        background-color: #ecf0f1;
+        color: #2c3e50;
+        vertical-align: top;
+    }
+    td {
+        vertical-align: top;
+    }
+    ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 5px;
+    }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Protocol Comparison</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>MCP (Anthropic)</th>
+            <th>A2A (Google)</th>
+            <th>AGP (AGNTCY)</th>
+            <th>ACP (Linux Foundation, BeeAI/IBM)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Focus</strong></td>
+            <td>Context management for LLMs - standardizes how AI assistants access tools and data sources</td>
+            <td>Agent-to-agent communication - enables direct collaboration between AI agents across platforms</td>
+            <td>Agent interactions in distributed systems - high-performance gateway for complex multi-agent scenarios</td>
+            <td>Agent interoperability, local-first - enables collaboration between agents with privacy and open governance</td>
+        </tr>
+        <tr>
+            <td><strong>Key Features</strong></td>
+            <td>
+                <ul>
+                    <li>JSON-RPC 2.0 protocol</li>
+                    <li>OAuth 2.1 security (June 2025)</li>
+                    <li>Multi-transport (stdio, HTTP, SSE)</li>
+                    <li>Tools, Resources, Prompts primitives</li>
+                    <li>SDK support (Python, TypeScript, C#, Java, Rust)</li>
+                    <li>300+ open-source servers</li>
+                    <li>Bi-directional communication</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>JSON-RPC 2.0 over HTTPS</li>
+                    <li>Agent Cards discovery</li>
+                    <li>Enterprise auth (OAuth 2.0, JWT, mTLS)</li>
+                    <li>Task management system</li>
+                    <li>Modality-agnostic design</li>
+                    <li>50+ technology partners</li>
+                    <li>Linux Foundation governance</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>gRPC-based with HTTP/2</li>
+                    <li>SLIM protocol implementation</li>
+                    <li>Separated data/control planes</li>
+                    <li>Multiple messaging patterns</li>
+                    <li>mTLS authentication</li>
+                    <li>Quantum-safe cryptography</li>
+                    <li>End-to-end encryption</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>RESTful API design</li>
+                    <li>Capability tokens</li>
+                    <li>Multimodal communication</li>
+                    <li>Registry-based discovery</li>
+                    <li>Dynamic updates</li>
+                    <li>W3C Solid integration</li>
+                    <li>OTLP instrumentation</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Strengths</strong></td>
+            <td>
+                <ul>
+                    <li>Mature ecosystem </li>
+                    <li>Proven production deployments</li>
+                    <li>Extensive community support</li>
+                    <li>Best for tool integration</li>
+                    <li>Rapid development cycle</li>
+                    <li>Strong vendor adoption</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Enterprise-ready security</li>
+                    <li>Comprehensive audit trails</li>
+                    <li>Cross-vendor compatibility</li>
+                    <li>Google Cloud integration</li>
+                    <li>Backed by major vendors</li>
+                    <li>Production-ready (late 2025)</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>High-throughput design</li>
+                    <li>Sub-millisecond latency</li>
+                    <li>Secure by design</li>
+                    <li>Ideal for distributed systems</li>
+                    <li>Advanced networking features</li>
+                    <li>Cisco expertise backing</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Lightweight architecture</li>
+                    <li>Cross-organizational support</li>
+                    <li>Open governance model</li>
+                    <li>Privacy-preserving</li>
+                    <li>Local sovereignty</li>
+                    <li>Academic rigor (IBM Research)</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Weaknesses</strong></td>
+            <td>
+                <ul>
+                    <li>Limited to tool access only</li>
+                    <li>No agent-to-agent communication</li>
+                    <li>Security vulnerabilities (April 2025)</li>
+                    <li>Optional authentication issues</li>
+                    <li>Limited native RBAC</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Still in development</li>
+                    <li>Google ecosystem dependency</li>
+                    <li>Assumes agent catalog exists</li>
+                    <li>Complex for simple use cases</li>
+                    <li>Vendor lock-in concerns</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Complex gateway setup</li>
+                    <li>Limited adoption</li>
+                    <li>Higher resource requirements</li>
+                    <li>Less documentation</li>
+                    <li>Steeper learning curve</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Alpha/Beta stability</li>
+                    <li>Registry dependency</li>
+                    <li>Limited production deployments</li>
+                    <li>May be overkill for simple setups</li>
+                    <li>Requires more development</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Stability</strong></td>
+            <td>
+                <b>High (Production-ready)</b>
+                <ul>
+                    <li>Multiple enterprise deployments</li>
+                    <li>Regular specification updates</li>
+                    <li>Strong backward compatibility</li>
+                    <li>Requires security hardening</li>
+                </ul>
+            </td>
+            <td>
+                <b>Medium-High (Near production)</b>
+                <ul>
+                    <li>Rapid enterprise adoption</li>
+                    <li>Google backing</li>
+                    <li>Linux Foundation transition</li>
+                    <li>Strong partner ecosystem</li>
+                </ul>
+            </td>
+            <td>
+                <b>Medium-High stability</b>
+                <ul>
+                    <li>Open-source project</li>
+                    <li>Active development</li>
+                    <li>Cisco backing</li>
+                    <li>Production validation (JARVIS)</li>
+                </ul>
+            </td>
+            <td>
+                <b>High potential stability</b>
+                <ul>
+                    <li>Linux Foundation governance</li>
+                    <li>IBM Research backing</li>
+                    <li>Open standard development</li>
+                    <li>Community-driven</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Scalability</strong></td>
+            <td>
+                <b>High scalability</b>
+                <ul>
+                    <li>1000+ req/sec locally</li>
+                    <li>500-800 req/sec HTTP</li>
+                    <li>Horizontal scaling</li>
+                    <li>Stateless design</li>
+                    <li>Connection pooling</li>
+                </ul>
+            </td>
+            <td>
+                <b>Very High scalability</b>
+                <ul>
+                    <li>Sub-100ms response times</li>
+                    <li>1000+ concurrent tasks</li>
+                    <li>10,000 concurrent interactions</li>
+                    <li>Stateless architecture</li>
+                    <li>Auto-scaling support</li>
+                </ul>
+            </td>
+            <td>
+                <b>Very High scalability</b>
+                <ul>
+                    <li>Designed for distribution</li>
+                    <li>Linear scaling</li>
+                    <li>Multi-region deployment</li>
+                    <li>Thousands of connections</li>
+                    <li>HTTP/2 multiplexing</li>
+                </ul>
+            </td>
+            <td>
+                <b>High scalability</b>
+                <ul>
+                    <li>Local optimization</li>
+                    <li>Edge computing support</li>
+                    <li>Cross-company workflows</li>
+                    <li>Stateless design</li>
+                    <li>Session persistence</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Integration</strong></td>
+            <td>
+                <b>Easy integration</b>
+                <ul>
+                    <li>Native HTTP/REST</li>
+                    <li>API gateway compatible</li>
+                    <li>Microservices aligned</li>
+                    <li>Standard JSON-RPC</li>
+                    <li>Multiple SDKs</li>
+                </ul>
+            </td>
+            <td>
+                <b>Seamless enterprise integration</b>
+                <ul>
+                    <li>Standard HTTP/HTTPS</li>
+                    <li>API gateway ready</li>
+                    <li>Cross-cloud architecture</li>
+                    <li>Existing web tech</li>
+                    <li>SOA compatible</li>
+                </ul>
+            </td>
+            <td>
+                <b>Complex but powerful</b>
+                <ul>
+                    <li>Service mesh compatible</li>
+                    <li>Heterogeneous frameworks</li>
+                    <li>gRPC ecosystem</li>
+                    <li>Protocol bridging</li>
+                </ul>
+            </td>
+            <td>
+                <b>Easy web integration</b>
+                <ul>
+                    <li>Standard REST/HTTP</li>
+                    <li>OpenAPI compatible</li>
+                    <li>BeeAI Platform native</li>
+                    <li>Framework adapters</li>
+                    <li>ESB alignment</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Infrastructure</strong></td>
+            <td>
+                <b>Minimal requirements</b>
+                <ul>
+                    <li>2 CPU/4GB RAM minimum</li>
+                    <li>Client-server architecture</li>
+                    <li>Cloud-native deployment</li>
+                    <li>Container-friendly</li>
+                    <li>Works with local/remote data</li>
+                </ul>
+            </td>
+            <td>
+                <b>Standard web infrastructure</b>
+                <ul>
+                    <li>HTTP servers</li>
+                    <li>Kubernetes-native</li>
+                    <li>Multi-cloud support</li>
+                    <li>Load balancer compatible</li>
+                    <li>VPC Service Controls</li>
+                </ul>
+            </td>
+            <td>
+                <b>Distributed infrastructure</b>
+                <ul>
+                    <li>Gateway requirements</li>
+                    <li>gRPC servers</li>
+                    <li>Higher CPU/memory needs</li>
+                    <li>Enterprise networking</li>
+                    <li>Multi-cluster support</li>
+                </ul>
+            </td>
+            <td>
+                <b>Flexible infrastructure</b>
+                <ul>
+                    <li>BeeAI Platform (production)</li>
+                    <li>Framework (development)</li>
+                    <li>Standard HTTP servers</li>
+                    <li>Air-gap capable</li>
+                    <li>Container-friendly</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Interoperability</strong></td>
+            <td>Complements A2A for agent communication. Bridges with ACP/AGP. Works alongside other protocols. Focused on tool layer.</td>
+            <td>Works with MCP (tools). Complements ACP (local). Enterprise system bridges. Multi-vendor ecosystems. Universal interoperability.</td>
+            <td>Integrates with A2A, MCP, ACP. Protocol translation. Comprehensive ecosystem. Bridges different systems. Gateway-based interop.</td>
+            <td>Complements A2A (general). Works with MCP (tools). Ideal for local/edge. Cross-organizational. Framework-agnostic.</td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
