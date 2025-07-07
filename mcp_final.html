@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocol Comparison</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        margin: 20px;
+        background: linear-gradient(135deg, #F5F5F5 0%, #EBE4FF 100%);
+        color: #231E33;
+        min-height: 100vh;
+    }
+    h1 {
+        text-align: center;
+        color: #5009B5;
+        text-shadow: 0 2px 4px rgba(80, 9, 181, 0.1);
+        margin-bottom: 30px;
+        font-size: 2.2em;
+        position: relative;
+    }
+    h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #5009B5, #794CFF);
+        border-radius: 2px;
+    }
+    /* Status badges */
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    .production-ready { background-color: #28a745; }
+    .near-production { background-color: #fd7e14; }
+    .production-beta { background-color: #ffc107; color: #333; }
+    .alpha-phase { background-color: #dc3545; }
+    .development { background-color: #6f42c1; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        box-shadow: 0 10px 30px rgba(80, 9, 181, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+    table:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(80, 9, 181, 0.2);
+    }
+    thead tr {
+        background: linear-gradient(135deg, #5009B5 0%, #281849 100%);
+        color: #ffffff;
+        text-align: left;
+        position: relative;
+    }
+    thead tr::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #00BEBA, #00B5F5);
+    }
+    th, td {
+        padding: 15px 18px;
+        border: 1px solid rgba(235, 228, 255, 0.3);
+        transition: all 0.2s ease;
+    }
+    th {
+        font-weight: bold;
+        font-size: 1.1em;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    tbody tr {
+        border-bottom: 1px solid rgba(235, 228, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+    tbody tr:nth-of-type(even) {
+        background-color: rgba(235, 228, 255, 0.1);
+    }
+    tbody tr:hover {
+        background: linear-gradient(90deg, rgba(235, 228, 255, 0.3), rgba(217, 245, 245, 0.2));
+        transform: translateX(5px);
+        box-shadow: 5px 0 15px rgba(80, 9, 181, 0.1);
+    }
+    tbody tr:last-of-type {
+        border-bottom: 3px solid #5009B5;
+    }
+    tbody td:first-child {
+        font-weight: bold;
+        background: linear-gradient(135deg, #EBE4FF 0%, #D9F5F5 100%);
+        color: #281849;
+        vertical-align: top;
+        border-right: 2px solid rgba(80, 9, 181, 0.2);
+        position: relative;
+    }
+    tbody td:first-child::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #5009B5, #00BEBA);
+    }
+    td {
+        vertical-align: top;
+        position: relative;
+    }
+    td:hover {
+        background-color: rgba(225, 237, 255, 0.3);
+    }
+    ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 5px;
+        transition: color 0.2s ease;
+    }
+    li:hover {
+        color: #5009B5;
+    }
+    /* Status row special styling */
+    tbody tr:first-child {
+        background: linear-gradient(90deg, rgba(0, 190, 186, 0.1), rgba(0, 181, 245, 0.1));
+        font-weight: 600;
+    }
+    tbody tr:first-child td {
+        border-bottom: 2px solid rgba(0, 190, 186, 0.3);
+    }
+    /* Subtle animation for the whole table */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    table {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Protocol Comparison</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>MCP (Anthropic)</th>
+            <th>A2A (Google)</th>
+            <th>AGP (AGNTCY)</th>
+            <th>ACP (Linux Foundation, BeeAI/IBM)</th>
+            <th>ANP (Agent Network Protocol)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Status</strong></td>
+            <td><span class="status-badge production-ready">Production Ready</span><br>OAuth 2.1 implemented June 2025</td>
+            <td><span class="status-badge near-production">Near Production</span><br>v1.0 target: End 2025</td>
+            <td><span class="status-badge production-beta">Production Beta</span><br>SLIM rebrand complete</td>
+            <td><span class="status-badge alpha-phase">Alpha Phase</span><br>LF AI & Data Foundation</td>
+            <td><span class="status-badge development">Development</span><br>W3C standardization planned</td>
+        </tr>
+        <tr>
+            <td><strong>Focus</strong></td>
+            <td>Context management for LLMs - standardizes how AI assistants access tools and data sources</td>
+            <td>Agent-to-agent communication - enables direct collaboration between AI agents across platforms</td>
+            <td>Agent interactions in distributed systems - high-performance gateway for complex multi-agent scenarios</td>
+            <td>Agent interoperability, local-first - enables collaboration between agents with privacy and open governance</td>
+            <td>Decentralized agent networks - P2P communication protocol for the "agent internet" with open standards</td>
+        </tr>
+        <tr>
+            <td><strong>Key Features</strong></td>
+            <td>
+                <ul>
+                    <li>JSON-RPC 2.0 protocol</li>
+                    <li>OAuth 2.1 security (June 2025)</li>
+                    <li>Multi-transport (stdio, HTTP, SSE)</li>
+                    <li>Tools, Resources, Prompts primitives</li>
+                    <li>SDK support (Python, TypeScript, C#, Java, Rust)</li>
+                    <li>300+ open-source servers</li>
+                    <li>Bi-directional communication</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>JSON-RPC 2.0 over HTTPS</li>
+                    <li>Agent Cards discovery</li>
+                    <li>Enterprise auth (OAuth 2.0, JWT, mTLS)</li>
+                    <li>Task management system</li>
+                    <li>Modality-agnostic design</li>
+                    <li>50+ technology partners</li>
+                    <li>Linux Foundation governance</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>gRPC-based with HTTP/2</li>
+                    <li>SLIM protocol implementation</li>
+                    <li>Separated data/control planes</li>
+                    <li>Multiple messaging patterns</li>
+                    <li>mTLS authentication</li>
+                    <li>Quantum-safe cryptography</li>
+                    <li>End-to-end encryption</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>RESTful API design</li>
+                    <li>Capability tokens</li>
+                    <li>Multimodal communication</li>
+                    <li>Registry-based discovery</li>
+                    <li>Dynamic updates</li>
+                    <li>W3C Solid integration</li>
+                    <li>OTLP instrumentation</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Three-layer P2P architecture</li>
+                    <li>W3C DID decentralized identity</li>
+                    <li>AI-powered protocol negotiation</li>
+                    <li>ECDHE end-to-end encryption</li>
+                    <li>JSON-LD semantic messaging</li>
+                    <li>0-RTT reconnection caching</li>
+                    <li>Cross-platform agent discovery</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Strengths</strong></td>
+            <td>
+                <ul>
+                    <li>Mature ecosystem </li>
+                    <li>Proven production deployments</li>
+                    <li>Extensive community support</li>
+                    <li>Best for tool integration</li>
+                    <li>Rapid development cycle</li>
+                    <li>Strong vendor adoption</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Enterprise-ready security</li>
+                    <li>Comprehensive audit trails</li>
+                    <li>Cross-vendor compatibility</li>
+                    <li>Google Cloud integration</li>
+                    <li>Backed by major vendors</li>
+                    <li>Production-ready (late 2025)</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>High-throughput design</li>
+                    <li>Sub-millisecond latency</li>
+                    <li>Secure by design</li>
+                    <li>Ideal for distributed systems</li>
+                    <li>Advanced networking features</li>
+                    <li>Cisco expertise backing</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Lightweight architecture</li>
+                    <li>Cross-organizational support</li>
+                    <li>Open governance model</li>
+                    <li>Privacy-preserving</li>
+                    <li>Local sovereignty</li>
+                    <li>Academic rigor (IBM Research)</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>True decentralization</li>
+                    <li>Standards-based (W3C DID)</li>
+                    <li>AI-native design</li>
+                    <li>Cross-platform interoperability</li>
+                    <li>Open-source community</li>
+                    <li>Zero-trust security</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Weaknesses</strong></td>
+            <td>
+                <ul>
+                    <li>Limited to tool access only</li>
+                    <li>No agent-to-agent communication</li>
+                    <li>Security vulnerabilities (April 2025)</li>
+                    <li>Optional authentication issues</li>
+                    <li>Limited native RBAC</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Still in development</li>
+                    <li>Google ecosystem dependency</li>
+                    <li>Assumes agent catalog exists</li>
+                    <li>Complex for simple use cases</li>
+                    <li>Vendor lock-in concerns</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Complex gateway setup</li>
+                    <li>Limited adoption</li>
+                    <li>Higher resource requirements</li>
+                    <li>Less documentation</li>
+                    <li>Steeper learning curve</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Alpha/Beta stability</li>
+                    <li>Registry dependency</li>
+                    <li>Limited production deployments</li>
+                    <li>May be overkill for simple setups</li>
+                    <li>Requires more development</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Early development stage</li>
+                    <li>Limited ecosystem adoption</li>
+                    <li>No production deployments</li>
+                    <li>High technical complexity</li>
+                    <li>Unproven performance claims</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Stability</strong></td>
+            <td>
+                <b>High (Production-ready)</b>
+                <ul>
+                    <li>Multiple enterprise deployments</li>
+                    <li>Regular specification updates</li>
+                    <li>Strong backward compatibility</li>
+                    <li>Requires security hardening</li>
+                </ul>
+            </td>
+            <td>
+                <b>Medium-High (Near production)</b>
+                <ul>
+                    <li>Rapid enterprise adoption</li>
+                    <li>Google backing</li>
+                    <li>Linux Foundation transition</li>
+                    <li>Strong partner ecosystem</li>
+                </ul>
+            </td>
+            <td>
+                <b>Medium-High stability</b>
+                <ul>
+                    <li>Open-source project</li>
+                    <li>Active development</li>
+                    <li>Cisco backing</li>
+                    <li>Production validation (JARVIS)</li>
+                </ul>
+            </td>
+            <td>
+                <b>High potential stability</b>
+                <ul>
+                    <li>Linux Foundation governance</li>
+                    <li>IBM Research backing</li>
+                    <li>Open standard development</li>
+                    <li>Community-driven</li>
+                </ul>
+            </td>
+            <td>
+                <b>Low-Medium (Development phase)</b>
+                <ul>
+                    <li>Core components functional</li>
+                    <li>Open-source community</li>
+                    <li>W3C standardization path</li>
+                    <li>MIT licensing</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Scalability</strong></td>
+            <td>
+                <b>High scalability</b>
+                <ul>
+                    <li>1000+ req/sec locally</li>
+                    <li>500-800 req/sec HTTP</li>
+                    <li>Horizontal scaling</li>
+                    <li>Stateless design</li>
+                    <li>Connection pooling</li>
+                </ul>
+            </td>
+            <td>
+                <b>Very High scalability</b>
+                <ul>
+                    <li>Sub-100ms response times</li>
+                    <li>1000+ concurrent tasks</li>
+                    <li>10,000 concurrent interactions</li>
+                    <li>Stateless architecture</li>
+                    <li>Auto-scaling support</li>
+                </ul>
+            </td>
+            <td>
+                <b>Very High scalability</b>
+                <ul>
+                    <li>Designed for distribution</li>
+                    <li>Linear scaling</li>
+                    <li>Multi-region deployment</li>
+                    <li>Thousands of connections</li>
+                    <li>HTTP/2 multiplexing</li>
+                </ul>
+            </td>
+            <td>
+                <b>High scalability</b>
+                <ul>
+                    <li>Local optimization</li>
+                    <li>Edge computing support</li>
+                    <li>Cross-company workflows</li>
+                    <li>Stateless design</li>
+                    <li>Session persistence</li>
+                </ul>
+            </td>
+            <td>
+                <b>Theoretical very high scalability</b>
+                <ul>
+                    <li>P2P network design</li>
+                    <li>Decentralized architecture</li>
+                    <li>Self-organizing networks</li>
+                    <li>0-RTT caching</li>
+                    <li>Unvalidated performance claims</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Integration</strong></td>
+            <td>
+                <b>Easy integration</b>
+                <ul>
+                    <li>Native HTTP/REST</li>
+                    <li>API gateway compatible</li>
+                    <li>Microservices aligned</li>
+                    <li>Standard JSON-RPC</li>
+                    <li>Multiple SDKs</li>
+                </ul>
+            </td>
+            <td>
+                <b>Seamless enterprise integration</b>
+                <ul>
+                    <li>Standard HTTP/HTTPS</li>
+                    <li>API gateway ready</li>
+                    <li>Cross-cloud architecture</li>
+                    <li>Existing web tech</li>
+                    <li>SOA compatible</li>
+                </ul>
+            </td>
+            <td>
+                <b>Complex but powerful</b>
+                <ul>
+                    <li>Service mesh compatible</li>
+                    <li>Heterogeneous frameworks</li>
+                    <li>gRPC ecosystem</li>
+                    <li>Protocol bridging</li>
+                </ul>
+            </td>
+            <td>
+                <b>Easy web integration</b>
+                <ul>
+                    <li>Standard REST/HTTP</li>
+                    <li>OpenAPI compatible</li>
+                    <li>BeeAI Platform native</li>
+                    <li>Framework adapters</li>
+                    <li>ESB alignment</li>
+                </ul>
+            </td>
+            <td>
+                <b>Web-native but complex</b>
+                <ul>
+                    <li>HTTP/WebSocket transport</li>
+                    <li>OAuth 2.0 compatibility</li>
+                    <li>Standard web servers</li>
+                    <li>Modular adoption path</li>
+                    <li>Steep learning curve</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Infrastructure</strong></td>
+            <td>
+                <b>Minimal requirements</b>
+                <ul>
+                    <li>2 CPU/4GB RAM minimum</li>
+                    <li>Client-server architecture</li>
+                    <li>Cloud-native deployment</li>
+                    <li>Container-friendly</li>
+                    <li>Works with local/remote data</li>
+                </ul>
+            </td>
+            <td>
+                <b>Standard web infrastructure</b>
+                <ul>
+                    <li>HTTP servers</li>
+                    <li>Kubernetes-native</li>
+                    <li>Multi-cloud support</li>
+                    <li>Load balancer compatible</li>
+                    <li>VPC Service Controls</li>
+                </ul>
+            </td>
+            <td>
+                <b>Distributed infrastructure</b>
+                <ul>
+                    <li>Gateway requirements</li>
+                    <li>gRPC servers</li>
+                    <li>Higher CPU/memory needs</li>
+                    <li>Enterprise networking</li>
+                    <li>Multi-cluster support</li>
+                </ul>
+            </td>
+            <td>
+                <b>Flexible infrastructure</b>
+                <ul>
+                    <li>BeeAI Platform (production)</li>
+                    <li>Framework (development)</li>
+                    <li>Standard HTTP servers</li>
+                    <li>Air-gap capable</li>
+                    <li>Container-friendly</li>
+                </ul>
+            </td>
+            <td>
+                <b>Standard web infrastructure</b>
+                <ul>
+                    <li>Standard HTTP/WebSocket servers</li>
+                    <li>DID document hosting</li>
+                    <li>Agent registry services</li>
+                    <li>Python runtime (current)</li>
+                    <li>Planned Rust core</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Interoperability</strong></td>
+            <td>Complements A2A for agent communication. Bridges with ACP/AGP. Works alongside other protocols. Focused on tool layer.</td>
+            <td>Works with MCP (tools). Complements ACP (local). Enterprise system bridges. Multi-vendor ecosystems. Universal interoperability.</td>
+            <td>Integrates with A2A, MCP, ACP. Protocol translation. Comprehensive ecosystem. Bridges different systems. Gateway-based interop.</td>
+            <td>Complements A2A (general). Works with MCP (tools). Ideal for local/edge. Cross-organizational. Framework-agnostic.</td>
+            <td>Semantic bridging with JSON-LD. Compatible with all protocols via meta-protocol negotiation. Cross-platform agent discovery. Open internet focus.</td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

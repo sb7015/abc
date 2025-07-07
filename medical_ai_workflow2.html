@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Workflow Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #e74c3c);
+            border-radius: 4px;
+            transition: width 0.8s ease;
+            width: 12.5%;
+        }
+
+        .workflow-container {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease;
+        }
+
+        .workflow-step.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .workflow-step:nth-child(even) {
+            flex-direction: row-reverse;
+            transform: translateX(50px);
+        }
+
+        .workflow-step:nth-child(even).active {
+            transform: translateX(0);
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+
+        .workflow-step.active .step-number {
+            animation: pulse 2s infinite;
+        }
+
+        .workflow-step.active .step-content {
+            animation: contentGlow 3s ease-in-out infinite;
+        }
+
+        .workflow-step.active .step-icon {
+            animation: iconSpin 4s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+            100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        }
+
+        @keyframes contentGlow {
+            0% { box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+            50% { box-shadow: 0 20px 45px rgba(52, 152, 219, 0.2); }
+            100% { box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        }
+
+        @keyframes iconSpin {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step-content {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .step-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .step-description {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .step-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .connection-line {
+            position: absolute;
+            left: 50%;
+            top: 100px;
+            bottom: 100px;
+            width: 4px;
+            background: linear-gradient(to bottom, #3498db, #e74c3c);
+            transform: translateX(-50%);
+            z-index: -1;
+            animation: dataFlow 3s linear infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { 
+                background: linear-gradient(to bottom, #3498db 0%, #3498db 20%, transparent 20%, transparent 100%);
+            }
+            25% {
+                background: linear-gradient(to bottom, transparent 0%, transparent 20%, #3498db 20%, #3498db 40%, transparent 40%, transparent 100%);
+            }
+            50% {
+                background: linear-gradient(to bottom, transparent 0%, transparent 40%, #3498db 40%, #3498db 60%, transparent 60%, transparent 100%);
+            }
+            75% {
+                background: linear-gradient(to bottom, transparent 0%, transparent 60%, #3498db 60%, #3498db 80%, transparent 80%, transparent 100%);
+            }
+            100% {
+                background: linear-gradient(to bottom, transparent 0%, transparent 80%, #e74c3c 80%, #e74c3c 100%);
+            }
+        }
+
+        @keyframes stepActivate {
+            0% { transform: translateX(-50px) scale(0.95); opacity: 0; }
+            60% { transform: translateX(5px) scale(1.02); opacity: 0.8; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Step-specific colors */
+        .step-1 .step-number { background: linear-gradient(45deg, #ff6b6b, #ee5a24); }
+        .step-2 .step-number { background: linear-gradient(45deg, #4ecdc4, #26d0ce); }
+        .step-3 .step-number { background: linear-gradient(45deg, #45b7d1, #2980b9); }
+        .step-4 .step-number { background: linear-gradient(45deg, #f39c12, #e67e22); }
+        .step-5 .step-number { background: linear-gradient(45deg, #9b59b6, #8e44ad); }
+        .step-6 .step-number { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+        .step-7 .step-number { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .step-8 .step-number { background: linear-gradient(45deg, #34495e, #2c3e50); }
+
+        .step-1 .step-icon { background: #ff6b6b; }
+        .step-2 .step-icon { background: #4ecdc4; }
+        .step-3 .step-icon { background: #45b7d1; }
+        .step-4 .step-icon { background: #f39c12; }
+        .step-5 .step-icon { background: #9b59b6; }
+        .step-6 .step-icon { background: #27ae60; }
+        .step-7 .step-icon { background: #e74c3c; }
+        .step-8 .step-icon { background: #34495e; }
+
+        @media (max-width: 768px) {
+            .workflow-step {
+                flex-direction: column !important;
+                text-align: center;
+            }
+            
+            .workflow-step:nth-child(even) {
+                flex-direction: column !important;
+            }
+            
+            .step-number {
+                margin: 0 0 20px 0;
+            }
+            
+            .connection-line {
+                display: none;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .btn {
+                margin: 5px;
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Medical AI Workflow Journey</h1>
+            <p>From Patient Query to Secure Healthcare Delivery</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="workflow-container">
+            <div class="connection-line"></div>
+
+            <div class="workflow-step step-1 active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">🗣️</div>
+                        Patient Query
+                    </div>
+                    <div class="step-description">
+                        A patient initiates the healthcare journey by submitting their medical query through a secure interface.
+                    </div>
+                    <div class="step-details">
+                        <strong>Process:</strong> Patient enters symptoms, medical history, or health concerns through encrypted channels. Natural language processing captures the intent and context of the query.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-2" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">🧠</div>
+                        AI Analysis
+                    </div>
+                    <div class="step-description">
+                        Advanced AI algorithms analyze the patient's query using machine learning models trained on medical literature.
+                    </div>
+                    <div class="step-details">
+                        <strong>Technology:</strong> Natural Language Processing, symptom analysis, risk assessment algorithms, and differential diagnosis models work together to interpret the medical query.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-3" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">🤖</div>
+                        Model Context Protocol (MCP)
+                    </div>
+                    <div class="step-description">
+                        The Model Context Protocol enables standardized communication between AI models and external resources, managing context and tool access.
+                    </div>
+                    <div class="step-details">
+                        <strong>Functionality:</strong> Establishes secure connections to medical databases, manages AI model context sharing, handles tool integration for diagnostics, and maintains session state across multiple AI interactions.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-4" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">🗃️</div>
+                        Multi-Database Cross-Reference
+                    </div>
+                    <div class="step-description">
+                        The system queries multiple medical databases to gather comprehensive information and validate findings.
+                    </div>
+                    <div class="step-details">
+                        <strong>Resources:</strong> PubMed, drug interaction databases, clinical guidelines, patient history, lab results, and imaging data are cross-referenced for accuracy.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-5" data-step="5">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">⚡</div>
+                        Response Generation
+                    </div>
+                    <div class="step-description">
+                        AI synthesizes all gathered information to generate personalized, evidence-based medical responses.
+                    </div>
+                    <div class="step-details">
+                        <strong>Output:</strong> Personalized recommendations, treatment options, risk assessments, and next steps are generated based on the patient's specific context and medical evidence.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-6" data-step="6">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">🔒</div>
+                        HIPAA Compliance
+                    </div>
+                    <div class="step-description">
+                        All data processing and response delivery must meet strict HIPAA privacy and security requirements.
+                    </div>
+                    <div class="step-details">
+                        <strong>Security:</strong> End-to-end encryption, access controls, audit trails, data minimization, and patient consent management ensure full HIPAA compliance.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-7" data-step="7">
+                <div class="step-number">7</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">📤</div>
+                        Delivery
+                    </div>
+                    <div class="step-description">
+                        The secure, personalized medical response is delivered to the patient through their preferred channel.
+                    </div>
+                    <div class="step-details">
+                        <strong>Channels:</strong> Patient portal, secure messaging, mobile app, or healthcare provider interface delivers the response with appropriate formatting and urgency flags.
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-step step-8" data-step="8">
+                <div class="step-number">8</div>
+                <div class="step-content">
+                    <div class="step-title">
+                        <div class="step-icon">📋</div>
+                        Documentation
+                    </div>
+                    <div class="step-description">
+                        All interactions are properly documented for continuity of care and regulatory compliance.
+                    </div>
+                    <div class="step-details">
+                        <strong>Records:</strong> Patient interaction logs, AI decision pathways, clinical recommendations, and outcome tracking are maintained in secure, searchable formats.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="startBtn" onclick="startAnimation()">Start Journey</button>
+            <button class="btn" id="resetBtn" onclick="resetAnimation()">Reset</button>
+            <button class="btn" id="nextBtn" onclick="nextStep()">Next Step</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let animationInterval = null;
+        let isAnimating = false;
+
+        function showStep(stepNumber) {
+            const steps = document.querySelectorAll('.workflow-step');
+            
+            // Show steps up to the current step with staggered animation
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    if (index < stepNumber) {
+                        step.classList.add('active');
+                        // Add a subtle shake effect when step becomes active
+                        step.style.animation = 'stepActivate 0.6s ease-out';
+                        setTimeout(() => {
+                            step.style.animation = '';
+                        }, 600);
+                    } else {
+                        step.classList.remove('active');
+                    }
+                }, index * 100); // Stagger the animations
+            });
+            
+            updateProgressBar(stepNumber);
+            updateButtons();
+        }
+
+        function updateProgressBar(stepNumber) {
+            const progressFill = document.getElementById('progressFill');
+            const percentage = (stepNumber / 8) * 100;
+            progressFill.style.width = percentage + '%';
+        }
+
+        function updateButtons() {
+            const startBtn = document.getElementById('startBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            startBtn.disabled = isAnimating;
+            nextBtn.disabled = currentStep >= 8 || isAnimating;
+        }
+
+        function startAnimation() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            resetAnimation();
+            
+            let step = 1;
+            animationInterval = setInterval(() => {
+                showStep(step);
+                currentStep = step;
+                step++;
+                
+                if (step > 8) {
+                    clearInterval(animationInterval);
+                    isAnimating = false;
+                    updateButtons();
+                }
+            }, 1200);
+        }
+
+        function resetAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+            }
+            
+            isAnimating = false;
+            currentStep = 1;
+            showStep(1);
+        }
+
+        function nextStep() {
+            if (currentStep < 8 && !isAnimating) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            showStep(1);
+            updateButtons();
+        });
+    </script>
+</body>
+</html>
