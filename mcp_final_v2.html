@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocol Comparison</title>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        margin: 20px;
+        background: linear-gradient(135deg, #F5F5F5 0%, #EBE4FF 100%);
+        color: #231E33;
+        min-height: 100vh;
+    }
+    h1 {
+        text-align: center;
+        color: #5009B5;
+        text-shadow: 0 2px 4px rgba(80, 9, 181, 0.1);
+        margin-bottom: 30px;
+        font-size: 2.2em;
+        position: relative;
+    }
+    h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #5009B5, #794CFF);
+        border-radius: 2px;
+    }
+    h2 {
+        color: #5009B5;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+    /* Status badges */
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    .production-ready { background-color: #28a745; }
+    .near-production { background-color: #fd7e14; }
+    .production-beta { background-color: #ffc107; color: #333; }
+    .alpha-phase { background-color: #dc3545; }
+    .development { background-color: #6f42c1; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        box-shadow: 0 10px 30px rgba(80, 9, 181, 0.15);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+    table:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(80, 9, 181, 0.2);
+    }
+    thead tr {
+        background: linear-gradient(135deg, #5009B5 0%, #281849 100%);
+        color: #ffffff;
+        text-align: left;
+        position: relative;
+    }
+    thead tr::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #00BEBA, #00B5F5);
+    }
+    th, td {
+        padding: 15px 18px;
+        border: 1px solid rgba(235, 228, 255, 0.3);
+        transition: all 0.2s ease;
+    }
+    th {
+        font-weight: bold;
+        font-size: 1.1em;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    tbody tr {
+        border-bottom: 1px solid rgba(235, 228, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+    tbody tr:nth-of-type(even) {
+        background-color: rgba(235, 228, 255, 0.1);
+    }
+    tbody tr:hover {
+        background: linear-gradient(90deg, rgba(235, 228, 255, 0.3), rgba(217, 245, 245, 0.2));
+        transform: translateX(5px);
+        box-shadow: 5px 0 15px rgba(80, 9, 181, 0.1);
+    }
+    tbody tr:last-of-type {
+        border-bottom: 3px solid #5009B5;
+    }
+    tbody td:first-child {
+        font-weight: bold;
+        background: linear-gradient(135deg, #EBE4FF 0%, #D9F5F5 100%);
+        color: #281849;
+        vertical-align: top;
+        border-right: 2px solid rgba(80, 9, 181, 0.2);
+        position: relative;
+    }
+    tbody td:first-child::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #5009B5, #00BEBA);
+    }
+    td {
+        vertical-align: top;
+        position: relative;
+    }
+    td:hover {
+        background-color: rgba(225, 237, 255, 0.3);
+    }
+    ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 5px;
+        transition: color 0.2s ease;
+    }
+    li:hover {
+        color: #5009B5;
+    }
+    /* Status row special styling */
+    tbody tr:first-child {
+        background: linear-gradient(90deg, rgba(0, 190, 186, 0.1), rgba(0, 181, 245, 0.1));
+        font-weight: 600;
+    }
+    tbody tr:first-child td {
+        border-bottom: 2px solid rgba(0, 190, 186, 0.3);
+    }
+    /* Summary section styling */
+    .summary-section {
+        background: linear-gradient(135deg, #F5F5F5 0%, #EBE4FF 100%);
+        border-radius: 12px;
+        padding: 25px;
+        margin: 30px 0;
+        box-shadow: 0 10px 30px rgba(80, 9, 181, 0.15);
+    }
+    .summary-section h2 {
+        margin-top: 0;
+    }
+    .winner-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #5009B5 0%, #794CFF 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.9em;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    .summary-item {
+        margin: 15px 0;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        border-left: 4px solid #5009B5;
+    }
+    /* Subtle animation for the whole table */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    table {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Protocol Comparison</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>MCP (Anthropic)</th>
+            <th>A2A (Google)</th>
+            <th>AGP (AGNTCY)</th>
+            <th>ACP (Linux Foundation, BeeAI/IBM)</th>
+            <th>ANP (Agent Network Protocol)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Status</strong></td>
+            <td><span class="status-badge production-ready">Production Ready</span><br>OAuth 2.1 implemented June 2025</td>
+            <td><span class="status-badge near-production">Near Production</span><br>v1.0 target: End 2025</td>
+            <td><span class="status-badge production-beta">Production Beta</span><br>SLIM rebrand complete</td>
+            <td><span class="status-badge alpha-phase">Alpha Phase</span><br>LF AI & Data Foundation</td>
+            <td><span class="status-badge development">Development</span><br>W3C standardization planned</td>
+        </tr>
+        <tr>
+            <td><strong>Focus</strong></td>
+            <td><b>Tool Connection Specialist</b><br>Like giving your AI assistant a keyring to access all your company tools - it connects AI to databases, APIs, and software but doesn't help AI talk to other AI</td>
+            <td><b>AI Communication Standard</b><br>Creates a common language so AI agents from different companies can understand each other - like establishing English as the business language between international partners</td>
+            <td><b>Traffic Control for AI</b><br>Manages complex AI operations like an air traffic controller - decides which AI does what task, prevents conflicts, and ensures smooth operations in busy environments</td>
+            <td><b>Private Collaboration Hub</b><br>Enables AI agents to work together while keeping each company's data private - like lawyers from different firms collaborating while maintaining client confidentiality</td>
+            <td><b>AI Internet Builder</b><br>Building highways for AI agents to freely communicate across the web - creating an open network where any AI can find and talk to any other AI without central control</td>
+        </tr>
+        <tr>
+            <td><strong>Key Features</strong></td>
+            <td>
+                <ul>
+                    <li><b>Universal Format:</b> Uses standard communication that works with any system</li>
+                    <li><b>Security Update:</b> Added enterprise-grade protection in June 2025</li>
+                    <li><b>Flexible Connections:</b> Works over local networks, internet, or direct connections</li>
+                    <li><b>Tool Library:</b> Pre-built connections to common business tools</li>
+                    <li><b>Developer Kits:</b> Ready-made packages for quick implementation</li>
+                    <li><b>Large Ecosystem:</b> 300+ pre-built tool connections available</li>
+                    <li><b>Two-way Talk:</b> Tools can send updates back to AI</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Web-based:</b> Uses secure internet connections everyone understands</li>
+                    <li><b>Agent Directory:</b> Like a phone book for finding AI agents</li>
+                    <li><b>Bank-level Security:</b> Multiple authentication options for enterprises</li>
+                    <li><b>Task Manager:</b> Built-in system for tracking what each AI is doing</li>
+                    <li><b>Any AI Type:</b> Works with text, voice, image, or any future AI</li>
+                    <li><b>Big Tech Support:</b> 50+ major companies collaborating</li>
+                    <li><b>Fair Governance:</b> Community makes decisions, not one company</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Speed Focus:</b> Built for maximum performance and minimal delays</li>
+                    <li><b>Smart Routing:</b> Advanced system for message delivery</li>
+                    <li><b>Dual Channels:</b> Separate lanes for data and control signals</li>
+                    <li><b>Message Options:</b> Different ways to send messages based on needs</li>
+                    <li><b>Certificate Security:</b> Like ID badges for secure access</li>
+                    <li><b>Future Encryption:</b> Protected against future quantum computers</li>
+                    <li><b>Total Privacy:</b> Everything encrypted from start to finish</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Simple Design:</b> Uses standard web technology anyone can implement</li>
+                    <li><b>Permission System:</b> Fine control over who can do what</li>
+                    <li><b>Multi-format:</b> Handles text conversations, voice calls, and images</li>
+                    <li><b>Easy Discovery:</b> Simple way to find and connect agents</li>
+                    <li><b>Live Updates:</b> Changes take effect immediately</li>
+                    <li><b>Privacy First:</b> Built to work with data protection laws</li>
+                    <li><b>Built-in Monitoring:</b> See what's happening in real-time</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Three Layers:</b> Organized structure for different functions</li>
+                    <li><b>Digital IDs:</b> Each agent has a unique, verifiable identity</li>
+                    <li><b>AI Translator:</b> AI helps agents understand each other's capabilities</li>
+                    <li><b>Military Encryption:</b> Highest level security available</li>
+                    <li><b>Smart Messages:</b> Self-describing messages that explain themselves</li>
+                    <li><b>Instant Reconnect:</b> Remembers connections for faster restart</li>
+                    <li><b>Global Discovery:</b> Find any agent anywhere on the network</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Strengths</strong></td>
+            <td>
+                <ul>
+                    <li><b>Battle-tested:</b> Already proven in real business environments</li>
+                    <li><b>Wide Adoption:</b> Many successful companies using it daily</li>
+                    <li><b>Community Help:</b> Large community for support and solutions</li>
+                    <li><b>Tool Expert:</b> Best choice for connecting AI to existing software</li>
+                    <li><b>Fast Updates:</b> Rapid improvements and bug fixes</li>
+                    <li><b>Industry Support:</b> Major tech companies backing it</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Enterprise Ready:</b> Built specifically for large corporations</li>
+                    <li><b>Full Tracking:</b> Complete audit trail of all activities</li>
+                    <li><b>Vendor Neutral:</b> Works across different company systems</li>
+                    <li><b>Google Power:</b> Seamless integration with Google services</li>
+                    <li><b>Industry Backing:</b> Supported by tech giants</li>
+                    <li><b>Nearly Ready:</b> Production release by end of 2025</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Performance King:</b> Handles massive workloads without breaking</li>
+                    <li><b>Lightning Fast:</b> Responses in thousandths of a second</li>
+                    <li><b>Security First:</b> Built with security as top priority</li>
+                    <li><b>Complex Operations:</b> Perfect for sophisticated AI systems</li>
+                    <li><b>Network Expert:</b> Advanced features for distributed systems</li>
+                    <li><b>Cisco Quality:</b> Backed by networking leader</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>User Friendly:</b> Simplest to understand and implement</li>
+                    <li><b>Cross-Company:</b> Designed for inter-organization collaboration</li>
+                    <li><b>Democratic:</b> Community decides direction, not one vendor</li>
+                    <li><b>Privacy Champion:</b> Your data stays under your control</li>
+                    <li><b>Data Sovereignty:</b> You own and control all your information</li>
+                    <li><b>IBM Research:</b> Backed by world-class research team</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>True Freedom:</b> No company controls the network</li>
+                    <li><b>Web Standards:</b> Built on proven internet technologies</li>
+                    <li><b>AI-Native:</b> Designed specifically for AI needs</li>
+                    <li><b>Universal:</b> Works with any platform or system</li>
+                    <li><b>Community Owned:</b> Belongs to everyone, not one company</li>
+                    <li><b>Maximum Security:</b> Zero-trust security model</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Weaknesses</strong></td>
+            <td>
+                <ul>
+                    <li><b>Limited Scope:</b> Only connects to tools, can't help AI agents communicate</li>
+                    <li><b>No AI-to-AI:</b> Doesn't enable collaboration between different AI agents</li>
+                    <li><b>Security Gaps:</b> Had vulnerabilities that needed fixing in April 2025</li>
+                    <li><b>Optional Security:</b> Security features weren't mandatory initially</li>
+                    <li><b>Basic Permissions:</b> Limited control over user access levels</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Not Ready Yet:</b> Still being finalized for production use</li>
+                    <li><b>Google Risk:</b> May create dependency on Google ecosystem</li>
+                    <li><b>Directory Required:</b> Assumes agent directory already exists</li>
+                    <li><b>Overkill Risk:</b> Too complex for simple AI interactions</li>
+                    <li><b>Lock-in Concern:</b> Risk of being tied to specific vendors</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Complex Setup:</b> Requires expertise to implement properly</li>
+                    <li><b>Low Adoption:</b> Few companies using it currently</li>
+                    <li><b>Resource Heavy:</b> Needs more servers and computing power</li>
+                    <li><b>Limited Docs:</b> Not much help documentation available</li>
+                    <li><b>Learning Curve:</b> Takes significant time to master</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Early Stage:</b> Still in testing, not production-ready</li>
+                    <li><b>Directory Dependent:</b> Relies on central registry system</li>
+                    <li><b>Few Users:</b> Limited real-world implementations</li>
+                    <li><b>Possible Overkill:</b> May be too much for basic needs</li>
+                    <li><b>Still Developing:</b> Needs more work before ready</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li><b>Very Early:</b> Still in initial development phase</li>
+                    <li><b>No Adoption:</b> Very few companies trying it</li>
+                    <li><b>Unproven:</b> No production deployments to learn from</li>
+                    <li><b>Very Technical:</b> Requires deep technical knowledge</li>
+                    <li><b>Unverified Claims:</b> Performance promises not yet proven</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Stability</strong></td>
+            <td><b>Rock Solid:</b> Like a mature product that's been refined through real use - reliable for daily operations but needs security attention</td>
+            <td><b>Almost There:</b> Like a product in final testing - stable enough for pilots but waiting for official release</td>
+            <td><b>Production Beta:</b> Like software that works well but is still adding features - stable for those willing to work with updates</td>
+            <td><b>Foundation Solid:</b> Like a building with good foundation but still under construction - the core is strong but needs finishing</td>
+            <td><b>Early Prototype:</b> Like a concept car - exciting ideas but not ready for the road</td>
+        </tr>
+        <tr>
+            <td><strong>Scalability</strong></td>
+            <td><b>Grows Well:</b> Like a restaurant that can add more tables - handles 1000+ orders per second locally, 500-800 over internet</td>
+            <td><b>Enterprise Scale:</b> Like a call center ready for millions - handles 10,000 simultaneous conversations with instant responses</td>
+            <td><b>Massive Scale:</b> Like an airport built for growth - designed to handle global operations with thousands of connections</td>
+            <td><b>Smart Growth:</b> Like a franchise model - starts local but scales across companies while keeping each location independent</td>
+            <td><b>Infinite Potential:</b> Like the internet itself - theoretically unlimited but not yet proven in practice</td>
+        </tr>
+        <tr>
+            <td><strong>Integration</strong></td>
+            <td><b>Plug and Play:</b> Like adding a printer to your computer - uses standard connections that IT teams already understand</td>
+            <td><b>Enterprise Ready:</b> Like software designed for corporate IT - fits perfectly into existing business systems</td>
+            <td><b>Expert Level:</b> Like installing industrial equipment - powerful but requires specialized knowledge</td>
+            <td><b>Standard Web:</b> Like adding a website to your network - uses familiar web technology anyone can work with</td>
+            <td><b>Web-based Complex:</b> Like building a sophisticated web app - uses standard tech but needs expertise</td>
+        </tr>
+        <tr>
+            <td><strong>Infrastructure</strong></td>
+            <td><b>Lightweight:</b> Like running a small app - needs just basic server (2 CPU/4GB RAM) and works anywhere</td>
+            <td><b>Corporate Standard:</b> Like typical business software - runs on standard web servers with normal requirements</td>
+            <td><b>Heavy Duty:</b> Like industrial machinery - needs powerful servers and specialized networking equipment</td>
+            <td><b>Flexible:</b> Like modular furniture - can run on simple servers or scale up, works even without internet</td>
+            <td><b>Standard Web:</b> Like a regular website - runs on normal web servers but needs identity management systems</td>
+        </tr>
+        <tr>
+            <td><strong>Interoperability</strong></td>
+            <td>Works as the tool connection layer while other protocols handle agent communication - like the USB ports on your computer</td>
+            <td>Designed to be the universal translator between all AI agents - works with MCP for tools and other protocols for specific needs</td>
+            <td>Acts as the master coordinator that can translate between all protocols - like a universal adapter for different systems</td>
+            <td>Complements others by adding privacy layer - works alongside other protocols while keeping data secure</td>
+            <td>Aims to connect everything through smart negotiation - like a protocol that speaks all languages</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="summary-section">
+    <h2>Summary: Who's Best at What?</h2>
+    
+    <div class="summary-item">
+        <strong>Best for Tool Integration:</strong> MCP (Anthropic) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Most mature, 300+ pre-built connections, proven in production, easiest to implement
+    </div>
+    
+    <div class="summary-item">
+        <strong>Best for Enterprise Agent Communication:</strong> A2A (Google) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Built for large corporations, comprehensive security, major industry backing
+    </div>
+    
+    <div class="summary-item">
+        <strong>Best for High-Performance Operations:</strong> AGP (AGNTCY) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Fastest response times, handles massive scale, built for complex operations
+    </div>
+    
+    <div class="summary-item">
+        <strong>Best for Privacy & Simplicity:</strong> ACP (Linux Foundation) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Easiest to understand, keeps data private, community-governed, perfect for cross-company collaboration without sharing sensitive data
+    </div>
+    
+    <div class="summary-item">
+        <strong>Best for Future Vision:</strong> ANP (Agent Network Protocol) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Most ambitious decentralized approach, no vendor lock-in, true peer-to-peer
+    </div>
+    
+    <div class="summary-item">
+        <strong>Best Overall for Business Today:</strong> MCP (for tools) + A2A (for agents) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Both are production-ready with strong ecosystems and complement each other perfectly
+    </div>
+    
+    <div class="summary-item">
+        <strong>Best for Privacy-Conscious Organizations:</strong> ACP (Linux Foundation) <span class="winner-badge">WINNER</span><br>
+        <em>Why:</em> Only protocol specifically designed to enable collaboration while guaranteeing data sovereignty and privacy
+    </div>
+</div>
+
+</body>
+</html>
