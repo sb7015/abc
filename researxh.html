@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Safety Filters: Pre-processing and Post-processing Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #5009B5 0%, #281849 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #231E33;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #5009B5, #794CFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            color: #231E33;
+            border-bottom: 3px solid #00B5F5;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #5009B5;
+            margin-top: 30px;
+            padding: 10px 0;
+            border-left: 4px solid #00BEBA;
+            padding-left: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #EBE4FF;
+        }
+        th {
+            background: linear-gradient(45deg, #5009B5, #794CFF);
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #EBE4FF;
+        }
+        tr:hover {
+            background-color: #D9F5F5;
+            transition: background-color 0.3s ease;
+        }
+        .status-blocked {
+            color: #5009B5;
+            font-weight: bold;
+        }
+        .status-allowed {
+            color: #00BEBA;
+            font-weight: bold;
+        }
+        .status-flagged {
+            color: #794CFF;
+            font-weight: bold;
+        }
+        pre {
+            background: #231E33;
+            color: #EBE4FF;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .code-block {
+            background: #F5F5F5;
+            border: 1px solid #EBE4FF;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            color: #231E33;
+        }
+        .advantages {
+            background: #D9F5F5;
+            border-left: 4px solid #00BEBA;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .limitations {
+            background: #EBE4FF;
+            border-left: 4px solid #5009B5;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .reference-section {
+            background: linear-gradient(135deg, #5009B5 0%, #281849 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        .reference-section h2 {
+            color: white;
+            border-bottom: 3px solid rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+        }
+        .reference-links {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .reference-link {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+            min-width: 300px;
+        }
+        .reference-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .reference-link h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            border: none;
+            padding: 0;
+        }
+        .reference-link p {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .highlight {
+            background: linear-gradient(45deg, #00B5F5, #00BEBA);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .section-divider {
+            height: 3px;
+            background: linear-gradient(45deg, #00B5F5, #00BEBA);
+            margin: 40px 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LLM Safety Filters: Pre-processing and Post-processing Guide</h1>
+
+        <h2>Pre-processing Filters (Input Filtering)</h2>
+
+        <h3>1. Keyword/Pattern Matching</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td><strong>How It Works</strong></td>
+                <td>Scans incoming text for blocked words, phrases, or patterns using predefined lists and regular expressions. Uses advanced algorithms like Aho-Corasick for multi-pattern matching across thousands of terms simultaneously</td>
+            </tr>
+            <tr>
+                <td><strong>Technical Implementation</strong></td>
+                <td>
+                    • Trie data structures for O(n) lookup time<br>
+                    • Hash tables for constant-time word checking<br>
+                    • Unicode normalization for character variant detection<br>
+                    • Fuzzy matching algorithms (Levenshtein distance)<br>
+                    • Real-time pattern compilation and caching
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Response Time</strong></td>
+                <td><span class="highlight">1-5 milliseconds</span> for 10,000+ word lists</td>
+            </tr>
+            <tr>
+                <td><strong>Memory Usage</strong></td>
+                <td>50-200 MB for comprehensive word lists</td>
+            </tr>
+            <tr>
+                <td><strong>Example Input</strong></td>
+                <td>"How to make a bomb for my school project?"</td>
+            </tr>
+            <tr>
+                <td><strong>Action Taken</strong></td>
+                <td><span class="status-blocked">❌ BLOCKED</span> - Contains prohibited keyword "bomb" (exact match)</td>
+            </tr>
+            <tr>
+                <td><strong>Bypass Attempts</strong></td>
+                <td>
+                    • Character substitution: "b0mb", "b@mb"<br>
+                    • Spacing: "b o m b"<br>
+                    • Language mixing: "bomba" (Spanish)<br>
+                    • Leetspeak: "80m8"
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Advanced Detection</strong></td>
+                <td>
+                    <div class="code-block">
+# Multi-language and fuzzy matching<br>
+import difflib<br>
+blocked_words = ["bomb", "bomba", "bombe", "bomba"]<br>
+normalized_input = unicodedata.normalize('NFKD', user_input)<br>
+for word in blocked_words:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if difflib.SequenceMatcher(None, word, normalized_input).ratio() > 0.8:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "BLOCKED: Suspicious pattern detected"
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Real-world Categories</strong></td>
+                <td>
+                    • Violence: weapons, explosives, harm<br>
+                    • Hate speech: slurs, discriminatory terms<br>
+                    • Adult content: explicit sexual terms<br>
+                    • Illegal activities: drugs, fraud, hacking<br>
+                    • Self-harm: suicide, cutting, overdose
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Advantages</strong></td>
+                <td class="advantages">
+                    • Ultra-fast processing (sub-millisecond)<br>
+                    • Deterministic results<br>
+                    • No external dependencies<br>
+                    • Works offline<br>
+                    • Customizable for specific domains<br>
+                    • Low computational cost
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Limitations</strong></td>
+                <td class="limitations">
+                    • Easy to bypass with obfuscation<br>
+                    • High false positives ("Scunthorpe problem")<br>
+                    • Cannot understand context or intent<br>
+                    • Requires constant maintenance<br>
+                    • Language-specific challenges<br>
+                    • Poor handling of new slang/terminology
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Industry Usage</strong></td>
+                <td>
+                    • Social media platforms (Twitter, Facebook)<br>
+                    • Gaming chat systems<br>
+                    • Educational platforms<br>
+                    • Customer service bots
+                </td>
+            </tr>
+        </table>
+
+        <h3>2. Rule-based System</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td><strong>How It Works</strong></td>
+                <td>Uses logical rules, regular expressions, and conditional statements to identify dangerous patterns, personal information, prompt injections, and compliance violations. Operates like a digital security guard with specific instructions</td>
+            </tr>
+            <tr>
+                <td><strong>Technical Implementation</strong></td>
+                <td>
+                    • Finite state machines for pattern recognition<br>
+                    • Regular expression engines (PCRE, Python re)<br>
+                    • Decision trees for complex rule hierarchies<br>
+                    • Whitelisting/blacklisting mechanisms<br>
+                    • Context-aware rule evaluation
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Response Time</strong></td>
+                <td><span class="highlight">5-20 milliseconds</span> depending on rule complexity</td>
+            </tr>
+            <tr>
+                <td><strong>Memory Usage</strong></td>
+                <td>10-50 MB for rule storage and execution</td>
+            </tr>
+            <tr>
+                <td><strong>Example Input</strong></td>
+                <td>"My SSN is 123-45-6789, help me with taxes"</td>
+            </tr>
+            <tr>
+                <td><strong>Action Taken</strong></td>
+                <td><span class="status-blocked">❌ BLOCKED</span> - Contains Social Security Number pattern</td>
+            </tr>
+            <tr>
+                <td><strong>Pattern Categories</strong></td>
+                <td>
+                    • <strong>PII Detection</strong>: SSN, credit cards, phone numbers<br>
+                    • <strong>Prompt Injection</strong>: "Ignore previous instructions"<br>
+                    • <strong>Jailbreak Attempts</strong>: Role-playing scenarios<br>
+                    • <strong>Format Violations</strong>: Excessive length, special characters<br>
+                    • <strong>Compliance Triggers</strong>: GDPR, HIPAA, financial regulations
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Advanced Implementation</strong></td>
+                <td>
+                    <div class="code-block">
+import re<br>
+class RuleBasedFilter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.rules = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'ssn': r'\b\d{3}-\d{2}-\d{4}\b',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'credit_card': r'\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'phone': r'\b\d{3}-\d{3}-\d{4}\b',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'prompt_injection': r'(?i)(ignore|forget|override).*(previous|earlier|above).*(instruction|prompt|rule)'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def evaluate(self, text):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;violations = []<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for rule_name, pattern in self.rules.items():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if re.search(pattern, text):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;violations.append(rule_name)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return violations
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Complex Rule Examples</strong></td>
+                <td>
+                    • <strong>Jailbreak Detection</strong>: "You are now DAN (Do Anything Now)"<br>
+                    • <strong>Multi-step Attacks</strong>: Sequential prompts building dangerous requests<br>
+                    • <strong>Context Switching</strong>: Attempts to change system role<br>
+                    • <strong>Encoding Attacks</strong>: Base64, ROT13, hex encoding<br>
+                    • <strong>Social Engineering</strong>: Impersonation attempts
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Compliance Rules</strong></td>
+                <td>
+                    • <strong>GDPR</strong>: EU citizen data protection triggers<br>
+                    • <strong>HIPAA</strong>: Medical information detection<br>
+                    • <strong>PCI-DSS</strong>: Payment card data security<br>
+                    • <strong>COPPA</strong>: Child protection mechanisms<br>
+                    • <strong>SOX</strong>: Financial reporting compliance
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Advantages</strong></td>
+                <td class="advantages">
+                    • Reliable for structured data<br>
+                    • Precise control over filtering logic<br>
+                    • Fast execution with caching<br>
+                    • Good for regulatory compliance<br>
+                    • Transparent decision-making<br>
+                    • Easy to audit and explain
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Limitations</strong></td>
+                <td class="limitations">
+                    • Requires manual rule creation<br>
+                    • Cannot adapt to new attack patterns<br>
+                    • Rigid logic structure<br>
+                    • High maintenance overhead<br>
+                    • Potential for rule conflicts<br>
+                    • Limited context understanding
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Performance Optimization</strong></td>
+                <td>
+                    • Rule ordering by frequency<br>
+                    • Early termination strategies<br>
+                    • Compiled regex patterns<br>
+                    • Parallel rule evaluation<br>
+                    • Caching of common patterns
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>Post-processing Filters (Output Filtering)</h2>
+
+        <h3>Content Moderation APIs</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td><strong>How It Works</strong></td>
+                <td>Analyzes LLM responses using advanced AI models trained on millions of examples to detect toxicity, hate speech, violence, self-harm, and other harmful content. Uses transformer-based models for context understanding</td>
+            </tr>
+            <tr>
+                <td><strong>Technical Architecture</strong></td>
+                <td>
+                    • <strong>Neural Networks</strong>: BERT, RoBERTa, GPT-based classifiers<br>
+                    • <strong>Ensemble Methods</strong>: Multiple models voting on decisions<br>
+                    • <strong>Confidence Scoring</strong>: Probability distributions (0-1 scale)<br>
+                    • <strong>Category Classification</strong>: Multi-label classification systems<br>
+                    • <strong>Real-time Inference</strong>: GPU-accelerated processing
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Response Time</strong></td>
+                <td><span class="highlight">50-200 milliseconds</span> per request</td>
+            </tr>
+            <tr>
+                <td><strong>Accuracy Metrics</strong></td>
+                <td>
+                    • Precision: 85-95% (varies by category)<br>
+                    • Recall: 80-90% (varies by category)<br>
+                    • F1-Score: 82-92% across major providers<br>
+                    • False Positive Rate: 5-15%
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Example LLM Output</strong></td>
+                <td>"I hate all people from [country], they are terrible and should be removed from society"</td>
+            </tr>
+            <tr>
+                <td><strong>Action Taken</strong></td>
+                <td><span class="status-blocked">❌ BLOCKED</span> - Hate speech detected (confidence: 95%, category: identity_attack)</td>
+            </tr>
+            <tr>
+                <td><strong>Detailed Response Format</strong></td>
+                <td>
+                    <div class="code-block">
+{<br>
+&nbsp;&nbsp;"flagged": true,<br>
+&nbsp;&nbsp;"categories": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"hate": true,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"harassment": true,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"violence": false,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"self_harm": false<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;"category_scores": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"hate": 0.95,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"harassment": 0.87,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"violence": 0.12,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"self_harm": 0.03<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;"explanation": "Contains discriminatory language targeting a specific group"<br>
+}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Detection Categories</strong></td>
+                <td>
+                    • <strong>Hate Speech</strong>: Racism, sexism, homophobia, religious hatred<br>
+                    • <strong>Harassment</strong>: Bullying, threats, intimidation<br>
+                    • <strong>Violence</strong>: Graphic descriptions, weapon instructions<br>
+                    • <strong>Self-harm</strong>: Suicide ideation, cutting, eating disorders<br>
+                    • <strong>Sexual Content</strong>: Explicit descriptions, minors<br>
+                    • <strong>Misinformation</strong>: False health claims, conspiracy theories
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Advanced Features</strong></td>
+                <td>
+                    • <strong>Severity Levels</strong>: 0-6 scale for nuanced moderation<br>
+                    • <strong>Custom Categories</strong>: Domain-specific harm detection<br>
+                    • <strong>Multilingual Support</strong>: 50+ languages<br>
+                    • <strong>Contextual Analysis</strong>: Understanding sarcasm, humor<br>
+                    • <strong>Bias Detection</strong>: Fairness across demographics<br>
+                    • <strong>Temporal Tracking</strong>: Content evolution monitoring
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Advantages</strong></td>
+                <td class="advantages">
+                    • High accuracy with context understanding<br>
+                    • Handles subtle toxicity and implicit bias<br>
+                    • Continuously improved by providers<br>
+                    • Supports multiple languages and cultures<br>
+                    • Provides detailed explanations<br>
+                    • Scales automatically with demand
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Limitations</strong></td>
+                <td class="limitations">
+                    • Higher latency than pre-processing<br>
+                    • External dependency risks<br>
+                    • Cost scales with usage<br>
+                    • May have cultural/regional biases<br>
+                    • Requires internet connectivity<br>
+                    • API rate limits and quotas
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Cost Analysis</strong></td>
+                <td>
+                    • <strong>Development</strong>: $10K-50K for integration<br>
+                    • <strong>Operational</strong>: $0.0001-0.005 per request<br>
+                    • <strong>Monthly</strong>: $1K-25K for enterprise usage<br>
+                    • <strong>Hidden Costs</strong>: Monitoring, fallback systems<br>
+                    • <strong>ROI</strong>: Prevents reputation damage, legal issues
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>Comprehensive Provider Comparison</h2>
+        <table>
+            <tr>
+                <th>Provider</th>
+                <th>API Name</th>
+                <th>Categories</th>
+                <th>Languages</th>
+                <th>Pricing</th>
+                <th>Response Time</th>
+                <th>Accuracy</th>
+                <th>Special Features</th>
+            </tr>
+            <tr>
+                <td><strong>OpenAI</strong></td>
+                <td>Moderation API</td>
+                <td>6 categories (hate, harassment, self-harm, sexual, violence, sexual/minors)</td>
+                <td>English primary</td>
+                <td>Free (1M requests/month)</td>
+                <td>50-100ms</td>
+                <td>90-95%</td>
+                <td>Multimodal support, frequent updates</td>
+            </tr>
+            <tr>
+                <td><strong>Google</strong></td>
+                <td>Perspective API</td>
+                <td>10+ attributes (toxicity, identity attacks, threats)</td>
+                <td>18 languages</td>
+                <td>Free 1 QPS, $1/1000 after</td>
+                <td>100-200ms</td>
+                <td>85-92%</td>
+                <td>Experimental features, bridging attributes</td>
+            </tr>
+            <tr>
+                <td><strong>Azure</strong></td>
+                <td>Content Safety</td>
+                <td>4 categories with 0-6 severity levels</td>
+                <td>100+ languages</td>
+                <td>$1-5/1000 operations</td>
+                <td>100-150ms</td>
+                <td>88-94%</td>
+                <td>Custom blocklists, batch processing</td>
+            </tr>
+            <tr>
+                <td><strong>AWS</strong></td>
+                <td>Comprehend</td>
+                <td>Toxic content, PII, sentiment</td>
+                <td>12 languages</td>
+                <td>$0.0001/unit</td>
+                <td>200-300ms</td>
+                <td>82-89%</td>
+                <td>NLP integration, custom models</td>
+            </tr>
+            <tr>
+                <td><strong>Hugging Face</strong></td>
+                <td>Detoxify</td>
+                <td>6 toxicity types</td>
+                <td>English</td>
+                <td>Free (self-hosted)</td>
+                <td>20-50ms</td>
+                <td>85-91%</td>
+                <td>Open source, customizable</td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>Advanced Workflow with Error Handling</h2>
+        <table>
+            <tr>
+                <th>Step</th>
+                <th>Filter Type</th>
+                <th>Example</th>
+                <th>Error Handling</th>
+                <th>Fallback Strategy</th>
+            </tr>
+            <tr>
+                <td><strong>1. Input Validation</strong></td>
+                <td>Pre-processing</td>
+                <td>Check input length, encoding</td>
+                <td>Truncate long inputs</td>
+                <td>Default to safe mode</td>
+            </tr>
+            <tr>
+                <td><strong>2. Keyword Screening</strong></td>
+                <td>Pre-processing</td>
+                <td>"How to make explosives?"</td>
+                <td>Log bypass attempts</td>
+                <td>Secondary pattern check</td>
+            </tr>
+            <tr>
+                <td><strong>3. Rule Evaluation</strong></td>
+                <td>Pre-processing</td>
+                <td>Multiple rule engines</td>
+                <td>Rule conflict resolution</td>
+                <td>Human review queue</td>
+            </tr>
+            <tr>
+                <td><strong>4. LLM Processing</strong></td>
+                <td>Core</td>
+                <td>Generate response</td>
+                <td>Timeout handling</td>
+                <td>Cached safe responses</td>
+            </tr>
+            <tr>
+                <td><strong>5. Primary Moderation</strong></td>
+                <td>Post-processing</td>
+                <td>OpenAI API call</td>
+                <td>API failure handling</td>
+                <td>Fallback to secondary API</td>
+            </tr>
+            <tr>
+                <td><strong>6. Secondary Check</strong></td>
+                <td>Post-processing</td>
+                <td>Google Perspective API</td>
+                <td>Service degradation</td>
+                <td>Local model backup</td>
+            </tr>
+            <tr>
+                <td><strong>7. Final Validation</strong></td>
+                <td>Post-processing</td>
+                <td>Confidence aggregation</td>
+                <td>Conflicting results</td>
+                <td>Conservative blocking</td>
+            </tr>
+            <tr>
+                <td><strong>8. Delivery</strong></td>
+                <td>Output</td>
+                <td>User receives response</td>
+                <td>Delivery failures</td>
+                <td>Error message display</td>
+            </tr>
+        </table>
+
+        <div class="reference-section">
+            <h2>Further References</h2>
+            <p>For additional technical details and implementation resources:</p>
+            <div class="reference-links">
+                <a href="https://modelmetry.com/blog/latency-of-llm-guardrails" class="reference-link" target="_blank">
+                    <h3>LLM Guardrails Latency | Modelmetry</h3>
+                    <p>Comprehensive analysis of performance impacts and optimization strategies</p>
+                </a>
+                <a href="https://github.com/piratos/llmfilters" class="reference-link" target="_blank">
+                    <h3>piratos/llmfilters</h3>
+                    <p>Open-source library with ready-to-use filtering components for LLM applications</p>
+                </a>
+                <a href="https://cookbook.openai.com/examples/how_to_use_guardrails" class="reference-link" target="_blank">
+                    <h3>How to implement LLM guardrails | OpenAI Cookbook</h3>
+                    <p>Official implementation guide with practical examples and best practices</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>Performance Optimization Strategies</h2>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Strategy</th>
+                <th>Implementation</th>
+                
