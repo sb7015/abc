@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Classification Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #EBE4FF 0%, #D9F5F5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #231E33;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(40, 24, 73, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #281849;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #EBE4FF;
+            padding-bottom: 8px;
+        }
+
+        .confusion-matrix {
+            grid-column: 1 / -1;
+        }
+
+        .cm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #281849;
+        }
+
+        .cm-table th,
+        .cm-table td {
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .cm-table th:not(.empty-cell),
+        .cm-table td:not(.empty-cell) {
+            border: 2px solid #281849;
+        }
+
+        .empty-cell {
+            background: white;
+            border: none !important;
+        }
+
+        .predicted-header {
+            background: #281849;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .safe-header {
+            background: #00BEBA;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .unsafe-header {
+            background: #5009B5;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .actual-header {
+            background: #794CFF;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            width: 60px;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+
+        .safe-label {
+            background: #D9F5F5;
+            color: #231E33;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .unsafe-label {
+            background: #EBE4FF;
+            color: #231E33;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .tp-cell {
+            background: #E1EDFF;
+            color: #231E33;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .fn-cell {
+            background: #F5F5F5;
+            color: #231E33;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .fp-cell {
+            background: #EBE4FF;
+            color: #231E33;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .tn-cell {
+            background: #D9F5F5;
+            color: #231E33;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .metrics-table th {
+            background: #281849;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .metrics-table td {
+            padding: 12px;
+            border-bottom: 1px solid #EBE4FF;
+        }
+
+        .metrics-table tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+
+        .metrics-table tr.highlight {
+            background: #EBE4FF !important;
+            font-weight: 700;
+        }
+
+        .metrics-table tr.highlight .metric-name-col {
+            color: #281849;
+            font-weight: 700;
+        }
+
+        .metrics-table tr.highlight .metric-value-col {
+            color: #5009B5;
+            font-weight: 700;
+            font-family: 'SF Mono', Monaco, monospace;
+            text-align: right;
+        }
+
+        .metric-name-col {
+            color: #281849;
+            font-weight: 500;
+        }
+
+        .metric-value-col {
+            color: #5009B5;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+            text-align: right;
+        }
+
+        .metrics-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #F5F5F5;
+            border-radius: 8px;
+            border-left: 4px solid #00BEBA;
+        }
+
+        .metric-name {
+            font-weight: 500;
+            color: #281849;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: #5009B5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #00BEBA, #00B5F5);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .performance-bar {
+            width: 100%;
+            height: 8px;
+            background: #EBE4FF;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .performance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5009B5, #794CFF);
+            transition: width 0.3s ease;
+        }
+
+        .insights {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #E1EDFF, #EBE4FF);
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #00BEBA;
+        }
+
+        .insight-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #794CFF;
+            margin-right: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .cm-table th,
+            .cm-table td {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Confusion Matrix -->
+        <div class="card confusion-matrix">
+            <div class="card-title">Confusion Matrix</div>
+            <table class="cm-table">
+                <thead>
+                    <tr>
+                        <th class="empty-cell"></th>
+                        <th class="empty-cell"></th>
+                        <th colspan="2" class="predicted-header">Predicted</th>
+                    </tr>
+                    <tr>
+                        <th class="empty-cell"></th>
+                        <th class="empty-cell"></th>
+                        <th class="safe-header">Safe</th>
+                        <th class="unsafe-header">Unsafe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th rowspan="2" class="actual-header">
+                            <div class="vertical-text">Actual</div>
+                        </th>
+                        <td class="safe-label">Safe</td>
+                        <td class="tp-cell">48</td>
+                        <td class="fn-cell">0</td>
+                    </tr>
+                    <tr>
+                        <td class="unsafe-label">Unsafe</td>
+                        <td class="fp-cell">40</td>
+                        <td class="tn-cell">48</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="card">
+            <div class="card-title">Performance Metrics</div>
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight">
+                        <td class="metric-name-col">Accuracy</td>
+                        <td class="metric-value-col">62.86%</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td class="metric-name-col">Precision</td>
+                        <td class="metric-value-col">100%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name-col">Recall</td>
+                        <td class="metric-value-col">48%</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td class="metric-name-col">F1 Score</td>
+                        <td class="metric-value-col">64.86%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name-col">Specificity</td>
+                        <td class="metric-value-col">100%</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td class="metric-name-col">False Positive Rate</td>
+                        <td class="metric-value-col">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name-col">False Negative Rate</td>
+                        <td class="metric-value-col">52%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name-col">False Discovery Rate</td>
+                        <td class="metric-value-col">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name-col">Negative Predictive Value</td>
+                        <td class="metric-value-col">43.48%</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td class="metric-name-col">Matthews Correlation</td>
+                        <td class="metric-value-col">0.457</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <!-- Model Insights -->
+        <div class="card insights">
+            <div class="card-title">Model Analysis</div>
+            <div class="insight-item">
+                <div class="insight-icon"></div>
+                <div>Perfect precision (100%) - No false positives detected</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-icon"></div>
+                <div>Conservative model - Only 48% recall, missing some true positives</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-icon"></div>
+                <div>High specificity (100%) - Excellent at identifying unsafe cases</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-icon"></div>
+                <div>70.6% of samples were correctly classified as safe</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
