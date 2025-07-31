@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Deliverables and Impact Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+            background: white;
+            padding: 40px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .slide {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: white;
+            min-height: 720px;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #0078D4;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 600;
+            color: #0078D4;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0;
+            border: 1px solid #e1e5e9;
+        }
+
+        .section-header {
+            padding: 20px 25px;
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .outcomes .section-header {
+            background: #107C10;
+        }
+
+        .automation .section-header {
+            background: #0078D4;
+        }
+
+        .risks {
+            grid-column: 1 / -1;
+        }
+
+        .risks .section-header {
+            background: #D83B01;
+        }
+
+        .icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-size: 16px;
+        }
+
+        .section-content {
+            padding: 25px;
+        }
+
+        .item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+        .bullet {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 15px;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .outcomes .bullet {
+            background: #107C10;
+        }
+
+        .automation .bullet {
+            background: #0078D4;
+        }
+
+        .risks .bullet {
+            background: #D83B01;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 4px;
+        }
+
+        .item-description {
+            font-size: 14px;
+            color: #605e5c;
+            line-height: 1.5;
+        }
+
+        .metric {
+            background: #0078D4;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .highlight {
+            color: #0078D4;
+            font-weight: 600;
+        }
+
+        .risks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Print-friendly styles */
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            .slide {
+                min-height: auto;
+            }
+        }
+
+        /* Ensure compatibility with PowerPoint copy-paste */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <h1 class="title">Key Deliverables and Impact Summary</h1>
+            <p class="subtitle">Strategic Achievements & Risk Management Overview</p>
+        </div>
+
+        <div class="content-grid">
+            <div class="section outcomes">
+                <div class="section-header">
+                    <span class="icon">📈</span>
+                    Major Outcomes Delivered
+                </div>
+                <div class="section-content">
+                    <div class="item">
+                        <div class="bullet"></div>
+                        <div class="item-content">
+                            <div class="item-title">AI-Powered Customer Insights Platform</div>
+                            <div class="item-description">
+                                Improved targeting by <span class="metric">30%</span>, boosting marketing ROI
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="bullet"></div>
+                        <div class="item-content">
+                            <div class="item-title">Predictive Maintenance</div>
+                            <div class="item-description">
+                                Reduced downtime by <span class="metric">25%</span>, saving approx. <span class="highlight">$2M annually</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section automation">
+                <div class="section-header">
+                    <span class="icon">⚡</span>
+                    Major Automation / Transformation
+                </div>
+                <div class="section-content">
+                    <div class="item">
+                        <div class="bullet"></div>
+                        <div class="item-content">
+                            <div class="item-title">Intelligent Document Processing</div>
+                            <div class="item-description">
+                                Reduced manual effort by <span class="metric">70%</span>, improving TAT and accuracy
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="bullet"></div>
+                        <div class="item-content">
+                            <div class="item-title">MLOps Framework</div>
+                            <div class="item-description">
+                                Cut model deployment time from <span class="highlight">weeks to days</span>, enhancing agility
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section risks">
+            <div class="section-header">
+                <span class="icon">⚠️</span>
+                Key Risks / Issues and Mitigation Plan
+            </div>
+            <div class="section-content">
+                <div class="risks-grid">
+                    <div class="item">
+                        <div class="bullet"></div>
+                        <div class="item-content">
+                            <div class="item-title">Model Drift</div>
+                            <div class="item-description">
+                                Mitigated with <span class="highlight">automated drift detection</span> and retraining pipelines
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="bullet"></div>
+                        <div class="item-content">
+                            <div class="item-title">Data Privacy</div>
+                            <div class="item-description">
+                                Ensured <span class="highlight">GDPR compliance</span> using federated learning
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
