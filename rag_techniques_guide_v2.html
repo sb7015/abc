@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced RAG Architectures Guide</title>
+    <style>
+        :root {
+            --purple: #5009B5;
+            --pale-purple: #EBE4FF;
+            --dark-purple: #281849;
+            --light-purple: #794CFF;
+            --turquoise: #00BEBA;
+            --pale-turquoise: #D9F5F5;
+            --cyan: #00B5F5;
+            --pale-cyan: #E1edff;
+            --dark-gray: #231E33;
+            --pale-gray: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background: linear-gradient(135deg, var(--pale-purple) 0%, var(--pale-cyan) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .technique-section {
+            margin-bottom: 60px;
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-left: 8px solid;
+        }
+
+        .reranker { border-left-color: var(--purple); }
+        .multi-query { border-left-color: var(--turquoise); }
+        .fusion { border-left-color: var(--cyan); }
+        .hyde { border-left-color: var(--light-purple); }
+
+        .technique-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .technique-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+
+        .reranker .technique-icon { background: var(--purple); }
+        .multi-query .technique-icon { background: var(--turquoise); }
+        .fusion .technique-icon { background: var(--cyan); }
+        .hyde .technique-icon { background: var(--light-purple); }
+
+        .technique-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark-purple);
+        }
+
+        .technique-subtitle {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .architecture-diagram {
+            background: var(--pale-gray);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .diagram-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--dark-purple);
+            text-align: center;
+        }
+
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 1000px;
+            margin: 20px 0;
+        }
+
+        .flow-node {
+            background: white;
+            border: 3px solid var(--pale-purple);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-width: 140px;
+        }
+
+        .flow-node.model {
+            border-color: var(--purple);
+            background: linear-gradient(135deg, var(--pale-purple) 0%, white 100%);
+        }
+
+        .flow-node.retrieval {
+            border-color: var(--turquoise);
+            background: linear-gradient(135deg, var(--pale-turquoise) 0%, white 100%);
+        }
+
+        .flow-node.processing {
+            border-color: var(--cyan);
+            background: linear-gradient(135deg, var(--pale-cyan) 0%, white 100%);
+        }
+
+        .flow-node.generation {
+            border-color: var(--light-purple);
+            background: linear-gradient(135deg, var(--pale-purple) 0%, white 100%);
+        }
+
+        .node-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--dark-purple);
+        }
+
+        .node-subtitle {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            opacity: 0.7;
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--purple);
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .model-details {
+            background: var(--pale-cyan);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .model-details h4 {
+            color: var(--dark-purple);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .model-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .model-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--turquoise);
+        }
+
+        .model-name {
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+
+        .model-purpose {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-top: 5px;
+        }
+
+        .example-section {
+            background: var(--pale-gray);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark-purple);
+            font-size: 1.2rem;
+        }
+
+        .code-block {
+            background: var(--dark-gray);
+            color: var(--pale-gray);
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+
+        .code-comment {
+            color: #88C999;
+        }
+
+        .code-keyword {
+            color: #FF6B6B;
+        }
+
+        .step-by-step {
+            margin: 25px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            background: var(--purple);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--purple);
+        }
+
+        .metric-label {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-purple);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        .comparison-table th {
+            background: var(--dark-purple);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--pale-gray);
+            vertical-align: top;
+        }
+
+        .comparison-table tr:hover {
+            background: var(--pale-cyan);
+        }
+
+        .technique-badge {
+            background: var(--purple);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
+            .flow-container {
+                min-width: 800px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .technique-title {
+                font-size: 1.8rem;
+            }
+            
+            .flow-container {
+                flex-direction: column;
+                min-width: auto;
+                gap: 20px;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .model-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced RAG Architectures</h1>
+            <p>Complete architectural breakdown with model specifications and implementation details</p>
+        </div>
+
+        <!-- RAG Reranker -->
+        <div class="technique-section reranker">
+            <div class="technique-header">
+                <div class="technique-icon">R</div>
+                <div>
+                    <div class="technique-title">RAG Reranker</div>
+                    <div class="technique-subtitle">Two-Stage Retrieval with Semantic Reranking</div>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <div class="diagram-title">RAG Reranker Architecture</div>
+                <div class="flow-container">
+                    <div class="flow-node processing">
+                        <div class="node-title">User Query</div>
+                        <div class="node-subtitle">"How to optimize database performance?"</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node retrieval">
+                        <div class="node-title">Stage 1: Broad Retrieval</div>
+                        <div class="node-subtitle">Vector DB (top-100)</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node model">
+                        <div class="node-title">Stage 2: Reranker Model</div>
+                        <div class="node-subtitle">Cross-encoder scoring</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node processing">
+                        <div class="node-title">Top-K Selection</div>
+                        <div class="node-subtitle">Best 5 documents</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node generation">
+                        <div class="node-title">LLM Generation</div>
+                        <div class="node-subtitle">Final answer</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-details">
+                <h4>Critical Model Specifications</h4>
+                <div class="model-list">
+                    <div class="model-item">
+                        <div class="model-name">Stage 1: Embedding Model</div>
+                        <div class="model-purpose">ColPali Model<br>Fast initial retrieval from vector database</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Stage 2: Reranker Model</div>
+                        <div class="model-purpose">Jina Reranker Cross-Encoder<br>Cross-encoder for precise relevance scoring</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Generation Model</div>
+                        <div class="model-purpose">GPT-4 / Claude<br>Final answer generation with context</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Initial Retrieval</div>
+                        <div class="step-description">Use bi-encoder model to retrieve top-100 candidate documents from vector database based on semantic similarity</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Cross-Encoder Reranking</div>
+                        <div class="step-description">Pass query-document pairs through cross-encoder model to get precise relevance scores</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Selection & Generation</div>
+                        <div class="step-description">Select top-5 reranked documents and generate final answer using LLM</div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Multi-Query RAG -->
+        <div class="technique-section multi-query">
+            <div class="technique-header">
+                <div class="technique-icon">M</div>
+                <div>
+                    <div class="technique-title">Multi-Query RAG</div>
+                    <div class="technique-subtitle">Query Expansion for Comprehensive Retrieval</div>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <div class="diagram-title">Multi-Query RAG Architecture</div>
+                <div class="flow-container">
+                    <div class="flow-node processing">
+                        <div class="node-title">Original Query</div>
+                        <div class="node-subtitle">User input</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node model">
+                        <div class="node-title">Query Generation LLM</div>
+                        <div class="node-subtitle">Create variations</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node retrieval">
+                        <div class="node-title">Parallel Retrieval</div>
+                        <div class="node-subtitle">5 queries → 5 result sets</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node processing">
+                        <div class="node-title">Merge & Deduplicate</div>
+                        <div class="node-subtitle">Combine results</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node generation">
+                        <div class="node-title">Answer Generation</div>
+                        <div class="node-subtitle">Final response</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-details">
+                <h4>Critical Model Specifications</h4>
+                <div class="model-list">
+                    <div class="model-item">
+                        <div class="model-name">Query Generation Model</div>
+                        <div class="model-purpose">Claude / GPT-4<br>Fast query variation generation</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Embedding Model</div>
+                        <div class="model-purpose">ColPali (Multimodal Model)<br>Retrieval for all query variations</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Generation Model</div>
+                        <div class="model-purpose">GPT-4 / Claude<br>Comprehensive answer synthesis</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Query Expansion</div>
+                        <div class="step-description">Use LLM to generate 4-5 diverse variations of the original query, capturing different aspects and phrasings</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Parallel Retrieval</div>
+                        <div class="step-description">Execute retrieval for each query variation simultaneously using the same embedding model</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Result Fusion</div>
+                        <div class="step-description">Merge all retrieved documents, remove duplicates, and rank by aggregate relevance scores</div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Fusion RAG -->
+        <div class="technique-section fusion">
+            <div class="technique-header">
+                <div class="technique-icon">F</div>
+                <div>
+                    <div class="technique-title">Fusion RAG</div>
+                    <div class="technique-subtitle">Multi-Modal Retrieval with Reciprocal Rank Fusion</div>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <div class="diagram-title">Fusion RAG Architecture</div>
+                <div class="flow-container">
+                    <div class="flow-node processing">
+                        <div class="node-title">Query Input</div>
+                        <div class="node-subtitle">Single query</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node retrieval">
+                        <div class="node-title">Vector Search</div>
+                        <div class="node-subtitle">Semantic similarity</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node retrieval">
+                        <div class="node-title">BM25 Search</div>
+                        <div class="node-subtitle">Keyword matching</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node model">
+                        <div class="node-title">Jina Multimodal Fusion</div>
+                        <div class="node-subtitle">Score combination</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node generation">
+                        <div class="node-title">Answer Generation</div>
+                        <div class="node-subtitle">Multi-source context</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-details">
+                <h4>Critical Model Specifications</h4>
+                <div class="model-list">
+                    <div class="model-item">
+                        <div class="model-name">Vector Search Model</div>
+                        <div class="model-purpose">sentence-transformers/all-mpnet-base-v2<br>Dense vector representations</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">BM25 Engine</div>
+                        <div class="model-purpose">Elasticsearch / Apache Lucene<br>Sparse keyword matching</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Fusion Algorithm</div>
+                        <div class="model-purpose">Jina Multimodal Fusion Model<br>Score normalization and combination</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Dual Retrieval</div>
+                        <div class="step-description">Execute query across vector database and BM25 index simultaneously to capture both semantic and keyword-based relevance</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Rank Normalization</div>
+                        <div class="step-description">Apply Reciprocal Rank Fusion (RRF) to normalize and combine ranking scores from different retrieval systems</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Final Selection</div>
+                        <div class="step-description">Select top-K documents based on fused scores and generate comprehensive answer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HyDE RAG -->
+        <div class="technique-section hyde">
+            <div class="technique-header">
+                <div class="technique-icon">H</div>
+                <div>
+                    <div class="technique-title">HyDE RAG</div>
+                    <div class="technique-subtitle">Hypothetical Document Embeddings with Multimodal Understanding</div>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <div class="diagram-title">HyDE Multimodal RAG Architecture</div>
+                <div class="flow-container">
+                    <div class="flow-node processing">
+                        <div class="node-title">Multimodal Query</div>
+                        <div class="node-subtitle">Text + Images/Documents</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node model">
+                        <div class="node-title">Multimodal Hypothesis Generator</div>
+                        <div class="node-subtitle">LLM creates multimodal answer</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node processing">
+                        <div class="node-title">Multimodal Embedding</div>
+                        <div class="node-subtitle">Text + Visual representation</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node retrieval">
+                        <div class="node-title">Multimodal Search</div>
+                        <div class="node-subtitle">Find similar content across modalities</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node generation">
+                        <div class="node-title">Multimodal Generation</div>
+                        <div class="node-subtitle">Text + Visual grounded answer</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-details">
+                <h4>Critical Multimodal Model Specifications</h4>
+                <div class="model-list">
+                    <div class="model-item">
+                        <div class="model-name">Multimodal Hypothesis Generator</div>
+                        <div class="model-purpose">GPT-4V / Claude-3 Vision<br>Creates hypothetical multimodal content (text + visual)</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Multimodal Embedding Model</div>
+                        <div class="model-purpose">ColPali / CLIP-based Models<br>Embeds text, images, and documents together</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-name">Multimodal Generator</div>
+                        <div class="model-purpose">GPT-4V / Claude-3 Vision<br>Ground-truth answer with text and visual context</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Multimodal Hypothesis Generation</div>
+                        <div class="step-description">Use multimodal LLM to generate hypothetical content that includes both text and visual elements relevant to the query</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Cross-Modal Embedding</div>
+                        <div class="step-description">Convert the hypothetical multimodal content into unified vector representation using models like ColPali or CLIP</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Multimodal Similarity Retrieval</div>
+                        <div class="step-description">Use hypothesis embedding to find real documents, images, and mixed content with similar semantic meaning</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Cross-Modal Grounded Generation</div>
+                        <div class="step-description">Generate final answer using original query and retrieved multimodal content (text, images, documents) as context</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Section -->
+        <div class="comparison-section">
+            <div class="comparison-title">Architecture Comparison</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Technique</th>
+                        <th>Key Models Used</th>
+                        <th>Retrieval Strategy</th>
+                        <th>Best Use Case</th>
+                        <th>Complexity Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="technique-badge">RAG Reranker</span></td>
+                        <td>Bi-encoder → Cross-encoder → Generation LLM</td>
+                        <td>Two-stage: Broad + Precise</td>
+                        <td>High-precision document selection</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td><span class="technique-badge">Multi-Query</span></td>
+                        <td>Query LLM → Embedding Model → Generation LLM</td>
+                        <td>Parallel multi-variation retrieval</td>
+                        <td>Comprehensive coverage</td>
+                        <td>Low-Medium</td>
+                    </tr>
+                    <tr>
+                        <td><span class="technique-badge">Fusion RAG</span></td>
+                        <td>Vector + BM25 + Jina Fusion Algorithm</td>
+                        <td>Dual-modal fusion approach</td>
+                        <td>Complex, diverse queries</td>
+                        <td>Medium-High</td>
+                    </tr>
+                    <tr>
+                        <td><span class="technique-badge">HyDE RAG</span></td>
+                        <td>Multimodal Hypothesis LLM → ColPali/CLIP → Vision LLM</td>
+                        <td>Cross-modal semantic bridging</td>
+                        <td>Complex multimodal queries</td>
+                        <td>Medium-High</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
