@@ -1,4 +1,0 @@
-PDF-to-Image Conversion: Converts PDF pages directly into images using pdf2image, treating each page as a visual document rather than extracting text.
-Multimodal Vector Indexing: Uses ColPali (a vision-language model) to create multimodal embeddings of the PDF page images and stores them in a vector index for semantic search.
-Visual Retrieval: For each query, searches the vector space to find the most relevant PDF page images, with optional reranking to improve retrieval quality.
-Vision-Language Answer Generation: Sends the retrieved page images along with the query to vision-language models (GPT-4V or Qwen2.5-VL) to generate answers based on visual content analysis.
