@@ -1,0 +1,13 @@
+- Deployed RunPod pod: PyTorch template, NVIDIA A100/RTX 4000 GPU, 50GB storage.
+- Installed Miniconda in /workspace: wget, bash install, conda init.
+- Accepted Conda ToS: conda tos accept for main and r channels.
+- Created Conda env: conda create -n nanonets python=3.10.
+- Activated env: source /workspace/miniconda/bin/activate nanonets.
+- Installed packages via pip: transformers, torch, pillow, pdf2image, flash-attention (optional), accelerate, torchvision lxml html5lib beautifulsoup4.
+- Installed system package: apt-get install poppler-utils.
+- Installed ipykernel: pip install ipykernel.
+- Registered kernel: python -m ipykernel install --user --name nanonets --display-name "Python (nanonets)".
+- Opened Jupyter: via RunPod URL, selected nanonets kernel.
+- Uploaded PDF to /workspace/sample_document.pdf.
+- Pasted and ran HF script in notebook cell: loads Nanonets-OCR-s, processes PDF to Markdown in /workspace/output/output.md.
+- Cached model (optional): save_pretrained to /workspace/nanonets-ocr-s.
