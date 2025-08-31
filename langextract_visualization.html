@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangExtract - Comprehensive Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #F5F5F5 0%, #E1edff 100%);
+            color: #231E33;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #5009B5 0%, #794CFF 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(80, 9, 181, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border-left: 4px solid #00BEBA;
+        }
+
+        .section-header {
+            background: linear-gradient(90deg, #00BEBA 0%, #00B5F5 100%);
+            color: white;
+            padding: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .section-content {
+            padding: 25px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .info-table th {
+            background-color: #EBE4FF;
+            color: #231E33;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #794CFF;
+        }
+
+        .info-table td {
+            padding: 15px;
+            border-bottom: 1px solid #E1edff;
+            vertical-align: top;
+        }
+
+        .info-table tr:hover {
+            background-color: #F5F5F5;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #D9F5F5 0%, #E1edff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #00BEBA;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 186, 186, 0.15);
+        }
+
+        .feature-card h4 {
+            color: #281849;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #231E33;
+            font-size: 0.95em;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #EBE4FF;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #794CFF;
+            transform: scale(1.05);
+        }
+
+        .metric-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #5009B5;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: #231E33;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: #281849;
+            color: #EBE4FF;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: #281849;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #E1edff;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #F5F5F5;
+        }
+
+        .check {
+            color: #00BEBA;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .cross {
+            color: #ff4757;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #EBE4FF 0%, #D9F5F5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #794CFF;
+            margin: 20px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #00BEBA;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 3px;
+            font-weight: 500;
+        }
+
+        .tag.secondary {
+            background: #794CFF;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-table, .comparison-table {
+                font-size: 0.9em;
+            }
+            
+            .info-table th, .info-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>LangExtract</h1>
+            <p>Google's Revolutionary Information Extraction Library - Transforming Unstructured Text into Structured Data with AI Precision</p>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="section">
+            <div class="section-header">
+                📋 Library Overview
+            </div>
+            <div class="section-content">
+                <table class="info-table">
+                    <tr>
+                        <th style="width: 25%;">Property</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td>LangExtract</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Developer</strong></td>
+                        <td>Google AI (Open Source)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Language</strong></td>
+                        <td>Python</td>
+                    </tr>
+                    <tr>
+                        <td><strong>License</strong></td>
+                        <td>Apache 2.0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Release Date</strong></td>
+                        <td>July 2025</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primary Function</strong></td>
+                        <td>Extract structured information from unstructured text using Large Language Models (LLMs)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Supported Models</strong></td>
+                        <td>Gemini 2.5 (Flash/Pro), Ollama models, OpenAI models (via TypeScript port)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Installation</strong></td>
+                        <td><code style="background:#EBE4FF;padding:4px 8px;border-radius:4px;">pip install langextract</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <div class="section-header">
+                ✨ Key Features & Capabilities
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🎯 Precise Source Grounding</h4>
+                        <p>Maps every extracted entity back to its exact character offsets in the source text, enabling full traceability and verification.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔧 Schema Enforcement</h4>
+                        <p>Uses controlled generation and few-shot examples to ensure consistently structured outputs that adhere to predefined schemas.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Interactive Visualization</h4>
+                        <p>Generates self-contained HTML files to visualize and review thousands of extracted entities in their original context.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⚡ Multi-Pass Processing</h4>
+                        <p>Overcomes "needle-in-a-haystack" challenges using optimized chunking, parallel processing, and multiple extraction passes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔄 Flexible LLM Support</h4>
+                        <p>Works with cloud-based models (Gemini) and local open-source models via Ollama interface.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🌐 Domain Adaptability</h4>
+                        <p>Define extraction tasks for any domain using just a few examples - no model fine-tuning required.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="section">
+            <div class="section-header">
+                📈 Performance Metrics
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="metric-card">
+                        <div class="metric-number">95%+</div>
+                        <div class="metric-label">Precision Rate</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-number">12%</div>
+                        <div class="metric-label">Higher Recall vs Single-Pass</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-number">58%</div>
+                        <div class="metric-label">Reduction in Annotation Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-number">26%</div>
+                        <div class="metric-label">Efficiency Gain for Expert Users</div>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <h4>🏆 Benchmark Results</h4>
+                    <p><strong>Needle-in-haystack tests:</strong> LangExtract achieved 12% higher recall than single-pass baselines across million-token contexts while maintaining precision above 95% when using Gemini-2.5-pro.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Cases -->
+        <div class="section">
+            <div class="section-header">
+                🎯 Primary Use Cases & Applications
+            </div>
+            <div class="section-content">
+                <table class="info-table">
+                    <tr>
+                        <th>Domain</th>
+                        <th>Applications</th>
+                        <th>Example Extractions</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Healthcare</strong></td>
+                        <td>Clinical notes, radiology reports, medical records</td>
+                        <td>
+                            <span class="tag">Medications</span>
+                            <span class="tag">Dosages</span>
+                            <span class="tag">Diagnoses</span>
+                            <span class="tag">Symptoms</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Legal</strong></td>
+                        <td>Contract analysis, legal document processing</td>
+                        <td>
+                            <span class="tag">Clauses</span>
+                            <span class="tag">Dates</span>
+                            <span class="tag">Parties</span>
+                            <span class="tag">Terms</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Finance</strong></td>
+                        <td>Financial reports, risk assessments</td>
+                        <td>
+                            <span class="tag">Numbers</span>
+                            <span class="tag">Companies</span>
+                            <span class="tag">Metrics</span>
+                            <span class="tag">Events</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Research</strong></td>
+                        <td>Academic papers, literature analysis</td>
+                        <td>
+                            <span class="tag">Entities</span>
+                            <span class="tag">Methods</span>
+                            <span class="tag">Results</span>
+                            <span class="tag">References</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business</strong></td>
+                        <td>Customer feedback, reports, emails</td>
+                        <td>
+                            <span class="tag">Insights</span>
+                            <span class="tag secondary">Actions</span>
+                            <span class="tag secondary">Metrics</span>
+                            <span class="tag secondary">Trends</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Technical Specifications -->
+        <div class="section">
+            <div class="section-header">
+                ⚙️ Technical Specifications
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>📦 Installation</h4>
+                        <div class="code-block">pip install langextract</div>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔑 API Setup</h4>
+                        <div class="code-block">export LANGEXTRACT_API_KEY="your-key"</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 20px 0 15px 0;">Basic Usage Example:</h4>
+                <div class="code-block">
+import langextract as lx
+
+# Define extraction task
+prompt = "Extract medications and dosages"
+examples = [lx.data.ExampleData(...)]
+
+# Run extraction
+result = lx.extract(
+    text_or_documents=input_text,
+    prompt_description=prompt,
+    examples=examples,
+    model_id="gemini-2.5-flash"
+)
+
+# Generate visualization
+html_content = lx.visualize("results.jsonl")
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="section">
+            <div class="section-header">
+                ⚖️ Comparison with Other NLP Libraries
+            </div>
+            <div class="section-content">
+                <table class="comparison-table">
+                    <tr>
+                        <th>Feature</th>
+                        <th>LangExtract</th>
+                        <th>spaCy</th>
+                        <th>NLTK</th>
+                        <th>Hugging Face</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Source Grounding</strong></td>
+                        <td><span class="check">✓</span> Character-level</td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Schema Enforcement</strong></td>
+                        <td><span class="check">✓</span> Controlled generation</td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓</span> Limited</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interactive Visualization</strong></td>
+                        <td><span class="check">✓</span> Built-in HTML</td>
+                        <td><span class="check">✓</span> displaCy</td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Large Document Support</strong></td>
+                        <td><span class="check">✓</span> Multi-pass, parallel</td>
+                        <td><span class="check">✓</span> Single-pass</td>
+                        <td><span class="cross">✗</span> Limited</td>
+                        <td><span class="check">✓</span> Varies by model</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Domain Adaptability</strong></td>
+                        <td><span class="check">✓</span> Few-shot examples</td>
+                        <td><span class="cross">✗</span> Pre-trained only</td>
+                        <td><span class="check">✓</span> Custom training</td>
+                        <td><span class="check">✓</span> Fine-tuning required</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Production Ready</strong></td>
+                        <td><span class="check">✓</span> Yes</td>
+                        <td><span class="check">✓</span> Yes</td>
+                        <td><span class="cross">✗</span> Research-focused</td>
+                        <td><span class="check">✓</span> Yes</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Research Foundation -->
+        <div class="section">
+            <div class="section-header">
+                🔬 Research Foundation
+            </div>
+            <div class="section-content">
+                <div class="highlight">
+                    <h4>📄 "LLMs Accelerate Annotation for Medical Information Extraction"</h4>
+                    <p><strong>Published:</strong> Machine Learning for Health (ML4H) 2023</p>
+                    <p><strong>Key Finding:</strong> LLMs can achieve expert-level annotation quality while reducing human annotation burden by 58% on average through a human-in-the-loop approach.</p>
+                </div>
+                
+                <table class="info-table">
+                    <tr>
+                        <th>Research Aspect</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Evaluation Task</strong></td>
+                        <td>Medication extraction from clinical notes (i2b2 dataset)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Model Used</strong></td>
+                        <td>PaLM 2 with prompt engineering (no fine-tuning)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Methodology</strong></td>
+                        <td>Two-phase: LLM Base Annotations + Expert Human Refinement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quality Metrics</strong></td>
+                        <td>F1: 0.907 (refined), Precision: 0.893, Recall: 0.921</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Efficiency Gains</strong></td>
+                        <td>Expert raters: 26% improvement, All raters: 58% time reduction</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- RAG Capabilities -->
+        <div class="section">
+            <div class="section-header">
+                🧠 RAG-like Capabilities (Without Traditional RAG)
+            </div>
+            <div class="section-content">
+                <div class="highlight">
+                    <h4>🎯 Revolutionary Approach</h4>
+                    <p><strong>Key Innovation:</strong> LangExtract performs RAG-like operations without traditional RAG processing - no more splitting, chunking, or embedding operations in your code. It leverages LLM reasoning directly on source text.</p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🚫 What LangExtract Eliminates</h4>
+                        <ul style="margin-top:10px;">
+                            <li>❌ Document chunking/splitting</li>
+                            <li>❌ Vector embeddings creation</li>
+                            <li>❌ Similarity search setup</li>
+                            <li>❌ Complex retrieval pipelines</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>✅ What LangExtract Provides</h4>
+                        <ul style="margin-top:10px;">
+                            <li>✅ Direct URL processing</li>
+                            <li>✅ Intelligent content extraction</li>
+                            <li>✅ Source-grounded results</li>
+                            <li>✅ Multi-pass parallel processing</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4 style="margin: 25px 0 15px 0;">📖 Real Example: Shakespeare Analysis (Google's Demo)</h4>
+                <p style="margin-bottom: 15px;">Google demonstrated LangExtract processing the entire Romeo & Juliet text (147,843 characters) directly from Project Gutenberg URL:</p>
+                
+                <div class="code-block">
+# Google's Romeo & Juliet Demo - No RAG Setup Required!
+import langextract as lx
+
+# Define what to extract from literature
+prompt = """
+Extract characters, emotions, and relationships in order of appearance.
+Use exact text for extractions. Do not paraphrase or overlap entities.
+Provide meaningful attributes for each entity to add context.
+"""
+
+# Few-shot example for the model
+examples = [
+    lx.data.ExampleData(
+        text="ROMEO. But soft! What light through yonder window breaks? It is the east, and Juliet is the sun.",
+        extractions=[
+            lx.data.Extraction(
+                extraction_class="character",
+                extraction_text="ROMEO",
+                attributes={"emotional_state": "wonder"}
+            ),
+            lx.data.Extraction(
+                extraction_class="emotion",
+                extraction_text="But soft!",
+                attributes={"feeling": "gentle awe"}
+            ),
+            lx.data.Extraction(
+                extraction_class="relationship",
+                extraction_text="Juliet is the sun",
+                attributes={"type": "metaphor"}
+            )
+        ]
+    )
+]
+
+# Process entire novel directly from URL - No RAG pipeline needed!
+result = lx.extract(
+    text_or_documents="https://www.gutenberg.org/files/1513/1513-0.txt",
+    prompt_description=prompt,
+    examples=examples,
+    model_id="gemini-2.5-flash",
+    extraction_passes=3,      # Multi-pass for better recall
+    max_workers=20,           # Parallel processing
+    max_char_buffer=1000     # Optimized chunking
+)
+
+# Generate interactive visualization
+html_content = lx.visualize("shakespeare_results.jsonl")
+                </div>
+
+                <table class="info-table" style="margin-top: 20px;">
+                    <tr>
+                        <th>Traditional RAG Approach</th>
+                        <th>LangExtract Approach</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            1. Document preprocessing<br>
+                            2. Text chunking/splitting<br>
+                            3. Generate embeddings<br>
+                            4. Vector database setup<br>
+                            5. Query embedding<br>
+                            6. Similarity search<br>
+                            7. Context retrieval<br>
+                            8. LLM generation
+                        </td>
+                        <td>
+                            1. Define extraction task<br>
+                            2. Provide few-shot examples<br>
+                            3. Direct text/URL processing<br>
+                            4. Multi-pass intelligent extraction<br>
+                            ✨ <strong>Result: Source-grounded entities</strong>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="highlight" style="margin-top: 20px;">
+                    <h4>🎭 Demo Results: What Google Extracted</h4>
+                    <p><strong>From 147,843 characters of Romeo & Juliet:</strong></p>
+                    <div style="margin-top: 15px;">
+                        <span class="tag">Characters: Romeo, Juliet, Mercutio, Tybalt...</span>
+                        <span class="tag">Emotions: Love, Rage, Despair, Joy...</span>
+                        <span class="tag secondary">Relationships: Family bonds, Romance, Rivalry...</span>
+                        <span class="tag secondary">Literary devices: Metaphors, Soliloquies...</span>
+                    </div>
+                    <p style="margin-top: 15px;"><strong>All with precise source grounding</strong> - click any entity to see exactly where it appears in the original text!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical Data Extraction Example -->
+        <div class="section">
+            <div class="section-header">
+                🏥 Medical Data Extraction: From Unstructured to Structured
+            </div>
+            <div class="section-content">
+                <div class="highlight">
+                    <h4>💊 Real-World Medical Example: Medication Extraction</h4>
+                    <p><strong>Challenge:</strong> Extract structured medication information from free-text clinical notes - the core use case that led to LangExtract's development.</p>
+                </div>
+
+                <h4 style="margin: 20px 0 10px 0;">📄 Input: Unstructured Clinical Note</h4>
+                <div class="code-block" style="background: #F5F5F5; color: #231E33; border-left: 4px solid #ff4757;">
+Patient reported severe headaches. Started on <mark style="background: #EBE4FF;">ibuprofen 400 mg</mark> 
+<mark style="background: #D9F5F5;">twice daily</mark> <mark style="background: #E1edff;">for pain management</mark>. 
+Patient developed <mark style="background: #EBE4FF;">mild stomach pain</mark> after 3 days. 
+<mark style="background: #D9F5F5;">Discontinued ibuprofen</mark> and switched to acetaminophen 500 mg 
+every 6 hours as needed for pain relief.
+                </div>
+
+                <h4 style="margin: 20px 0 10px 0;">⚙️ LangExtract Processing Code</h4>
+                <div class="code-block">
+import langextract as lx
+
+# Define medical extraction task
+prompt = """
+Extract medication information including drug names, dosages, 
+frequencies, routes, and any adverse reactions or actions taken.
+Link related information together.
+"""
+
+# Few-shot example for medical context
+examples = [
+    lx.data.ExampleData(
+        text="Patient takes aspirin 81mg daily for cardioprotection",
+        extractions=[
+            lx.data.Extraction(
+                extraction_class="medication",
+                extraction_text="aspirin",
+                attributes={"purpose": "cardioprotection"}
+            ),
+            lx.data.Extraction(
+                extraction_class="dosage", 
+                extraction_text="81mg",
+                attributes={"medication": "aspirin"}
+            ),
+            lx.data.Extraction(
+                extraction_class="frequency",
+                extraction_text="daily",
+                attributes={"medication": "aspirin"}
+            )
+        ]
+    )
+]
+
+# Process clinical note
+result = lx.extract(
+    text_or_documents=clinical_note,
+    prompt_description=prompt,
+    examples=examples,
+    model_id="gemini-2.5-flash"
+)
+                </div>
+
+                <h4 style="margin: 20px 0 10px 0;">📊 Output: Structured Medical Data</h4>
+                <table class="info-table" style="border-left: 4px solid #00BEBA;">
+                    <tr>
+                        <th>Entity Type</th>
+                        <th>Extracted Text</th>
+                        <th>Attributes</th>
+                        <th>Source Position</th>
+                    </tr>
+                    <tr style="background: #EBE4FF;">
+                        <td><strong>Medication</strong></td>
+                        <td>"ibuprofen"</td>
+                        <td>purpose: "pain management"</td>
+                        <td>Characters 64-72</td>
+                    </tr>
+                    <tr style="background: #D9F5F5;">
+                        <td><strong>Dosage</strong></td>
+                        <td>"400 mg"</td>
+                        <td>medication: "ibuprofen"</td>
+                        <td>Characters 73-79</td>
+                    </tr>
+                    <tr style="background: #E1edff;">
+                        <td><strong>Frequency</strong></td>
+                        <td>"twice daily"</td>
+                        <td>medication: "ibuprofen"</td>
+                        <td>Characters 80-91</td>
+                    </tr>
+                    <tr style="background: #EBE4FF;">
+                        <td><strong>Adverse Reaction</strong></td>
+                        <td>"mild stomach pain"</td>
+                        <td>severity: "mild", medication: "ibuprofen"</td>
+                        <td>Characters 156-172</td>
+                    </tr>
+                    <tr style="background: #D9F5F5;">
+                        <td><strong>Action Taken</strong></td>
+                        <td>"Discontinued ibuprofen"</td>
+                        <td>reason: "adverse reaction"</td>
+                        <td>Characters 194-214</td>
+                    </tr>
+                </table>
+
+                <div class="feature-grid" style="margin-top: 25px;">
+                    <div class="feature-card" style="background: linear-gradient(135deg, #EBE4FF 0%, #F5F5F5 100%);">
+                        <h4>🎯 Precise Source Grounding</h4>
+                        <p>Every extracted entity is mapped to exact character positions in the original text, enabling perfect traceability for medical compliance and verification.</p>
+                    </div>
+                    <div class="feature-card" style="background: linear-gradient(135deg, #D9F5F5 0%, #F5F5F5 100%);">
+                        <h4>🔗 Relationship Mapping</h4>
+                        <p>LangExtract automatically links related medical entities - dosages to medications, adverse reactions to specific drugs, actions to causes.</p>
+                    </div>
+                </div>
+
+                <h4 style="margin: 25px 0 15px 0;">🖼️ RadExtract: Radiology Report Structuring Demo</h4>
+                <div class="highlight">
+                    <p><strong>Live Demo Available:</strong> Google's RadExtract on HuggingFace Spaces demonstrates LangExtract processing free-text radiology reports.</p>
+                    
+                    <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #794CFF;">
+                        <p><strong>Example Input:</strong> "Chest CT shows mild bilateral lower lobe consolidation consistent with pneumonia. No pleural effusion noted. Heart size normal."</p>
+                        
+                        <p style="margin-top: 10px;"><strong>Structured Output:</strong></p>
+                        <div style="margin-top: 10px;">
+                            <span class="tag">Finding: consolidation</span>
+                            <span class="tag">Location: bilateral lower lobe</span>
+                            <span class="tag secondary">Severity: mild</span>
+                            <span class="tag secondary">Impression: pneumonia</span>
+                        </div>
+                    </div>
+                    
+                    <p><strong>🌐 Try it:</strong> <code style="background:#EBE4FF;padding:4px 8px;border-radius:4px;">https://google-radextract.hf.space</code></p>
+                </div>
+
+                <div class="highlight" style="background: linear-gradient(120deg, #EBE4FF 0%, #D9F5F5 100%); margin-top: 20px;">
+                    <h4>⚡ Research Results: 58% Faster Medical Annotation</h4>
+                    <p><strong>Proven Performance:</strong> In clinical studies, LangExtract reduced human annotation time by 58% while maintaining expert-level quality (F1 score: 0.907, Precision: 0.893, Recall: 0.921).</p>
+                    
+                    <p style="margin-top: 10px;"><strong>⚠️ Medical Disclaimer:</strong> For illustrative purposes only. Not intended for medical diagnosis or treatment decisions. Subject to Health AI Developer Foundations Terms of Use.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Getting Started -->
+        <div class="section">
+            <div class="section-header">
+                🚀 Getting Started
+            </div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>1️⃣ Install</h4>
+                        <div class="code-block">pip install langextract</div>
+                    </div>
+                    <div class="feature-card">
+                        <h4>2️⃣ Configure</h4>
+                        <p>Set up your API key for Gemini models or use local models via Ollama</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>3️⃣ Define Task</h4>
+                        <p>Create clear prompts and provide high-quality few-shot examples</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>4️⃣ Extract</h4>
+                        <p>Run extraction on your text and generate interactive visualizations</p>
+                    </div>
+                </div>
+
+                <div class="highlight">
+                    <h4>📚 Resources</h4>
+                    <p><strong>GitHub:</strong> github.com/google/langextract</p>
+                    <p><strong>Demo:</strong> RadExtract on HuggingFace Spaces</p>
+                    <p><strong>Documentation:</strong> Health AI Developer Foundations</p>
+                    <p><strong>Live Example:</strong> Romeo & Juliet Analysis Demo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
