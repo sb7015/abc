@@ -1,1 +1,154 @@
+from PIL import Image
+from transformers import AutoTokenizer, AutoProcessor, AutoModelForImageTextToText
+from pdf2image import convert_from_path
+import pandas as pd
+import os
+from io import StringIO  # Added to handle the FutureWarning from pandas
+
+# Load model and components
+model_path = "nanonets/Nanonets-OCR-s"
+model = AutoModelForImageTextToText.from_pretrained(
+    model_path,
+    torch_dtype="auto",
+    device_map="auto"
+)
+model.eval()
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+processor = AutoProcessor.from_pretrained(model_path)
+
+# Define OCR function for a single image, focusing on table extraction
+def ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=4096):
+    prompt = """Extract tables from the document in HTML format."""
+
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": [
+            {"type": "image", "image": f"file://temp_image.jpg"},
+            {"type": "text", "text": prompt},
+        ]},
+    ]
+
+    text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = processor(text=[text], images=[image], padding=True, return_tensors="pt")
+    inputs = inputs.to(model.device)
+
+    output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False)
+    generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
+    output_text = processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+
+    return output_text[0]
+
+# Extract tables and save as CSV/Excel
+def process_pdf_for_tables(pdf_path, model, processor, output_dir="/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/output_table", output_format="csv"):
+    os.makedirs(output_dir, exist_ok=True)
+    images = convert_from_path(pdf_path)
+    all_tables = []
+
+    for i, image in enumerate(images):
+        temp_image_path = f"/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/temp/temp_page_{i+1}.jpg"
+        # Ensure the temp directory exists
+        os.makedirs(os.path.dirname(temp_image_path), exist_ok=True)
+        image.save(temp_image_path, "JPEG")
+        html_output = ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=15000)
+
+        # Extract HTML tables using pandas with StringIO to avoid FutureWarning
+        try:
+            html_io = StringIO(html_output)  # Wrap the HTML string in StringIO
+            tables = pd.read_html(html_io)
+            for j, table in enumerate(tables):
+                table['Page'] = i + 1  # Add page number for reference
+                all_tables.append(table)
+        except ValueError:
+            print(f"No tables found on page {i+1}")
+
+        os.remove(temp_image_path)
+
+    if not all_tables:
+        print("No tables extracted from the document.")
+        return None
+
+    # Combine all tables into a single DataFrame
+    combined_df = pd.concat(all_tables, ignore_index=True)
+
+    # Save to CSV or Excel
+    if output_format == "csv":
+        output_path = os.path.join(output_dir, "tables.csv")
+        combined_df.to_csv(output_path, index=False)
+    elif output_format == "excel":
+        output_path = os.path.join(output_dir, "tables.xlsx")
+        combined_df.to_excel(output_path, index=False)
+
+    return output_path
+
+# Example usage
+pdf_path = "/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/input/extracted_pages_combined.pdf"
+output_path = process_pdf_for_tables(pdf_path, model, processor, output_format="csv")  # Change to "excel" for .xlsx
+if output_path:
+    print(f"Tables saved to: {output_path}")
+
+
+
+
+from PIL import Image
+from transformers import AutoTokenizer, AutoProcessor, AutoModelForImageTextToText
+from pdf2image import convert_from_path
+import os
+
+# Load model and components
+model_path = "nanonets/Nanonets-OCR-s"
+model = AutoModelForImageTextToText.from_pretrained(
+    model_path,
+    torch_dtype="auto",
+    device_map="auto"
+)
+model.eval()
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+processor = AutoProcessor.from_pretrained(model_path)
+
+# Define OCR function for a single image
+def ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=4096):
+    prompt = """Extract the text from the above document as if you were reading it naturally. Return the tables in html format. Return the equations in LaTeX representation. If there is an image in the document and image caption is not present, add a small description of the image inside the <img></img> tag; otherwise, add the image caption inside <img></img>. Watermarks should be wrapped in brackets. Ex: <watermark>OFFICIAL COPY</watermark>. Page numbers should be wrapped in brackets. Ex: <page_number>14</page_number> or <page_number>9/22</page_number>. Prefer using ☐ and ☑ for check boxes."""
+
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": [
+            {"type": "image", "image": f"file://temp_image.jpg"},
+            {"type": "text", "text": prompt},
+        ]},
+    ]
+
+    text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = processor(text=[text], images=[image], padding=True, return_tensors="pt")
+    inputs = inputs.to(model.device)
+
+    output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False)
+    generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
+    output_text = processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+
+    return output_text[0]
+
+# Process PDF
+def process_pdf(pdf_path, model, processor, output_dir="/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/output_markdown"):
+    os.makedirs(output_dir, exist_ok=True)
+    images = convert_from_path(pdf_path)
+    results = []
+    for i, image in enumerate(images):
+        temp_image_path = f"/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/temp/temp_page_{i+1}.jpg"
+        # Ensure the temp directory exists
+        os.makedirs(os.path.dirname(temp_image_path), exist_ok=True)
+        image.save(temp_image_path, "JPEG")
+        result = ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=15000)
+        results.append(f"--- Page {i+1} ---\n{result}")
+        os.remove(temp_image_path)
+
+    output_path = os.path.join(output_dir, "output.md")
+    with open(output_path, "w") as f:
+        f.write("\n\n".join(results))
+
+    return output_path
+
+# Example usage
+pdf_path = "/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/input/extracted_pages_combined_2.pdf"
+output_path = process_pdf(pdf_path, model, processor)
+print(f"Output saved to: {output_path}")
 
