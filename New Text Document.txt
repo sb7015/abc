@@ -1,154 +1,169 @@
-from PIL import Image
-from transformers import AutoTokenizer, AutoProcessor, AutoModelForImageTextToText
-from pdf2image import convert_from_path
-import pandas as pd
-import os
-from io import StringIO  # Added to handle the FutureWarning from pandas
+#!/usr/bin/env python3
+"""
+OpenAI-provider LangExtract benchmark (no os.getenv, no API key check)
+"""
 
-# Load model and components
-model_path = "nanonets/Nanonets-OCR-s"
-model = AutoModelForImageTextToText.from_pretrained(
-    model_path,
-    torch_dtype="auto",
-    device_map="auto"
+import time, json, csv, textwrap, logging
+from datetime import datetime
+from typing import List, Dict, Any
+
+import langextract as lx
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
 )
-model.eval()
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-processor = AutoProcessor.from_pretrained(model_path)
+log = logging.getLogger("openai_benchmark")
 
-# Define OCR function for a single image, focusing on table extraction
-def ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=4096):
-    prompt = """Extract tables from the document in HTML format."""
+# ------------------------------------------------------------------
+# 1. CONFIG – EDIT HERE ONLY
+# ------------------------------------------------------------------
+API_KEY      = "XXXXXXXXX"   # Replace with your actual key
+MODEL_URL    = "XXXXXXXXX"
+MODEL_ID     = "gpt-4o"
+TIMEOUT_S    = 60
+MAX_CHARS    = 200_000
 
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": [
-            {"type": "image", "image": f"file://temp_image.jpg"},
-            {"type": "text", "text": prompt},
-        ]},
-    ]
+# ------------------------------------------------------------------
+# 2. Prompt + few-shot
+# ------------------------------------------------------------------
+PROMPT = textwrap.dedent("""\
+Extract planet names, numeric facts, and relationships.
+- extraction_class: planet_fact
+- extraction_text: exact phrase
+- attributes: {fact: short phrase}\
+""")
 
-    text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    inputs = processor(text=[text], images=[image], padding=True, return_tensors="pt")
-    inputs = inputs.to(model.device)
+EXAMPLES = [
+    lx.data.ExampleData(
+        text="Mars has a radius of 3,390 km.",
+        extractions=[
+            lx.data.Extraction(
+                extraction_class="planet_fact",
+                extraction_text="Mars",
+                attributes={"fact": "radius 3,390 km"},
+            )
+        ],
+    )
+]
 
-    output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False)
-    generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
-    output_text = processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+# ------------------------------------------------------------------
+# 3. Corpus builder
+# ------------------------------------------------------------------
+def build_corpus() -> List[Dict[str, str]]:
+    base = """
+    Mercury is the smallest planet. Venus is the hottest. Earth harbors life.
+    Mars is red. Jupiter is massive. Saturn has rings. Uranus rolls on its side.
+    Neptune has strong winds. Pluto is a dwarf planet.
+    """
+    docs = []
+    for mult in (1, 3, 10, 30, 100, 300):
+        txt = (base * mult).strip()
+        if len(txt) > MAX_CHARS:
+            break
+        docs.append({"name": f"{len(txt)//1_000}k", "text": txt})
+    return docs
 
-    return output_text[0]
+# ------------------------------------------------------------------
+# 4. Single call
+# ------------------------------------------------------------------
+def single_run(text: str) -> Dict[str, Any]:
+    start = time.perf_counter()
+    try:
+        result = lx.extract(
+            text_or_documents=text,
+            prompt_description=PROMPT,
+            examples=EXAMPLES,
+            model_id=MODEL_ID,
+            api_key=API_KEY,
+            model_url=MODEL_URL,
+            fence_output=True,
+            use_schema_constraints=False,
+        )
+        elapsed = time.perf_counter() - start
+        extractions = result.extractions or []
+        usage = getattr(result, "usage_metadata", {}) or {}
+        prompt_tokens = usage.get("prompt_token_count", 0)
+        completion_tokens = usage.get("candidates_token_count", 0)
+        return {
+            "success": True,
+            "chars": len(text),
+            "elapsed_s": round(elapsed, 2),
+            "extractions": len(extractions),
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "error": None,
+        }
+    except Exception as exc:
+        elapsed = time.perf_counter() - start
+        return {
+            "success": False,
+            "chars": len(text),
+            "elapsed_s": round(elapsed, 2),
+            "extractions": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "error": str(exc)[:100],
+        }
 
-# Extract tables and save as CSV/Excel
-def process_pdf_for_tables(pdf_path, model, processor, output_dir="/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/output_table", output_format="csv"):
-    os.makedirs(output_dir, exist_ok=True)
-    images = convert_from_path(pdf_path)
-    all_tables = []
+# ------------------------------------------------------------------
+# 5. Main loop
+# ------------------------------------------------------------------
+def main():
+    corpus = build_corpus()
+    log.info("Starting benchmark with %s documents", len(corpus))
 
-    for i, image in enumerate(images):
-        temp_image_path = f"/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/temp/temp_page_{i+1}.jpg"
-        # Ensure the temp directory exists
-        os.makedirs(os.path.dirname(temp_image_path), exist_ok=True)
-        image.save(temp_image_path, "JPEG")
-        html_output = ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=15000)
+    csv_name = f"openai_langextract_benchmark_{datetime.now():%Y%m%d_%H%M}.csv"
+    jsonl_name = csv_name.replace(".csv", ".jsonl")
 
-        # Extract HTML tables using pandas with StringIO to avoid FutureWarning
-        try:
-            html_io = StringIO(html_output)  # Wrap the HTML string in StringIO
-            tables = pd.read_html(html_io)
-            for j, table in enumerate(tables):
-                table['Page'] = i + 1  # Add page number for reference
-                all_tables.append(table)
-        except ValueError:
-            print(f"No tables found on page {i+1}")
+    with open(csv_name, "w", newline="", encoding="utf-8") as cf, open(
+        jsonl_name, "w", encoding="utf-8"
+    ) as jf:
+        writer = csv.DictWriter(
+            cf,
+            fieldnames=[
+                "name",
+                "chars",
+                "elapsed_s",
+                "extractions",
+                "prompt_tokens",
+                "completion_tokens",
+                "success",
+                "error",
+            ],
+        )
+        writer.writeheader()
 
-        os.remove(temp_image_path)
+        for doc in corpus:
+            log.info("Running %s (%s chars)", doc["name"], f"{len(doc['text']):,}")
+            res = single_run(doc["text"])
+            row = {"name": doc["name"], **res}
+            writer.writerow(row)
+            cf.flush()
 
-    if not all_tables:
-        print("No tables extracted from the document.")
-        return None
+            json_rec = {
+                "timestamp": datetime.now().isoformat(),
+                "model_id": MODEL_ID,
+                "model_url": MODEL_URL,
+                **row,
+            }
+            print(json.dumps(json_rec), file=jf)
+            jf.flush()
 
-    # Combine all tables into a single DataFrame
-    combined_df = pd.concat(all_tables, ignore_index=True)
+            if not res["success"] or res["elapsed_s"] > TIMEOUT_S:
+                log.warning("Stopping early – last call failed or timed out")
+                break
 
-    # Save to CSV or Excel
-    if output_format == "csv":
-        output_path = os.path.join(output_dir, "tables.csv")
-        combined_df.to_csv(output_path, index=False)
-    elif output_format == "excel":
-        output_path = os.path.join(output_dir, "tables.xlsx")
-        combined_df.to_excel(output_path, index=False)
-
-    return output_path
-
-# Example usage
-pdf_path = "/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/input/extracted_pages_combined.pdf"
-output_path = process_pdf_for_tables(pdf_path, model, processor, output_format="csv")  # Change to "excel" for .xlsx
-if output_path:
-    print(f"Tables saved to: {output_path}")
+    log.info("Done. Results -> %s + %s", csv_name, jsonl_name)
 
 
+if __name__ == "__main__":
+    main()
+name	chars	elapsed_s	extractions	prompt_tokens	completion_tokens	success	error
+0k	209	1.98	9	0	0	TRUE	
+0k	647	1.85	9	0	0	TRUE	
+2k	2180	3.37	27	0	0	TRUE	
+6k	6560	9.04	99	0	0	TRUE	
+21k	21890	723.17	207	0	0	TRUE	
 
-
-from PIL import Image
-from transformers import AutoTokenizer, AutoProcessor, AutoModelForImageTextToText
-from pdf2image import convert_from_path
-import os
-
-# Load model and components
-model_path = "nanonets/Nanonets-OCR-s"
-model = AutoModelForImageTextToText.from_pretrained(
-    model_path,
-    torch_dtype="auto",
-    device_map="auto"
-)
-model.eval()
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-processor = AutoProcessor.from_pretrained(model_path)
-
-# Define OCR function for a single image
-def ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=4096):
-    prompt = """Extract the text from the above document as if you were reading it naturally. Return the tables in html format. Return the equations in LaTeX representation. If there is an image in the document and image caption is not present, add a small description of the image inside the <img></img> tag; otherwise, add the image caption inside <img></img>. Watermarks should be wrapped in brackets. Ex: <watermark>OFFICIAL COPY</watermark>. Page numbers should be wrapped in brackets. Ex: <page_number>14</page_number> or <page_number>9/22</page_number>. Prefer using ☐ and ☑ for check boxes."""
-
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": [
-            {"type": "image", "image": f"file://temp_image.jpg"},
-            {"type": "text", "text": prompt},
-        ]},
-    ]
-
-    text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    inputs = processor(text=[text], images=[image], padding=True, return_tensors="pt")
-    inputs = inputs.to(model.device)
-
-    output_ids = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False)
-    generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
-    output_text = processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)
-
-    return output_text[0]
-
-# Process PDF
-def process_pdf(pdf_path, model, processor, output_dir="/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/output_markdown"):
-    os.makedirs(output_dir, exist_ok=True)
-    images = convert_from_path(pdf_path)
-    results = []
-    for i, image in enumerate(images):
-        temp_image_path = f"/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/temp/temp_page_{i+1}.jpg"
-        # Ensure the temp directory exists
-        os.makedirs(os.path.dirname(temp_image_path), exist_ok=True)
-        image.save(temp_image_path, "JPEG")
-        result = ocr_page_with_nanonets_s(image, model, processor, max_new_tokens=15000)
-        results.append(f"--- Page {i+1} ---\n{result}")
-        os.remove(temp_image_path)
-
-    output_path = os.path.join(output_dir, "output.md")
-    with open(output_path, "w") as f:
-        f.write("\n\n".join(results))
-
-    return output_path
-
-# Example usage
-pdf_path = "/mnt/nfs/work/ocr_nano/ocr_nanonet/ocr_nano/input/extracted_pages_combined_2.pdf"
-output_path = process_pdf(pdf_path, model, processor)
-print(f"Output saved to: {output_path}")
 
