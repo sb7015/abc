@@ -167,3 +167,100 @@ name	chars	elapsed_s	extractions	prompt_tokens	completion_tokens	success	error
 21k	21890	723.17	207	0	0	TRUE	
 
 
+
+import os
+import textwrap
+import pathlib as pl
+import pandas as pd
+import langextract as lx
+
+# Set up SSL certificates if needed
+os.environ['SSL_CERT_FILE'] = os.path.join(os.getcwd(), "root.pem")
+os.environ['REQUESTS_CA_BUNDLE'] = os.path.join(os.getcwd(), "root.pem")
+
+# 🔧 Set your markdown filename here
+markdown_filename = "extracted_pages_combined.md"  # Replace with your actual file name
+md_file = pl.Path(markdown_filename)
+
+if not md_file.exists():
+    raise FileNotFoundError(f"File not found: {md_file.resolve()}")
+
+# 📌 Prompt and few-shot example
+prompt = textwrap.dedent("""\
+    The input is a Markdown file that contains one or more tables (pipe-delimited or GitHub-flavoured).
+    1. Locate the primary data table (ignore layout or TOC tables).
+    2. Use the header row to determine the column names.
+    3. Return one extraction per data row (skip the header itself).
+    4. extraction_class must be "table_row".
+    5. extraction_text must be the raw text of the first cell in that row (useful as a natural key).
+    6. attributes must be a dict whose keys are the exact column headers and whose values are the corresponding cell texts for that row.
+    7. Preserve original wording; do not paraphrase.
+    8. If a cell is empty, store an empty string as value.
+    9. Emit rows in the same order they appear in the Markdown.
+""")
+
+examples = [
+    lx.data.ExampleData(
+        text=textwrap.dedent("""\
+            | Planet  | Distance (AU) | Radius (km) | Moons |
+            |---------|---------------|-------------|-------|
+            | Earth   | 1.0           | 6371        | 1     |
+            | Mars    | 1.52          | 3390        | 2     |
+        """),
+        extractions=[
+            lx.data.Extraction(
+                extraction_class="table_row",
+                extraction_text="Earth",
+                attributes={
+                    "Planet": "Earth",
+                    "Distance (AU)": "1.0",
+                    "Radius (km)": "6371",
+                    "Moons": "1"
+                }
+            ),
+            lx.data.Extraction(
+                extraction_class="table_row",
+                extraction_text="Mars",
+                attributes={
+                    "Planet": "Mars",
+                    "Distance (AU)": "1.52",
+                    "Radius (km)": "3390",
+                    "Moons": "2"
+                }
+            ),
+        ]
+    )
+]
+
+# 📄 Read the Markdown file
+markdown_text = md_file.read_text(encoding="utf-8")
+
+# 🧠 LangExtract call
+result = lx.extract(
+    text_or_documents=markdown_text,
+    prompt_description=prompt,
+    examples=examples,
+    model_id="gpt-4o",
+    api_key="hclXrQFZfwREJigLbW6wKu3ao68Bwyk6",  # or replace with your actual key
+    model_url="https://api.horizon.elevancehealth.com/openai/v1"  # or your custom model URL
+)
+
+# 📊 Convert extractions to DataFrame
+rows = []
+for ext in result.extractions:
+    row = {"Class": ext.extraction_class, "Text": ext.extraction_text}
+    if ext.attributes:  # Only update if attributes are not None
+        row.update(ext.attributes)
+    rows.append(row)
+df = pd.DataFrame(rows)
+
+# 🧼 Clean and export
+df_clean = df.drop(columns=["Class", "Text"])
+df_clean.to_excel(md_file.with_suffix(".xlsx"), index=False)
+df_clean.to_html(md_file.with_suffix(".html"), index=False)
+
+print(f"✅ Done! Files saved as:\n→ {md_file.with_suffix('.xlsx').resolve()}\n→ {md_file.with_suffix('.html').resolve()}")
+
+
+
+
