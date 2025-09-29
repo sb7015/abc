@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fraud Detection System - Technology Stack</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #EBE4FF 0%, #D9F5F5 100%);
+            color: #231E33;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #281849;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #5009B5;
+            font-size: 1.2em;
+        }
+
+        .phases-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .phase {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(80, 9, 181, 0.1);
+            overflow: hidden;
+        }
+
+        .phase-header {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .phase1-header {
+            background: linear-gradient(135deg, #5009B5, #794CFF);
+        }
+
+        .phase2-header {
+            background: linear-gradient(135deg, #00BEBA, #00B5F5);
+        }
+
+        .stack-layer {
+            margin: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .layer-header {
+            padding: 12px 20px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        .layer-content {
+            padding: 15px 20px;
+            background: #F5F5F5;
+        }
+
+        .layer-item {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        /* Phase 1 Layers */
+        .data-sources .layer-header { background: #5009B5; }
+        .data-sources .layer-item { border-left-color: #5009B5; }
+
+        .extraction .layer-header { background: #794CFF; }
+        .extraction .layer-item { border-left-color: #794CFF; }
+
+        .normalization .layer-header { background: #281849; }
+        .normalization .layer-item { border-left-color: #281849; }
+
+        /* Phase 2 Layers */
+        .ai-linguistic .layer-header { background: #00BEBA; }
+        .ai-linguistic .layer-item { border-left-color: #00BEBA; }
+
+        .factual .layer-header { background: #00B5F5; }
+        .factual .layer-item { border-left-color: #00B5F5; }
+
+        .context .layer-header { background: #281849; }
+        .context .layer-item { border-left-color: #281849; }
+
+        .tech-stack {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(80, 9, 181, 0.1);
+        }
+
+        .tech-stack h2 {
+            color: #281849;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .tech-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .tech-layer {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-layer-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .tech-layer-content {
+            flex: 1;
+        }
+
+        .tech-layer-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .tech-layer-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-item {
+            background: #EBE4FF;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #281849;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tech-icon {
+            font-size: 1.1em;
+        }
+
+        /* Tech Stack Layer Colors */
+        .presentation-layer { background: #E1edff; }
+        .presentation-layer .tech-layer-icon { background: #00B5F5; }
+        .presentation-layer .tech-layer-title { color: #00B5F5; }
+
+        .application-layer { background: #D9F5F5; }
+        .application-layer .tech-layer-icon { background: #00BEBA; }
+        .application-layer .tech-layer-title { color: #00BEBA; }
+
+        .ai-layer { background: #EBE4FF; }
+        .ai-layer .tech-layer-icon { background: #794CFF; }
+        .ai-layer .tech-layer-title { color: #794CFF; }
+
+        .data-layer { background: #F5F5F5; }
+        .data-layer .tech-layer-icon { background: #5009B5; }
+        .data-layer .tech-layer-title { color: #5009B5; }
+
+        .infrastructure-layer { background: #F5F5F5; }
+        .infrastructure-layer .tech-layer-icon { background: #281849; }
+        .infrastructure-layer .tech-layer-title { color: #281849; }
+
+        @media (max-width: 768px) {
+            .phases-container {
+                flex-direction: column;
+            }
+
+            .tech-layer {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .tech-layer-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Fraud Detection System</h1>
+            <p>Technology Stack & Implementation Phases</p>
+        </div>
+
+        <div class="phases-container">
+            <!-- Phase 1: Data Ingestion & Preprocessing -->
+            <div class="phase">
+                <div class="phase-header phase1-header">
+                    Phase 1: Data Ingestion & Preprocessing
+                </div>
+
+                <div class="stack-layer data-sources">
+                    <div class="layer-header">Data Sources Integration</div>
+                    <div class="layer-content">
+                        <div class="layer-item">CMS-1500 & UB-04 Claims</div>
+                        <div class="layer-item">EHR Extracts & Clinical Notes</div>
+                        <div class="layer-item">Provider Directories & Master Data</div>
+                        <div class="layer-item">Prior Authorization Requests</div>
+                    </div>
+                </div>
+
+                <div class="stack-layer extraction">
+                    <div class="layer-header">Data Extraction & Digitization</div>
+                    <div class="layer-content">
+                        <div class="layer-item">OCR with Intelligent Document Processing</div>
+                        <div class="layer-item">Key Field Extraction</div>
+                        <div class="layer-item">Scanned Document Processing</div>
+                    </div>
+                </div>
+
+                <div class="stack-layer normalization">
+                    <div class="layer-header">Normalization & Standardization</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Medical Terminology Mapping</div>
+                        <div class="layer-item">CPT/HCPCS/ICD-10 Validation</div>
+                        <div class="layer-item">Data Linking & Enrichment</div>
+                        <div class="layer-item">Historical Data Integration</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2: Core AI Detection Modules -->
+            <div class="phase">
+                <div class="phase-header phase2-header">
+                    Phase 2: Core AI Detection Modules
+                </div>
+
+                <div class="stack-layer ai-linguistic">
+                    <div class="layer-header">AI Linguistic Detection</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Human Variability vs AI Consistency</div>
+                        <div class="layer-item">Perplexity & Burstiness Analysis</div>
+                        <div class="layer-item">Suspicious Repetition Detection</div>
+                        <div class="layer-item">Lexical Diversity Analysis</div>
+                    </div>
+                </div>
+
+                <div class="stack-layer factual">
+                    <div class="layer-header">Factual Consistency</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Temporal Logic Validation</div>
+                        <div class="layer-item">Medical Necessity Alignment</div>
+                        <div class="layer-item">Dosage & Frequency Checks</div>
+                        <div class="layer-item">Cross-Patient Analysis</div>
+                    </div>
+                </div>
+
+                <div class="stack-layer context">
+                    <div class="layer-header">Context-Based Analysis</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Age/Sex Appropriateness</div>
+                        <div class="layer-item">Provider Specialty Matching</div>
+                        <div class="layer-item">Diagnosis-Procedure Validation</div>
+                        <div class="layer-item">Scope of Practice Verification</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Stack -->
+        <div class="tech-stack">
+            <h2>Complete Technology Stack</h2>
+            <div class="tech-layers">
+                <div class="tech-layer presentation-layer">
+                    <div class="tech-layer-icon">🖥️</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Presentation Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item"><span class="tech-icon">⚛️</span>React.js</span>
+                            <span class="tech-item"><span class="tech-icon">🅰️</span>Angular</span>
+                            <span class="tech-item"><span class="tech-icon">📊</span>D3.js</span>
+                            <span class="tech-item"><span class="tech-icon">🎨</span>Tableau</span>
+                            <span class="tech-item"><span class="tech-icon">📱</span>Responsive UI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-layer application-layer">
+                    <div class="tech-layer-icon">⚙️</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Application Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item"><span class="tech-icon">☕</span>Java Spring Boot</span>
+                            <span class="tech-item"><span class="tech-icon">🔷</span>.NET Core</span>
+                            <span class="tech-item"><span class="tech-icon">🟢</span>Node.js</span>
+                            <span class="tech-item"><span class="tech-icon">🐍</span>Python Flask</span>
+                            <span class="tech-item"><span class="tech-icon">🔌</span>RESTful APIs</span>
+                            <span class="tech-item"><span class="tech-icon">🏥</span>HL7/FHIR</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-layer ai-layer">
+                    <div class="tech-layer-icon">🤖</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">AI/ML Processing Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item"><span class="tech-icon">🐍</span>Python</span>
+                            <span class="tech-item"><span class="tech-icon">🔥</span>PyTorch</span>
+                            <span class="tech-item"><span class="tech-icon">🧠</span>TensorFlow</span>
+                            <span class="tech-item"><span class="tech-icon">🤗</span>Hugging Face</span>
+                            <span class="tech-item"><span class="tech-icon">📝</span>spaCy NLP</span>
+                            <span class="tech-item"><span class="tech-icon">🔍</span>Scikit-learn</span>
+                            <span class="tech-item"><span class="tech-icon">📄</span>Tesseract OCR</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-layer data-layer">
+                    <div class="tech-layer-icon">💾</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Data Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item"><span class="tech-icon">🗄️</span>PostgreSQL</span>
+                            <span class="tech-item"><span class="tech-icon">🔷</span>SQL Server</span>
+                            <span class="tech-item"><span class="tech-icon">🐬</span>MySQL</span>
+                            <span class="tech-item"><span class="tech-icon">🍃</span>MongoDB</span>
+                            <span class="tech-item"><span class="tech-icon">⚡</span>Redis Cache</span>
+                            <span class="tech-item"><span class="tech-icon">🐘</span>Apache Kafka</span>
+                            <span class="tech-item"><span class="tech-icon">📦</span>Amazon S3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-layer infrastructure-layer">
+                    <div class="tech-layer-icon">☁️</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Infrastructure Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item"><span class="tech-icon">☁️</span>AWS / Azure</span>
+                            <span class="tech-item"><span class="tech-icon">🐳</span>Docker</span>
+                            <span class="tech-item"><span class="tech-icon">☸️</span>Kubernetes</span>
+                            <span class="tech-item"><span class="tech-icon">🖥️</span>Linux</span>
+                            <span class="tech-item"><span class="tech-icon">🪟</span>Windows Server</span>
+                            <span class="tech-item"><span class="tech-icon">🔐</span>HIPAA Compliance</span>
+                            <span class="tech-item"><span class="tech-icon">⚡</span>GPU Computing</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
