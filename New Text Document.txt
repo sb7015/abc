@@ -1,266 +1,377 @@
-#!/usr/bin/env python3
-"""
-OpenAI-provider LangExtract benchmark (no os.getenv, no API key check)
-"""
-
-import time, json, csv, textwrap, logging
-from datetime import datetime
-from typing import List, Dict, Any
-
-import langextract as lx
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s",
-)
-log = logging.getLogger("openai_benchmark")
-
-# ------------------------------------------------------------------
-# 1. CONFIG – EDIT HERE ONLY
-# ------------------------------------------------------------------
-API_KEY      = "XXXXXXXXX"   # Replace with your actual key
-MODEL_URL    = "XXXXXXXXX"
-MODEL_ID     = "gpt-4o"
-TIMEOUT_S    = 60
-MAX_CHARS    = 200_000
-
-# ------------------------------------------------------------------
-# 2. Prompt + few-shot
-# ------------------------------------------------------------------
-PROMPT = textwrap.dedent("""\
-Extract planet names, numeric facts, and relationships.
-- extraction_class: planet_fact
-- extraction_text: exact phrase
-- attributes: {fact: short phrase}\
-""")
-
-EXAMPLES = [
-    lx.data.ExampleData(
-        text="Mars has a radius of 3,390 km.",
-        extractions=[
-            lx.data.Extraction(
-                extraction_class="planet_fact",
-                extraction_text="Mars",
-                attributes={"fact": "radius 3,390 km"},
-            )
-        ],
-    )
-]
-
-# ------------------------------------------------------------------
-# 3. Corpus builder
-# ------------------------------------------------------------------
-def build_corpus() -> List[Dict[str, str]]:
-    base = """
-    Mercury is the smallest planet. Venus is the hottest. Earth harbors life.
-    Mars is red. Jupiter is massive. Saturn has rings. Uranus rolls on its side.
-    Neptune has strong winds. Pluto is a dwarf planet.
-    """
-    docs = []
-    for mult in (1, 3, 10, 30, 100, 300):
-        txt = (base * mult).strip()
-        if len(txt) > MAX_CHARS:
-            break
-        docs.append({"name": f"{len(txt)//1_000}k", "text": txt})
-    return docs
-
-# ------------------------------------------------------------------
-# 4. Single call
-# ------------------------------------------------------------------
-def single_run(text: str) -> Dict[str, Any]:
-    start = time.perf_counter()
-    try:
-        result = lx.extract(
-            text_or_documents=text,
-            prompt_description=PROMPT,
-            examples=EXAMPLES,
-            model_id=MODEL_ID,
-            api_key=API_KEY,
-            model_url=MODEL_URL,
-            fence_output=True,
-            use_schema_constraints=False,
-        )
-        elapsed = time.perf_counter() - start
-        extractions = result.extractions or []
-        usage = getattr(result, "usage_metadata", {}) or {}
-        prompt_tokens = usage.get("prompt_token_count", 0)
-        completion_tokens = usage.get("candidates_token_count", 0)
-        return {
-            "success": True,
-            "chars": len(text),
-            "elapsed_s": round(elapsed, 2),
-            "extractions": len(extractions),
-            "prompt_tokens": prompt_tokens,
-            "completion_tokens": completion_tokens,
-            "error": None,
-        }
-    except Exception as exc:
-        elapsed = time.perf_counter() - start
-        return {
-            "success": False,
-            "chars": len(text),
-            "elapsed_s": round(elapsed, 2),
-            "extractions": 0,
-            "prompt_tokens": 0,
-            "completion_tokens": 0,
-            "error": str(exc)[:100],
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fraud Detection System - Technology Stack</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #EBE4FF 0%, #D9F5F5 100%);
+            color: #231E33;
         }
 
-# ------------------------------------------------------------------
-# 5. Main loop
-# ------------------------------------------------------------------
-def main():
-    corpus = build_corpus()
-    log.info("Starting benchmark with %s documents", len(corpus))
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    csv_name = f"openai_langextract_benchmark_{datetime.now():%Y%m%d_%H%M}.csv"
-    jsonl_name = csv_name.replace(".csv", ".jsonl")
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    with open(csv_name, "w", newline="", encoding="utf-8") as cf, open(
-        jsonl_name, "w", encoding="utf-8"
-    ) as jf:
-        writer = csv.DictWriter(
-            cf,
-            fieldnames=[
-                "name",
-                "chars",
-                "elapsed_s",
-                "extractions",
-                "prompt_tokens",
-                "completion_tokens",
-                "success",
-                "error",
-            ],
-        )
-        writer.writeheader()
+        .header h1 {
+            color: #281849;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
 
-        for doc in corpus:
-            log.info("Running %s (%s chars)", doc["name"], f"{len(doc['text']):,}")
-            res = single_run(doc["text"])
-            row = {"name": doc["name"], **res}
-            writer.writerow(row)
-            cf.flush()
+        .header p {
+            color: #5009B5;
+            font-size: 1.2em;
+        }
 
-            json_rec = {
-                "timestamp": datetime.now().isoformat(),
-                "model_id": MODEL_ID,
-                "model_url": MODEL_URL,
-                **row,
+        .phases-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .phase {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(80, 9, 181, 0.1);
+            overflow: hidden;
+        }
+
+        .phase-header {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .phase1-header {
+            background: linear-gradient(135deg, #5009B5, #794CFF);
+        }
+
+        .phase2-header {
+            background: linear-gradient(135deg, #00BEBA, #00B5F5);
+        }
+
+        .stack-layer {
+            margin: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .layer-header {
+            padding: 12px 20px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        .layer-content {
+            padding: 15px 20px;
+            background: #F5F5F5;
+        }
+
+        .layer-item {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        /* Phase 1 Layers */
+        .data-sources .layer-header { background: #5009B5; }
+        .data-sources .layer-item { border-left-color: #5009B5; }
+
+        .extraction .layer-header { background: #794CFF; }
+        .extraction .layer-item { border-left-color: #794CFF; }
+
+        .normalization .layer-header { background: #281849; }
+        .normalization .layer-item { border-left-color: #281849; }
+
+        /* Phase 2 Layers */
+        .ai-linguistic .layer-header { background: #00BEBA; }
+        .ai-linguistic .layer-item { border-left-color: #00BEBA; }
+
+        .factual .layer-header { background: #00B5F5; }
+        .factual .layer-item { border-left-color: #00B5F5; }
+
+        .context .layer-header { background: #281849; }
+        .context .layer-item { border-left-color: #281849; }
+
+        .tech-stack {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(80, 9, 181, 0.1);
+        }
+
+        .tech-stack h2 {
+            color: #281849;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .tech-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .tech-layer {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-layer-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 20px;
+        }
+
+        .tech-layer-content {
+            flex: 1;
+        }
+
+        .tech-layer-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .tech-layer-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-item {
+            background: #EBE4FF;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #281849;
+        }
+
+        /* Tech Stack Layer Colors */
+        .presentation-layer { background: #E1edff; }
+        .presentation-layer .tech-layer-icon { background: #00B5F5; }
+        .presentation-layer .tech-layer-title { color: #00B5F5; }
+
+        .application-layer { background: #D9F5F5; }
+        .application-layer .tech-layer-icon { background: #00BEBA; }
+        .application-layer .tech-layer-title { color: #00BEBA; }
+
+        .ai-layer { background: #EBE4FF; }
+        .ai-layer .tech-layer-icon { background: #794CFF; }
+        .ai-layer .tech-layer-title { color: #794CFF; }
+
+        .data-layer { background: #F5F5F5; }
+        .data-layer .tech-layer-icon { background: #5009B5; }
+        .data-layer .tech-layer-title { color: #5009B5; }
+
+        .infrastructure-layer { background: #F5F5F5; }
+        .infrastructure-layer .tech-layer-icon { background: #281849; }
+        .infrastructure-layer .tech-layer-title { color: #281849; }
+
+        @media (max-width: 768px) {
+            .phases-container {
+                flex-direction: column;
             }
-            print(json.dumps(json_rec), file=jf)
-            jf.flush()
 
-            if not res["success"] or res["elapsed_s"] > TIMEOUT_S:
-                log.warning("Stopping early – last call failed or timed out")
-                break
+            .tech-layer {
+                flex-direction: column;
+                text-align: center;
+            }
 
-    log.info("Done. Results -> %s + %s", csv_name, jsonl_name)
+            .tech-layer-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Fraud Detection System</h1>
+            <p>Technology Stack & Implementation Phases</p>
+        </div>
 
+        <div class="phases-container">
+            <!-- Phase 1: Data Ingestion & Preprocessing -->
+            <div class="phase">
+                <div class="phase-header phase1-header">
+                    Phase 1: Data Ingestion & Preprocessing
+                </div>
 
-if __name__ == "__main__":
-    main()
-name	chars	elapsed_s	extractions	prompt_tokens	completion_tokens	success	error
-0k	209	1.98	9	0	0	TRUE	
-0k	647	1.85	9	0	0	TRUE	
-2k	2180	3.37	27	0	0	TRUE	
-6k	6560	9.04	99	0	0	TRUE	
-21k	21890	723.17	207	0	0	TRUE	
+                <div class="stack-layer data-sources">
+                    <div class="layer-header">Data Sources Integration</div>
+                    <div class="layer-content">
+                        <div class="layer-item">CMS-1500 & UB-04 Claims</div>
+                        <div class="layer-item">EHR Extracts & Clinical Notes</div>
+                        <div class="layer-item">Provider Directories & Master Data</div>
+                        <div class="layer-item">Prior Authorization Requests</div>
+                    </div>
+                </div>
 
+                <div class="stack-layer extraction">
+                    <div class="layer-header">Data Extraction & Digitization</div>
+                    <div class="layer-content">
+                        <div class="layer-item">OCR with Intelligent Document Processing</div>
+                        <div class="layer-item">Key Field Extraction</div>
+                        <div class="layer-item">Scanned Document Processing</div>
+                    </div>
+                </div>
 
+                <div class="stack-layer normalization">
+                    <div class="layer-header">Normalization & Standardization</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Medical Terminology Mapping</div>
+                        <div class="layer-item">CPT/HCPCS/ICD-10 Validation</div>
+                        <div class="layer-item">Data Linking & Enrichment</div>
+                        <div class="layer-item">Historical Data Integration</div>
+                    </div>
+                </div>
+            </div>
 
-import os
-import textwrap
-import pathlib as pl
-import pandas as pd
-import langextract as lx
+            <!-- Phase 2: Core AI Detection Modules -->
+            <div class="phase">
+                <div class="phase-header phase2-header">
+                    Phase 2: Core AI Detection Modules
+                </div>
 
-# Set up SSL certificates if needed
-os.environ['SSL_CERT_FILE'] = os.path.join(os.getcwd(), "root.pem")
-os.environ['REQUESTS_CA_BUNDLE'] = os.path.join(os.getcwd(), "root.pem")
+                <div class="stack-layer ai-linguistic">
+                    <div class="layer-header">AI Linguistic Detection</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Human Variability vs AI Consistency</div>
+                        <div class="layer-item">Perplexity & Burstiness Analysis</div>
+                        <div class="layer-item">Suspicious Repetition Detection</div>
+                        <div class="layer-item">Lexical Diversity Analysis</div>
+                    </div>
+                </div>
 
-# 🔧 Set your markdown filename here
-markdown_filename = "extracted_pages_combined.md"  # Replace with your actual file name
-md_file = pl.Path(markdown_filename)
+                <div class="stack-layer factual">
+                    <div class="layer-header">Factual Consistency</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Temporal Logic Validation</div>
+                        <div class="layer-item">Medical Necessity Alignment</div>
+                        <div class="layer-item">Dosage & Frequency Checks</div>
+                        <div class="layer-item">Cross-Patient Analysis</div>
+                    </div>
+                </div>
 
-if not md_file.exists():
-    raise FileNotFoundError(f"File not found: {md_file.resolve()}")
+                <div class="stack-layer context">
+                    <div class="layer-header">Context-Based Analysis</div>
+                    <div class="layer-content">
+                        <div class="layer-item">Age/Sex Appropriateness</div>
+                        <div class="layer-item">Provider Specialty Matching</div>
+                        <div class="layer-item">Diagnosis-Procedure Validation</div>
+                        <div class="layer-item">Scope of Practice Verification</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-# 📌 Prompt and few-shot example
-prompt = textwrap.dedent("""\
-    The input is a Markdown file that contains one or more tables (pipe-delimited or GitHub-flavoured).
-    1. Locate the primary data table (ignore layout or TOC tables).
-    2. Use the header row to determine the column names.
-    3. Return one extraction per data row (skip the header itself).
-    4. extraction_class must be "table_row".
-    5. extraction_text must be the raw text of the first cell in that row (useful as a natural key).
-    6. attributes must be a dict whose keys are the exact column headers and whose values are the corresponding cell texts for that row.
-    7. Preserve original wording; do not paraphrase.
-    8. If a cell is empty, store an empty string as value.
-    9. Emit rows in the same order they appear in the Markdown.
-""")
+        <!-- Technology Stack -->
+        <div class="tech-stack">
+            <h2>Complete Technology Stack</h2>
+            <div class="tech-layers">
+                <div class="tech-layer presentation-layer">
+                    <div class="tech-layer-icon">UI</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Presentation Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item">Investigation Dashboard</span>
+                            <span class="tech-item">Alert Management UI</span>
+                            <span class="tech-item">Reporting Interface</span>
+                            <span class="tech-item">Case Management Portal</span>
+                        </div>
+                    </div>
+                </div>
 
-examples = [
-    lx.data.ExampleData(
-        text=textwrap.dedent("""\
-            | Planet  | Distance (AU) | Radius (km) | Moons |
-            |---------|---------------|-------------|-------|
-            | Earth   | 1.0           | 6371        | 1     |
-            | Mars    | 1.52          | 3390        | 2     |
-        """),
-        extractions=[
-            lx.data.Extraction(
-                extraction_class="table_row",
-                extraction_text="Earth",
-                attributes={
-                    "Planet": "Earth",
-                    "Distance (AU)": "1.0",
-                    "Radius (km)": "6371",
-                    "Moons": "1"
-                }
-            ),
-            lx.data.Extraction(
-                extraction_class="table_row",
-                extraction_text="Mars",
-                attributes={
-                    "Planet": "Mars",
-                    "Distance (AU)": "1.52",
-                    "Radius (km)": "3390",
-                    "Moons": "2"
-                }
-            ),
-        ]
-    )
-]
+                <div class="tech-layer application-layer">
+                    <div class="tech-layer-icon">API</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Application Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item">Fraud Detection APIs</span>
+                            <span class="tech-item">Workflow Engine</span>
+                            <span class="tech-item">Business Logic Services</span>
+                            <span class="tech-item">Integration Services</span>
+                        </div>
+                    </div>
+                </div>
 
-# 📄 Read the Markdown file
-markdown_text = md_file.read_text(encoding="utf-8")
+                <div class="tech-layer ai-layer">
+                    <div class="tech-layer-icon">AI</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">AI/ML Processing Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item">NLP Models</span>
+                            <span class="tech-item">Anomaly Detection</span>
+                            <span class="tech-item">TensorFlow/PyTorch</span>
+                            <span class="tech-item">Pattern Recognition</span>
+                            <span class="tech-item">OCR Engine</span>
+                        </div>
+                    </div>
+                </div>
 
-# 🧠 LangExtract call
-result = lx.extract(
-    text_or_documents=markdown_text,
-    prompt_description=prompt,
-    examples=examples,
-    model_id="gpt-4o",
-    api_key="hclXrQFZfwREJigLbW6wKu3ao68Bwyk6",  # or replace with your actual key
-    model_url="https://api.horizon.elevancehealth.com/openai/v1"  # or your custom model URL
-)
+                <div class="tech-layer data-layer">
+                    <div class="tech-layer-icon">DB</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Data Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item">Healthcare Databases</span>
+                            <span class="tech-item">Claims Data Warehouse</span>
+                            <span class="tech-item">Document Storage</span>
+                            <span class="tech-item">Model Training Data</span>
+                            <span class="tech-item">Master Data Management</span>
+                        </div>
+                    </div>
+                </div>
 
-# 📊 Convert extractions to DataFrame
-rows = []
-for ext in result.extractions:
-    row = {"Class": ext.extraction_class, "Text": ext.extraction_text}
-    if ext.attributes:  # Only update if attributes are not None
-        row.update(ext.attributes)
-    rows.append(row)
-df = pd.DataFrame(rows)
-
-# 🧼 Clean and export
-df_clean = df.drop(columns=["Class", "Text"])
-df_clean.to_excel(md_file.with_suffix(".xlsx"), index=False)
-df_clean.to_html(md_file.with_suffix(".html"), index=False)
-
-print(f"✅ Done! Files saved as:\n→ {md_file.with_suffix('.xlsx').resolve()}\n→ {md_file.with_suffix('.html').resolve()}")
-
-
-
-
+                <div class="tech-layer infrastructure-layer">
+                    <div class="tech-layer-icon">⚙️</div>
+                    <div class="tech-layer-content">
+                        <div class="tech-layer-title">Infrastructure Layer</div>
+                        <div class="tech-layer-items">
+                            <span class="tech-item">Cloud Platform (AWS/Azure)</span>
+                            <span class="tech-item">GPU Computing</span>
+                            <span class="tech-item">Container Orchestration</span>
+                            <span class="tech-item">Load Balancing</span>
+                            <span class="tech-item">Security & Compliance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
