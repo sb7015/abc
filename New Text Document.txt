@@ -1,19 +1,1 @@
-Story 1: Research Data Ingestion & Preprocessing Standards
 
-Research industry-standard healthcare data sources (CMS claims, EHR/HL7, provider registries), OCR technologies (Tesseract, AWS Textract), and normalization standards (CPT/ICD-10, SNOMED CT) used in fraud detection systems.
-
-
-Story 2: Identify AI/ML Technologies Used in Healthcare Fraud Detection
-
-Research AI/ML technologies commonly used including NLP models (BERT, GPT), ML algorithms (XGBoost, Random Forest, Isolation Forest), frameworks (PyTorch, TensorFlow), and graph analytics (Neo4j, GNN) in industry fraud detection platforms.
-
-
-Story 3: Document Healthcare Compliance & Validation Standards
-
-Research industry-standard compliance rules (NCCI edits, MUE), clinical validation requirements (temporal constraints, drug interactions), and regulatory mandates (HIPAA, SOC 2) for healthcare fraud detection systems.
-
-
-Story 4: Research Technology Stack Architecture for Fraud Detection
-
-Research common technology stacks used in fraud detection platforms including UI frameworks (React, Angular), backend services (Spring Boot, HL7/FHIR), AI/ML tools (Python, Scikit-learn), databases (PostgreSQL, Kafka, Snowflake), and cloud infrastructure (AWS/Azure, Kubernetes).
-RetryClaude can make mistakes. Please double-check responses.
