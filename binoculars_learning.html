@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binoculars: AI Text Detection Explained</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #EBE4FF 0%, #E1edff 100%);
+            color: #231E33;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #5009B5 0%, #281849 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(80, 9, 181, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            background: linear-gradient(90deg, #794CFF 0%, #00B5F5 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .subsection {
+            margin: 20px 0;
+            padding: 20px;
+            background: #F5F5F5;
+            border-left: 5px solid #794CFF;
+            border-radius: 8px;
+        }
+
+        .subsection h3 {
+            color: #5009B5;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .key-point {
+            background: linear-gradient(135deg, #EBE4FF 0%, #D9F5F5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #00BEBA;
+        }
+
+        .formula-box {
+            background: #281849;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .formula-box h4 {
+            color: #794CFF;
+            margin-bottom: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: #5009B5;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #EBE4FF;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+
+        .comparison-table tr:hover {
+            background: #EBE4FF;
+        }
+
+        .observer-box {
+            background: linear-gradient(135deg, #794CFF 0%, #5009B5 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .performer-box {
+            background: linear-gradient(135deg, #00B5F5 0%, #00BEBA 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .example-sentence {
+            background: #E1edff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            text-align: center;
+            font-weight: bold;
+            color: #281849;
+            border: 3px solid #00B5F5;
+        }
+
+        .token-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .token-card {
+            background: white;
+            border: 2px solid #794CFF;
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .token-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(121, 76, 255, 0.3);
+        }
+
+        .token-card h4 {
+            color: #5009B5;
+            margin-bottom: 10px;
+        }
+
+        .surprise-low {
+            color: #00BEBA;
+            font-weight: bold;
+        }
+
+        .surprise-high {
+            color: #5009B5;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .highlight-purple {
+            background: #EBE4FF;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #5009B5;
+        }
+
+        .highlight-cyan {
+            background: #D9F5F5;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #00BEBA;
+        }
+
+        .vs-divider {
+            text-align: center;
+            font-size: 2em;
+            color: #794CFF;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .final-result {
+            background: linear-gradient(135deg, #281849 0%, #5009B5 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            margin: 30px 0;
+        }
+
+        .final-result .score {
+            font-size: 2em;
+            color: #00BEBA;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        code {
+            background: #281849;
+            color: #00BEBA;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .tip-box {
+            background: #D9F5F5;
+            border-left: 5px solid #00BEBA;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: #EBE4FF;
+            border-left: 5px solid #5009B5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        ul li {
+            margin: 8px 0;
+        }
+
+        .step-number {
+            background: #5009B5;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            .section-header {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Binoculars: AI Text Detection</h1>
+            <p>Zero-Shot Detection of LLM-Generated Text</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">ICML 2024 | University of Maryland</p>
+        </header>
+
+        <!-- Overview Section -->
+        <div class="section">
+            <div class="section-header">📚 What is Binoculars?</div>
+            
+            <div class="key-point">
+                <h3>Core Concept</h3>
+                <p>Binoculars is a <strong>zero-shot</strong> AI detection system that identifies LLM-generated text without needing any training data. It works by comparing how two similar language models process the same text.</p>
+            </div>
+
+            <div class="subsection">
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Zero-shot:</strong> No training or labeled data required</li>
+                    <li><strong>High accuracy:</strong> 90%+ detection rate with 0.01% false positives</li>
+                    <li><strong>Domain-agnostic:</strong> Works on any text type (news, essays, technical content)</li>
+                    <li><strong>Free & open-source:</strong> Available on GitHub</li>
+                    <li><strong>Fixed threshold:</strong> Score < 0.901 = AI-generated</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Why It Works:</strong> Most LLMs are trained on similar datasets (Common Crawl, The Pile), so AI-generated text shows characteristic "alignment" patterns between similar models.
+            </div>
+        </div>
+
+        <!-- Two Models Section -->
+        <div class="section">
+            <div class="section-header">🎭 The Two Models</div>
+            
+            <div class="observer-box">
+                <h3>👁️ Observer Model (e.g., Falcon-7B-Instruct)</h3>
+                <p><strong>Role:</strong> The "Judge" - Evaluates and scores the text</p>
+                <p><strong>Type:</strong> Instruction-tuned LLM (fine-tuned to follow human-like instructions)</p>
+                <p><strong>Tasks:</strong></p>
+                <ul>
+                    <li>Calculates PPL (Perplexity) alone</li>
+                    <li>Evaluates Performer's predictions for X-PPL (Cross-Perplexity)</li>
+                    <li>Acts as the final evaluator in both calculations</li>
+                </ul>
+            </div>
+
+            <div class="performer-box">
+                <h3>🎪 Performer Model (e.g., Falcon-7B)</h3>
+                <p><strong>Role:</strong> The "Predictor" - Provides probability distributions</p>
+                <p><strong>Type:</strong> Base LLM (raw, untuned model)</p>
+                <p><strong>Tasks:</strong></p>
+                <ul>
+                    <li>Only used for X-PPL calculation</li>
+                    <li>Generates probability distributions for all possible next tokens</li>
+                    <li>Does NOT evaluate or judge on its own</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <strong>🔑 Key Insight:</strong> Using similar-but-not-identical models (base vs. tuned) makes the difference between AI and human text pop out!
+            </div>
+        </div>
+
+        <!-- PPL vs X-PPL Section -->
+        <div class="section">
+            <div class="section-header">🔬 PPL vs X-PPL: The Core Difference</div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>PPL (Perplexity)</th>
+                        <th>X-PPL (Cross-Perplexity)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Who calculates?</strong></td>
+                        <td>Observer alone</td>
+                        <td>Observer + Performer together</td>
+                    </tr>
+                    <tr>
+                        <td><strong>What's measured?</strong></td>
+                        <td>Surprise at the ONE actual token</td>
+                        <td>Expected surprise across ALL possible tokens</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Focus</strong></td>
+                        <td>Single point: actual path taken</td>
+                        <td>Entire distribution: all possible paths</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Formula</strong></td>
+                        <td>-log(probability of actual word)</td>
+                        <td>-Σ[Observer(word) × log(Performer(word))]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Question asked</strong></td>
+                        <td>"How surprised am I by what happened?"</td>
+                        <td>"How much do we disagree on what could happen?"</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="key-point">
+                <h3>The Fundamental Insight</h3>
+                <p><span class="highlight-purple">PPL</span>: Measures if the Observer was surprised by the actual word</p>
+                <p><span class="highlight-cyan">X-PPL</span>: Measures if Observer and Performer predict the future similarly</p>
+                <br>
+                <p><strong>For AI text:</strong> Both have similar "futures" (models agree) → Low ratio</p>
+                <p><strong>For human text:</strong> Different "futures" (models disagree) → High ratio</p>
+            </div>
+        </div>
+
+        <!-- Example Walkthrough -->
+        <div class="section">
+            <div class="section-header">📝 Complete Example: Token-by-Token Analysis</div>
+            
+            <div class="example-sentence">
+                "I was driving my car and saw a cow crossing the road"
+            </div>
+
+            <h3 style="color: #5009B5; margin: 30px 0 20px 0;">Observer Calculating PPL (Looking at Actual Words)</h3>
+            
+            <div style="overflow-x: auto; margin: 20px 0;">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Context</th>
+                            <th>Actual Word</th>
+                            <th>Observer Probability</th>
+                            <th>Surprise Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td>[empty]</td>
+                            <td><strong>"I"</strong></td>
+                            <td>30%</td>
+                            <td><span class="surprise-low">2.0</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td>"I"</td>
+                            <td><strong>"was"</strong></td>
+                            <td>50%</td>
+                            <td><span class="surprise-low">2.5</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td>"I was"</td>
+                            <td><strong>"driving"</strong></td>
+                            <td>40%</td>
+                            <td><span class="surprise-low">2.2</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td>"I was driving"</td>
+                            <td><strong>"my"</strong></td>
+                            <td>60%</td>
+                            <td><span class="surprise-low">1.8</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td>"I was driving my"</td>
+                            <td><strong>"car"</strong></td>
+                            <td>70%</td>
+                            <td><span class="surprise-low">1.5</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6</strong></td>
+                            <td>"I was driving my car"</td>
+                            <td><strong>"and"</strong></td>
+                            <td>40%</td>
+                            <td><span class="surprise-low">2.0</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7</strong></td>
+                            <td>"I was driving my car and"</td>
+                            <td><strong>"saw"</strong></td>
+                            <td>50%</td>
+                            <td><span class="surprise-low">2.3</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8</strong></td>
+                            <td>"I was driving my car and saw"</td>
+                            <td><strong>"a"</strong></td>
+                            <td>60%</td>
+                            <td><span class="surprise-low">1.7</span> (LOW)</td>
+                        </tr>
+                        <tr style="background: #EBE4FF !important; border: 2px solid #5009B5;">
+                            <td><strong>9</strong></td>
+                            <td>"I was driving my car and saw a"</td>
+                            <td><strong>"cow" 🐄</strong></td>
+                            <td>15%</td>
+                            <td><span class="surprise-high">3.5</span> (HIGH!)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>10</strong></td>
+                            <td>"...saw a cow"</td>
+                            <td><strong>"crossing"</strong></td>
+                            <td>40%</td>
+                            <td><span class="surprise-low">2.4</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>11</strong></td>
+                            <td>"...cow crossing"</td>
+                            <td><strong>"the"</strong></td>
+                            <td>70%</td>
+                            <td><span class="surprise-low">1.6</span> (LOW)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>12</strong></td>
+                            <td>"...crossing the"</td>
+                            <td><strong>"road"</strong></td>
+                            <td>80%</td>
+                            <td><span class="surprise-low">1.4</span> (LOW)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="formula-box">
+                <h4>PPL Calculation:</h4>
+                <p>log PPL = (2.0 + 2.5 + 2.2 + 1.8 + 1.5 + 2.0 + 2.3 + 1.7 + 3.5 + 2.4 + 1.6 + 1.4) / 12</p>
+                <p>log PPL = 26.9 / 12 = <strong style="color: #00BEBA;">2.24</strong></p>
+            </div>
+
+            <div class="vs-divider">⚡ VS ⚡</div>
+
+            <h3 style="color: #00B5F5; margin: 30px 0 20px 0;">Performer Calculating X-PPL (Comparing Distributions)</h3>
+
+            <div class="warning-box">
+                <strong>⚠️ Critical Difference:</strong> X-PPL does NOT look at the actual word at each position! It compares the ENTIRE probability distributions of both models.
+            </div>
+
+            <div class="subsection">
+                <h4>Position 1: [predicting "I"...]</h4>
+                <p><strong>Context:</strong> [empty]</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "The" → 40%</p>
+                        <p>• "I" → 30%</p>
+                        <p>• "A" → 15%</p>
+                        <p>• "My" → 10%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "The" → 35%</p>
+                        <p>• "I" → 25%</p>
+                        <p>• "A" → 20%</p>
+                        <p>• "My" → 12%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.40×log(0.35) + 0.30×log(0.25) + 0.15×log(0.20) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">2.0</span></strong> (distributions match fairly well)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 2: [predicting "was"...]</h4>
+                <p><strong>Context:</strong> "I"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "was" → 50%</p>
+                        <p>• "am" → 30%</p>
+                        <p>• "have" → 12%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "was" → 45%</p>
+                        <p>• "am" → 35%</p>
+                        <p>• "have" → 10%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.50×log(0.45) + 0.30×log(0.35) + 0.12×log(0.10) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">2.3</span></strong> (slight disagreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 3: [predicting "driving"...]</h4>
+                <p><strong>Context:</strong> "I was"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "driving" → 40%</p>
+                        <p>• "going" → 30%</p>
+                        <p>• "walking" → 15%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "driving" → 35%</p>
+                        <p>• "going" → 35%</p>
+                        <p>• "walking" → 18%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.40×log(0.35) + 0.30×log(0.35) + 0.15×log(0.18) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">2.1</span></strong> (good alignment)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 4: [predicting "my"...]</h4>
+                <p><strong>Context:</strong> "I was driving"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "my" → 60%</p>
+                        <p>• "a" → 20%</p>
+                        <p>• "the" → 12%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "my" → 55%</p>
+                        <p>• "a" → 25%</p>
+                        <p>• "the" → 10%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.60×log(0.55) + 0.20×log(0.25) + 0.12×log(0.10) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">1.9</span></strong> (strong agreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 5: [predicting "car"...]</h4>
+                <p><strong>Context:</strong> "I was driving my"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "car" → 70%</p>
+                        <p>• "bike" → 10%</p>
+                        <p>• "truck" → 8%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "car" → 65%</p>
+                        <p>• "bike" → 15%</p>
+                        <p>• "truck" → 10%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.70×log(0.65) + 0.10×log(0.15) + 0.08×log(0.10) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">1.6</span></strong> (very strong agreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 6: [predicting "and"...]</h4>
+                <p><strong>Context:</strong> "I was driving my car"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "and" → 40%</p>
+                        <p>• "when" → 30%</p>
+                        <p>• "." → 15%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "and" → 35%</p>
+                        <p>• "when" → 35%</p>
+                        <p>• "." → 18%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.40×log(0.35) + 0.30×log(0.35) + 0.15×log(0.18) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">2.0</span></strong> (moderate agreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 7: [predicting "saw"...]</h4>
+                <p><strong>Context:</strong> "I was driving my car and"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "saw" → 50%</p>
+                        <p>• "hit" → 20%</p>
+                        <p>• "stopped" → 15%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "saw" → 45%</p>
+                        <p>• "hit" → 25%</p>
+                        <p>• "stopped" → 12%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.50×log(0.45) + 0.20×log(0.25) + 0.15×log(0.12) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">2.2</span></strong> (slight disagreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 8: [predicting "a"...]</h4>
+                <p><strong>Context:</strong> "I was driving my car and saw"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "a" → 60%</p>
+                        <p>• "the" → 30%</p>
+                        <p>• "some" → 5%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "a" → 55%</p>
+                        <p>• "the" → 35%</p>
+                        <p>• "some" → 6%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.60×log(0.55) + 0.30×log(0.35) + 0.05×log(0.06) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">1.8</span></strong> (good agreement)</p>
+            </div>
+
+            <div class="subsection" style="background: #D9F5F5; border-left: 5px solid #00BEBA;">
+                <h4>Position 9: [predicting "cow"...] 🐄</h4>
+                <p><strong>Context:</strong> "I was driving my car and saw a"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "car" → 30%</p>
+                        <p>• "person" → 25%</p>
+                        <p>• "cow" → 15%</p>
+                        <p>• "sign" → 10%</p>
+                        <p>• "tree" → 8%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "car" → 35% ← DIFFERENT!</p>
+                        <p>• "person" → 20% ← DIFFERENT!</p>
+                        <p>• "cow" → 12% ← DIFFERENT!</p>
+                        <p>• "sign" → 8% ← DIFFERENT!</p>
+                        <p>• "tree" → 10% ← DIFFERENT!</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.30×log(0.35) + 0.25×log(0.20) + 0.15×log(0.12) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-high">3.2</span></strong> (HIGHER - MORE DISAGREEMENT!)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 10: [predicting "crossing"...]</h4>
+                <p><strong>Context:</strong> "I was driving my car and saw a cow"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "crossing" → 40%</p>
+                        <p>• "standing" → 30%</p>
+                        <p>• "in" → 15%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "crossing" → 35%</p>
+                        <p>• "standing" → 35%</p>
+                        <p>• "in" → 12%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.40×log(0.35) + 0.30×log(0.35) + 0.15×log(0.12) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">2.3</span></strong> (moderate disagreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 11: [predicting "the"...]</h4>
+                <p><strong>Context:</strong> "I was driving my car and saw a cow crossing"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "the" → 70%</p>
+                        <p>• "a" → 20%</p>
+                        <p>• "my" → 5%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "the" → 65%</p>
+                        <p>• "a" → 25%</p>
+                        <p>• "my" → 6%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.70×log(0.65) + 0.20×log(0.25) + 0.05×log(0.06) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">1.7</span></strong> (strong agreement)</p>
+            </div>
+
+            <div class="subsection">
+                <h4>Position 12: [predicting "road"...]</h4>
+                <p><strong>Context:</strong> "I was driving my car and saw a cow crossing the"</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0;">
+                    <div class="observer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Observer:</h5>
+                        <p>• "road" → 80%</p>
+                        <p>• "street" → 10%</p>
+                        <p>• "highway" → 5%</p>
+                        <p>• [others]</p>
+                    </div>
+                    <div class="performer-box" style="padding: 15px;">
+                        <h5 style="margin-bottom: 8px;">Performer:</h5>
+                        <p>• "road" → 75%</p>
+                        <p>• "street" → 15%</p>
+                        <p>• "highway" → 6%</p>
+                        <p>• [others]</p>
+                    </div>
+                </div>
+                <p><code>Cross-entropy = -[0.80×log(0.75) + 0.10×log(0.15) + 0.05×log(0.06) + ...]</code></p>
+                <p><strong>X-PPL Score: <span class="surprise-low">1.5</span></strong> (very strong agreement)</p>
+            </div>
+
+            <div class="formula-box">
+                <h4>X-PPL Calculation:</h4>
+                <p>Average X-PPL = (2.0 + 2.3 + 2.1 + 1.9 + 1.6 + 2.0 + 2.2 + 1.8 + 3.2 + 2.3 + 1.7 + 1.5) / 12</p>
+                <p>Average X-PPL = 24.6 / 12 = <strong style="color: #00BEBA;">2.05</strong> ← This is log X-PPL</p>
+            </div>
+        </div>
+
+        <!-- Detection Score -->
+        <div class="section">
+            <div class="section-header">🎯 The Detection Score</div>
+            
+            <div class="formula-box">
+                <h4>Detection Ratio B:</h4>
+                <p style="font-size: 1.2em;">B = log PPL / log X-PPL</p>
+                <p style="font-size: 1.2em;">B = 2.24 / 2.05 = <strong style="color: #00BEBA; font-size: 1.5em;">1.09</strong></p>
+            </div>
+
+            <div class="final-result">
+                <h3>Classification Result</h3>
+                <div class="score">B = 1.09 > 0.901</div>
+                <h2 style="color: #00BEBA;">✅ HUMAN DETECTED!</h2>
+                <p style="margin-top: 15px; opacity: 0.9;">The "cow" word added human-like unpredictability, making models diverge</p>
+            </div>
+
+            <div class="subsection">
+                <h3>Why This Works</h3>
+                <ul>
+                    <li><strong>AI text:</strong> Models agree closely (low X-PPL) → Ratio ≈ 1 or < 1</li>
+                    <li><strong>Human text:</strong> Models diverge (higher X-PPL) → Ratio > 1</li>
+                    <li><strong>Threshold 0.901:</strong> Optimal balance between catching AI and avoiding false accusations</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Why Logarithms -->
+        <div class="section">
+            <div class="section-header">🔢 Why Logarithms Are Essential</div>
+            
+            <div class="key-point">
+                <h3>Problem: Probabilities Get Extremely Small</h3>
+                <p>For a 100-word sentence:</p>
+                <code>0.5 × 0.4 × 0.6 × ... (100 times) ≈ 10⁻⁵⁰</code>
+                <p style="margin-top: 10px;">Computers can't handle numbers this tiny (underflow error!)</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Without Log</th>
+                        <th>With Log</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0.5 × 0.4 × 0.3 = 0.06</td>
+                        <td>-0.69 + (-0.92) + (-1.20) = -2.81</td>
+                    </tr>
+                    <tr>
+                        <td>Numbers get tiny (10⁻⁵⁰)</td>
+                        <td>Numbers stay reasonable (-50)</td>
+                    </tr>
+                    <tr>
+                        <td>Multiplication (slow)</td>
+                        <td>Addition (fast)</td>
+                    </tr>
+                    <tr>
+                        <td>Underflow risk</td>
+                        <td>No underflow</td>
+                    </tr>
+                    <tr>
+                        <td>Precision errors compound</td>
+                        <td>Stable precision</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="subsection">
+                <h3>Key Benefits of Logarithms</h3>
+                <ul>
+                    <li><strong>Converts multiplication to addition:</strong> log(a × b) = log(a) + log(b)</li>
+                    <li><strong>Prevents underflow:</strong> Keeps all numbers in manageable range</li>
+                    <li><strong>Information theory foundation:</strong> Surprise = -log(probability)</li>
+                    <li><strong>Numerical stability:</strong> More accurate calculations</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Practical Information -->
+        <div class="section">
+            <div class="section-header">⚙️ Practical Information</div>
+            
+            <div class="subsection">
+                <h3><span class="step-number">1</span> Installation</h3>
+                <div class="formula-box">
+                    <p>git clone https://github.com/ahans30/Binoculars.git</p>
+                    <p>cd Binoculars</p>
+                    <p>pip install -e .</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3><span class="step-number">2</span> Basic Usage</h3>
+                <div class="formula-box">
+                    <p>from binoculars import Binoculars</p>
+                    <br>
+                    <p>bino = Binoculars()  # Uses Falcon-7B by default</p>
+                    <p>sample = "Your text here..."</p>
+                    <br>
+                    <p>score = bino.compute_score(sample)  # Returns number</p>
+                    <p>prediction = bino.predict(sample)   # Returns classification</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3><span class="step-number">3</span> Recommended Models</h3>
+                <ul>
+                    <li><strong>Default (Best):</strong> Falcon-7B-Instruct (observer) + Falcon-7B (performer)</li>
+                    <li><strong>Alternative:</strong> LLaMA-2-7B-chat (observer) + LLaMA-2-7B (performer)</li>
+                    <li><strong>Newer:</strong> LLaMA-3-8B-Instruct + LLaMA-3-8B (untested but compatible)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3><span class="step-number">4</span> Hardware Requirements</h3>
+                <ul>
+                    <li><strong>CPU:</strong> Works, but slower (16GB+ RAM recommended)</li>
+                    <li><strong>GPU:</strong> Significantly faster (CUDA support recommended)</li>
+                    <li><strong>Optimization:</strong> Use quantization to reduce memory usage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Limitations -->
+        <div class="section">
+            <div class="section-header">⚠️ Limitations & Considerations</div>
+            
+            <div class="warning-box">
+                <h3>Known Limitations</h3>
+                <ul>
+                    <li><strong>No explainability:</strong> Only provides a score, no per-token breakdown</li>
+                    <li><strong>Cannot train:</strong> Zero-shot only, not customizable with your data</li>
+                    <li><strong>Best for English:</strong> Weaker performance in other languages</li>
+                    <li><strong>Requires HuggingFace models:</strong> Can't use proprietary APIs (Grok, GPT-4)</li>
+                    <li><strong>Not adversarial-robust:</strong> May fail against deliberate evasion attempts</li>
+                    <li><strong>Black box:</strong> No insight into why specific text was flagged</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <h3>Best Practices</h3>
+                <ul>
+                    <li>Use for research purposes, not unsupervised deployment</li>
+                    <li>Requires human oversight for real-world applications</li>
+                    <li>Test on domain-specific samples before trusting results</li>
+                    <li>Consider false positive rate (0.01%) when making decisions</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="section">
+            <div class="section-header">📊 Performance Metrics</div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Dataset</th>
+                        <th>Detection Rate</th>
+                        <th>False Positive Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ChatGPT - News</td>
+                        <td>94.9%</td>
+                        <td>0.01%</td>
+                    </tr>
+                    <tr>
+                        <td>ChatGPT - Creative Writing</td>
+                        <td>93.5%</td>
+                        <td>0.01%</td>
+                    </tr>
+                    <tr>
+                        <td>ChatGPT - Student Essays</td>
+                        <td>97.6%</td>
+                        <td>0.01%</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-3 (Open-Orca)</td>
+                        <td>92.0%</td>
+                        <td>0.01%</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4 (Open-Orca)</td>
+                        <td>89.57%</td>
+                        <td>0.01%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="key-point">
+                <h3>Comparison with Other Detectors</h3>
+                <p><strong>Binoculars significantly outperforms:</strong></p>
+                <ul>
+                    <li>GPTZero: 64.7-96.6% detection</li>
+                    <li>Ghostbuster: 50.5-99.1% detection (OOD)</li>
+                    <li>DetectGPT: 1-4.5% detection</li>
+                    <li>Fast-DetectGPT: 0.4-0.7% detection</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="section">
+            <div class="section-header">📖 Quick Reference Card</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="observer-box">
+                    <h3>Observer (PPL)</h3>
+                    <ul>
+                        <li>Works alone</li>
+                        <li>Looks at actual words</li>
+                        <li>Single surprise score per word</li>
+                        <li>Formula: -log(prob)</li>
+                    </ul>
+                </div>
+                <div class="performer-box">
+                    <h3>Performer (X-PPL)</h3>
+                    <ul>
+                        <li>Works with Observer</li>
+                        <li>Compares distributions</li>
+                        <li>Cross-entropy score</li>
+                        <li>Formula: -Σ[O(w)×log(P(w))]</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="final-result" style="margin-top: 20px;">
+                <h3>Detection Formula</h3>
+                <p style="font-size: 1.3em; margin: 15px 0;">B = log PPL / log X-PPL</p>
+                <p>If <strong style="color: #00BEBA;">B < 0.901</strong> → AI-Generated</p>
+                <p>If <strong style="color: #00BEBA;">B > 0.901</strong> → Human-Written</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 40px 20px; color: #231E33;">
+            <p style="font-size: 1.1em; margin-bottom: 10px;">🔗 <strong>GitHub:</strong> ahans30/Binoculars</p>
+            <p style="font-size: 0.9em; opacity: 0.7;">ICML 2024 | University of Maryland | Free & Open Source</p>
+        </div>
+    </div>
+</body>
+</html>
