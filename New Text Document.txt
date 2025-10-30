@@ -1,1 +1,355 @@
+https://arxiv.org/abs/2405.10129
+
+
+# %% 🔁 COMPLETE OFFLINE AI-DETECTOR – single Jupyter cell
+# ------------------------------------------------------------------
+# 0.  Soft-deps install (first time only, quiet afterwards)
+# ------------------------------------------------------------------
+import subprocess, sys, os, warnings, re, json, asyncio, time, hashlib
+from pathlib import Path
+warnings.filterwarnings("ignore")
+
+for pkg in ["textblob", "textstat", "nltk", "spacy", "PyMuPDF", "python-docx", "pandas", "numpy", "torch", "transformers", "aiofiles"]:
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", pkg], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+subprocess.run([sys.executable, "-m", "spacy", "download", "-q", "en_core_web_sm"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+# Download ALL required NLTK data
+import nltk, textblob
+nltk.download('brown', quiet=True)
+nltk.download('stopwords', quiet=True)  # Added missing stopwords
+nltk.download('punkt', quiet=True)      # Added punkt for tokenization
+nltk.download('vader_lexicon', quiet=True)  # Added for sentiment analysis
+
+# ------------------------------------------------------------------
+# 1.  Imports
+# ------------------------------------------------------------------
+import torch, numpy as np, pandas as pd, aiofiles, asyncio, logging, warnings
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from collections import Counter
+from docx import Document
+import fitz, textstat, spacy
+from nltk.corpus import stopwords
+
+# Load spacy and nltk resources
+nlp = spacy.load("en_core_web_sm")
+try:
+    ENGLISH_STOPWORDS = set(stopwords.words('english'))
+except LookupError:
+    # Fallback if NLTK download fails
+    ENGLISH_STOPWORDS = {
+        'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", 
+        "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 
+        'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself',
+        'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 
+        'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 
+        'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 
+        'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 
+        'while', 'of', 'at', 'by', 'for', 'with', 'through', 'during', 'before', 'after', 
+        'above', 'below', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 
+        'further', 'then', 'once'
+    }
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
+log = logging.getLogger("ai_det")
+
+# ------------------------------------------------------------------
+# 2.  Model – offline mirror (must exist)
+# ------------------------------------------------------------------
+MIRROR = Path("/mnt/nfs/work/Binoculars2/HF_cache_stableai/stablelm-2-1_6b")
+if not MIRROR.exists():
+    raise FileNotFoundError("Mirror missing – run:  huggingface-cli download stabilityai/stablelm-2-1_6b --local-dir " + str(MIRROR))
+tok = AutoTokenizer.from_pretrained(MIRROR, local_files_only=True)
+model = AutoModelForCausalLM.from_pretrained(MIRROR, dtype=torch.float16, device_map="auto", local_files_only=True, trust_remote_code=False)
+model.eval()
+
+# ------------------------------------------------------------------
+# 3.  Calibration constants
+# ------------------------------------------------------------------
+MU   = np.array([3.96e+01, 4.23e-01, 6.65e-01, 9.84e-02, 1.09e+00, 2.39e-01,
+                 5.02e+01, 2.89e+00, 5.45e-02, 3.18e+00, 6.84e+03, 5.12e+00, -8.73e+02])
+SIG  = np.array([1.42e+01, 1.31e-01, 7.23e-02, 3.11e-02, 3.45e-01, 7.66e-02,
+                 1.14e+01, 2.71e-01, 1.02e-02, 2.44e-01, 1.97e+03, 8.90e-01, 2.31e+02])
+W    = np.array([-4.21e-01, 3.77e-01, 2.95e-01, -1.82e-01, -2.69e-01, 1.18e-01,
+                 8.90e-02, 7.40e-02, 6.10e-02, 5.50e-02, -1.51e-01, 1.34e-01, -1.43e-01])
+B    = 0.027
+MIN_TOKENS = 140   # ≈ 70 words
+
+# ------------------------------------------------------------------
+# 4.  Text cleaning
+# ------------------------------------------------------------------
+_CLEAN_RE = [
+    (re.compile(r'\S+@\S+'), ''),                 # emails
+    (re.compile(r'https?://\S+|www\.\S+'), ''),   # URLs
+    (re.compile(r'^\s*Page\s+\d+\s*$', re.M), ''),  # page numbers
+    (re.compile(r'^\s*[\-\*•]\s*\S{1,3}\s*$', re.M), ''),  # short bullets
+]
+def clean(text: str) -> str:
+    for pat, repl in _CLEAN_RE:
+        text = pat.sub(repl, text)
+    return " ".join(text.split())
+
+# ------------------------------------------------------------------
+# 5.  Classical metrics (CPU) - Fixed stopwords issue
+# ------------------------------------------------------------------
+def classical_metrics(text: str):
+    try:
+        doc = nlp(text)
+        sents = [s.text.strip() for s in doc.sents if len(s.text.split()) >= 4]
+        tokens = [t.lower_ for t in doc if t.is_alpha]
+        
+        if not tokens:
+            return np.zeros(11)
+
+        ttr = len(set(tokens)) / len(tokens)
+        trig = [tuple(tokens[i:i+3]) for i in range(len(tokens)-2)]
+        rep3 = len([t for t, c in Counter(trig).items() if c > 1]) / max(1, len(trig))
+
+        # Fixed: Use our fallback stopwords instead of nltk corpus directly
+        func = Counter(t.text for t in doc if t.is_stop)
+        chi2 = sum((v - len(tokens)*func.get(w,0)/len(ENGLISH_STOPWORDS))**2 / 
+                  (len(tokens)*func.get(w,0)/len(ENGLISH_STOPWORDS) + 1e-9)
+                  for w, v in func.items() if w in ENGLISH_STOPWORDS)
+
+        # Sentiment analysis with error handling
+        try:
+            pol = [textblob.TextBlob(s).sentiment.polarity for s in sents]
+            sentvar = np.var(pol) if pol else 0.
+        except Exception:
+            sentvar = 0.
+
+        # Readability with error handling
+        try:
+            flesch = textstat.flesch_reading_ease(text)
+        except Exception:
+            flesch = 50.0  # Default moderate readability score
+
+        deplen = np.mean([len(list(t.subtree)) for t in doc]) if doc else 1.0
+        punct = len(re.findall(r"[^\w\s]", text)) / max(1, len(text))
+        lens = [len(s.split()) for s in sents]
+        
+        if lens:
+            probs = np.bincount(lens) / len(lens)
+            slen_ent = -np.sum(probs * np.log2(probs + 1e-9))
+        else:
+            slen_ent = 0.
+
+        return np.array([ttr, rep3, chi2, sentvar, flesch, deplen, punct, slen_ent, 0., 0., 0.])
+    
+    except Exception as e:
+        log.warning(f"Classical metrics calculation failed: {e}")
+        return np.zeros(11)
+
+# ------------------------------------------------------------------
+# 6.  GPU metrics
+# ------------------------------------------------------------------
+@torch.inference_mode()
+def gpu_metrics(text: str, max_len=8_000):
+    try:
+        inputs = tok(clean(text)[:max_len], return_tensors="pt", truncation=True).to(model.device)
+        if inputs.input_ids.shape[1] < 2:
+            return np.nan, np.nan, np.nan, np.nan, np.nan
+
+        logits = model(**inputs).logits
+        shift_lbl = inputs.input_ids[:, 1:]
+        shift_logits = logits[:, :-1, :]
+        log_p = torch.log_softmax(shift_logits, dim=-1)
+        nll = -log_p.gather(2, shift_lbl.unsqueeze(-1)).squeeze(-1)
+
+        ppl = float(torch.exp(nll.mean()).cpu())
+        ll = float(-nll.sum().cpu())
+
+        ranks = torch.where(torch.argsort(log_p, dim=-1, descending=True) == shift_lbl.unsqueeze(-1))[2]
+        rank = float(ranks.float().mean().cpu()) if ranks.numel() else np.nan
+
+        ent = -(log_p * torch.exp(log_p)).sum(-1)
+        mean_ent = float(ent.mean().cpu())
+
+        sents = list(nlp(tok.decode(inputs.input_ids[0], skip_special_tokens=True)).sents)
+        if len(sents) < 2:
+            burst = 0.
+        else:
+            sent_ppls = []
+            start = 0
+            for sent in sents[:-1]:
+                end = start + len(tok(sent.text).input_ids)
+                sent_ppls.append(float(torch.exp(nll[:, start:end].mean()).cpu()))
+                start = end
+            burst = float((torch.tensor(sent_ppls).std() / (torch.tensor(sent_ppls).mean() + 1e-9)).cpu())
+        
+        return ppl, rank, ll, mean_ent, burst
+    
+    except Exception as e:
+        log.warning(f"GPU metrics calculation failed: {e}")
+        return np.nan, np.nan, np.nan, np.nan, np.nan
+
+# ------------------------------------------------------------------
+# 7.  Production detector – three-tier logic
+# ------------------------------------------------------------------
+def detect(text: str):
+    text = clean(text)
+    tokens = tok.encode(text)
+    if len(tokens) < MIN_TOKENS:
+        return {k: None for k in
+                ["ppl", "burst", "ttr", "rep3", "func_chi2", "sentvar",
+                 "flesch", "deplen", "punct_rich", "slen_ent", "rank", "entropy", "log_lik"]} | \
+               {"h_score": None, "ai": False, "error": "too_short"}
+
+    classical = classical_metrics(text)
+    gpu = gpu_metrics(text)
+
+    # 1.  GPU completely failed  →  no score
+    if any(np.isnan(gpu)):
+        return {k: None for k in
+                ["ppl", "burst", "ttr", "rep3", "func_chi2", "sentvar",
+                 "flesch", "deplen", "punct_rich", "slen_ent", "rank", "entropy", "log_lik"]} | \
+               {"h_score": None, "ai": False, "error": "gpu_failed"}
+
+    # 2.  Build feature vector
+    classical[8:11] = gpu[1], gpu[3], gpu[4]          # rank, entropy, burst
+    x = np.array([gpu[0], gpu[4], *classical])        # ppl, burst, ...
+
+    # 3.  Degraded mode when burst = 0  (only 1 sentence)
+    if gpu[4] == 0:
+        W_dgr = W.copy()
+        W_dgr[1] = 0                                              # zero-out burst weight
+        W_dgr = W_dgr / W_dgr.sum() * W.sum()                     # re-normalise total weight
+        logit = B + (x - MU) / SIG @ W_dgr
+        degraded = True
+    else:
+        logit = B + (x - MU) / SIG @ W
+        degraded = False
+
+    h_score = float(1 / (1 + np.exp(-logit)))
+    keys = ["ppl", "burst", "ttr", "rep3", "func_chi2", "sentvar",
+            "flesch", "deplen", "punct_rich", "slen_ent", "rank", "entropy", "log_lik"]
+    return {**dict(zip(keys, x)),
+            "h_score": round(h_score, 4),
+            "ai": h_score <= 0.30,
+            "degraded": degraded,
+            "error": ""}
+
+# ------------------------------------------------------------------
+# 8.  Async extractors
+# ------------------------------------------------------------------
+async def _pdf(p): 
+    try:
+        with fitz.open(p) as doc: 
+            txt = " ".join(page.get_text() for page in doc)
+        return clean(txt)
+    except Exception as e:
+        log.error(f"PDF extraction failed for {p}: {e}")
+        return ""
+
+async def _docx(p): 
+    try:
+        return clean(" ".join(par.text for par in Document(p).paragraphs))
+    except Exception as e:
+        log.error(f"DOCX extraction failed for {p}: {e}")
+        return ""
+
+async def _txt(p): 
+    try:
+        async with aiofiles.open(p, "r", encoding="utf-8", errors="ignore") as f:
+            return clean(await f.read())
+    except Exception as e:
+        log.error(f"TXT extraction failed for {p}: {e}")
+        return ""
+
+_EXTRACT = {".pdf": _pdf, ".docx": _docx, ".doc": _docx, ".txt": _txt, "": _txt}
+
+def safe(name):
+    return name if len(name) <= 200 else f"{name[:50]}...{hashlib.blake2b(name.encode()).hexdigest()[:16]}{Path(name).suffix}"
+
+# ------------------------------------------------------------------
+# 9.  Job processing function
+# ------------------------------------------------------------------
+async def _job(file_path: Path, semaphore: asyncio.Semaphore):
+    """Process a single file and return detection results"""
+    async with semaphore:  # Limit concurrent processing
+        try:
+            # Extract text based on file extension
+            ext = file_path.suffix.lower()
+            if ext in _EXTRACT:
+                text = await _EXTRACT[ext](file_path)
+            else:
+                text = await _txt(file_path)  # Default to text extraction
+            
+            # Get word count
+            word_count = len(text.split()) if text else 0
+            
+            # Skip empty files
+            if word_count == 0:
+                return {
+                    "filename": safe(file_path.name),
+                    "file_path": str(file_path),
+                    "word_count": 0,
+                    "processing_time": time.time(),
+                    "h_score": None,
+                    "ai": False,
+                    "error": "empty_file"
+                }
+            
+            # Run AI detection
+            result = detect(text)
+            
+            # Return row data
+            return {
+                "filename": safe(file_path.name),
+                "file_path": str(file_path),
+                "word_count": word_count,
+                "processing_time": time.time(),
+                **result
+            }
+            
+        except Exception as e:
+            log.error(f"Error processing {file_path}: {str(e)}")
+            return {
+                "filename": safe(file_path.name),
+                "file_path": str(file_path),
+                "word_count": 0,
+                "processing_time": time.time(),
+                "h_score": None,
+                "ai": False,
+                "error": f"processing_error: {str(e)}"
+            }
+
+# ------------------------------------------------------------------
+# 10. Folder runner
+# ------------------------------------------------------------------
+import nest_asyncio
+nest_asyncio.apply()          # allow nested loop in Jupyter
+
+FOLDER_NAME = "Synthetic_Harish"          # <--- change here
+BASE_INPUT  = Path("/mnt/nfs/work/Binoculars2/Input") / FOLDER_NAME
+BASE_OUTPUT = Path("/mnt/nfs/work/Binoculars2/output")
+OUT_DIR     = BASE_OUTPUT / f"stat_out_{FOLDER_NAME}"
+OUT_DIR.mkdir(exist_ok=True, parents=True)
+
+files = [p for p in BASE_INPUT.iterdir() if p.suffix.lower() in _EXTRACT]
+
+async def _run():
+    if not files:
+        print("❌ No files found")
+        return
+    
+    print(f"🔄 Processing {len(files)} files...")
+    rows = await asyncio.gather(*(_job(f, asyncio.Semaphore(4)) for f in files))
+    df = pd.DataFrame(rows)
+    csv_path = OUT_DIR / f"ai_detection_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    df.to_csv(csv_path, index=False)
+    
+    # Display results summary
+    display_cols = ["filename", "word_count", "h_score", "ai", "error"]
+    print(df[display_cols].to_string(index=False))
+    print(f"\n✅ Saved → {csv_path}")
+    
+    # Summary stats
+    successful = df[df['error'] == ''].shape[0]
+    total = len(df)
+    ai_detected = df[df['ai'] == True].shape[0]
+    print(f"\n📊 Summary: {successful}/{total} processed successfully, {ai_detected} flagged as AI-generated")
+
+# Execute
+await _run()
+
 
