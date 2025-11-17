@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVIDIA Guardrails Code Explanation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+        
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        tr:hover {
+            background-color: #edf2f7;
+            transition: background-color 0.2s ease;
+        }
+        
+        .cell-number {
+            font-weight: bold;
+            color: #4a5568;
+            background: #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .section-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .key-actions {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .key-actions li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.4;
+        }
+        
+        .key-actions li:before {
+            content: "▸";
+            color: #4299e1;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .execution-flow {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .execution-flow h3 {
+            margin: 0 0 15px 0;
+            color: #744210;
+            font-size: 1.2em;
+        }
+        
+        .flow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .flow-step {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #744210;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .arrow {
+            color: #744210;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .key-outputs {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .key-outputs h3 {
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            font-size: 1.2em;
+        }
+        
+        .outputs-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .outputs-list li {
+            background: white;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4299e1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .outputs-list li strong {
+            color: #2d3748;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+            
+            .flow-steps {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .flow-step {
+                text-align: center;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NVIDIA Guardrails Code Explanation</h1>
+            <p>Cell-by-cell breakdown of the content safety analysis pipeline</p>
+        </div>
+        
+        <div class="content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cell #</th>
+                        <th>Section</th>
+                        <th>What It Does</th>
+                        <th>Key Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="cell-number">Cell 1</span></td>
+                        <td><div class="section-name">Installation & Imports</div></td>
+                        <td>Sets up all required libraries and tests imports</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li>Imports pandas, numpy, plotly</li>
+                                <li>Fixes tqdm compatibility</li>
+                                <li>Tests nemoguardrails, openai, langchain imports</li>
+                                <li>Enables async for Jupyter</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="cell-number">Cell 2</span></td>
+                        <td><div class="section-name">Data Preparation</div></td>
+                        <td>Placeholder for your dataframe</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li>Shows where to import your CSV/data</li>
+                                <li>No sample data created</li>
+                                <li>Ready to accept your dataframe</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="cell-number">Cell 3</span></td>
+                        <td><div class="section-name">API Keys Setup & Validation</div></td>
+                        <td>Defines function to test API connections</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li>Sets OpenAI and NVIDIA API keys</li>
+                                <li>Tests OpenAI connection with simple call</li>
+                                <li>Tests NVIDIA connection with ChatNVIDIA</li>
+                                <li>Returns True/False if connections work</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="cell-number">Cell 4</span></td>
+                        <td><div class="section-name">Guardrails Configuration</div></td>
+                        <td>Creates NVIDIA safety rules</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li>Defines input/output screening rules</li>
+                                <li>Sets up safety policies</li>
+                                <li>Configures which models to use for screening</li>
+                                <li>Returns guardrails configuration object</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="cell-number">Cell 5</span></td>
+                        <td><div class="section-name">Main Analysis Function</div></td>
+                        <td>The core analysis engine</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li><strong>Step 5.1:</strong> Validates your dataframe and column</li>
+                                <li><strong>Step 5.2:</strong> Gets responses from normal NVIDIA model</li>
+                                <li><strong>Step 5.3:</strong> Gets responses from guardrail-protected model</li>
+                                <li><strong>Step 5.4:</strong> Uses GPT-4 to judge both responses</li>
+                                <li><strong>Step 5.5:</strong> Calculates safety statistics</li>
+                                <li><strong>Step 5.6:</strong> Exports results to CSV</li>
+                                <li><strong>Step 5.7:</strong> Prints summary report</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="cell-number">Cell 6</span></td>
+                        <td><div class="section-name">Main Execution Function</div></td>
+                        <td>Wrapper to run everything</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li>Calls API validation</li>
+                                <li>Runs the main analysis</li>
+                                <li>Displays final results</li>
+                                <li>Shows the analysis dataframe</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="cell-number">Cell 7</span></td>
+                        <td><div class="section-name">Usage Examples</div></td>
+                        <td>Shows how to call the functions</td>
+                        <td>
+                            <ul class="key-actions">
+                                <li>Example calls with your dataframe</li>
+                                <li>Shows parameter structure</li>
+                                <li>Demo of batch_size usage</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="execution-flow">
+                <h3>🔄 Execution Flow</h3>
+                <div class="flow-steps">
+                    <div class="flow-step">Your Data</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">API Validation</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Normal AI Response</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Guardrail AI Response</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">GPT-4 Judges Both</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Calculate Stats</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Export CSV</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Show Results</div>
+                </div>
+            </div>
+            
+            <div class="key-outputs">
+                <h3>📁 Key Outputs</h3>
+                <ul class="outputs-list">
+                    <li><strong>CSV file:</strong> NVIDIA_CLOUD_RESULT_DD_MM_YYYY_HHMMSS.csv</li>
+                    <li><strong>Console:</strong> Progress bars, statistics, summary report</li>
+                    <li><strong>Return:</strong> Dictionary with all results and dataframe</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
