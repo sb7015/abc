@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KM Agent — lambda_handler.py Breakdown</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg:      #0a0e1a;
+    --bg2:     #0f1628;
+    --bg3:     #161e35;
+    --border:  #1e2d4a;
+    --accent1: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text:    #e2e8f0;
+    --text2:   #94a3b8;
+    --text3:   #64748b;
+    --fn-blue: #93c5fd;
+    --purple:  #a78bfa;
+    --step:    #60a5fa;
+    --info:    #22c55e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────── */
+  header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f1628 50%, #161e35 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content:''; position:absolute; top:-80px; right:-80px;
+    width:300px; height:300px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    border-radius:50%;
+  }
+  header::after {
+    content:''; position:absolute; bottom:-60px; left:200px;
+    width:200px; height:200px;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+    border-radius:50%;
+  }
+  .header-badge {
+    display:inline-block;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--accent1);
+    font-family: 'JetBrains Mono', monospace;
+    font-size:11px; padding:4px 12px; border-radius:20px;
+    letter-spacing:2px; margin-bottom:16px;
+  }
+  header h1 {
+    font-size:36px; font-weight:800;
+    background: linear-gradient(135deg, #ffffff 0%, var(--accent1) 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text; line-height:1.2; margin-bottom:8px;
+  }
+  header p { color:var(--text2); font-size:15px; }
+  .header-stats { display:flex; gap:32px; margin-top:28px; flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat-num {
+    font-size:28px; font-weight:800; color:var(--accent1);
+    font-family:'JetBrains Mono', monospace;
+  }
+  .stat-label { font-size:11px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+
+  /* ── MAIN ────────────────────────────────────────────── */
+  main { padding:48px 60px; max-width:1400px; margin:0 auto; }
+
+  .section-title {
+    font-size:13px; font-weight:700; letter-spacing:3px;
+    text-transform:uppercase; color:var(--accent1);
+    margin-bottom:24px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* ── FLOW CHAIN (reused from architecture html) ──────── */
+  .flow-section {
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:16px; padding:32px; margin-bottom:48px;
+  }
+  .flow-chain { display:flex; align-items:center; flex-wrap:wrap; row-gap:16px; }
+  .flow-node {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:10px; padding:10px 16px;
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    white-space:nowrap; transition:border-color 0.2s;
+  }
+  .flow-node:hover { border-color:var(--accent1); }
+  .flow-node.entry  { border-color:rgba(0,212,255,0.4);  color:var(--accent1); font-weight:700; }
+  .flow-node.chat   { border-color:rgba(148,163,184,0.4); color:var(--text2); }
+  .flow-node.agent  { border-color:rgba(124,58,237,0.4);  color:var(--purple); }
+  .flow-node.db     { border-color:rgba(16,185,129,0.4);  color:var(--accent3); }
+  .flow-node.tool   { border-color:rgba(96,165,250,0.4);  color:var(--step); }
+  .flow-node.ext    { border-color:rgba(245,158,11,0.4);  color:var(--accent4); }
+  .flow-node.ok     { border-color:rgba(34,197,94,0.4);   color:var(--info); }
+  .flow-node.err    { border-color:rgba(239,68,68,0.4);   color:var(--accent5); }
+  .flow-arrow { color:var(--text3); font-size:18px; padding:0 6px; font-family:'JetBrains Mono', monospace; }
+
+  /* ── HANDLER CARDS ───────────────────────────────────── */
+  .handler-grid {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:24px;
+    margin-bottom:48px;
+  }
+  .handler-card {
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden;
+    transition:transform 0.2s, border-color 0.2s;
+  }
+  .handler-card:hover { transform:translateY(-2px); border-color:#2a3a5a; }
+  .handler-card.full { grid-column: 1 / -1; }
+
+  .card-header {
+    padding:20px 24px 16px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:flex-start; gap:16px;
+  }
+  .card-icon {
+    width:40px; height:40px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+  .card-meta { flex:1; }
+  .card-path {
+    font-family:'JetBrains Mono', monospace; font-size:13px;
+    font-weight:600; color:var(--accent1); margin-bottom:4px;
+  }
+  .card-role { font-size:13px; color:var(--text2); }
+  .card-badge {
+    font-size:10px; font-weight:700; letter-spacing:1px;
+    padding:3px 10px; border-radius:20px; white-space:nowrap;
+    align-self:flex-start;
+  }
+  .card-body { padding:20px 24px; }
+
+  /* ── PIPELINE STEPS ──────────────────────────────────── */
+  .pipeline { display:flex; flex-direction:column; gap:0; }
+
+  .step-row {
+    display:flex; align-items:stretch; gap:0;
+    border-bottom:1px solid rgba(30,45,74,0.4);
+    position:relative;
+  }
+  .step-row:last-child { border-bottom:none; }
+
+  /* vertical connector line */
+  .step-line {
+    width:32px; flex-shrink:0;
+    display:flex; flex-direction:column; align-items:center;
+    padding:12px 0;
+    position:relative;
+  }
+  .step-line::before {
+    content:''; position:absolute; top:0; bottom:0; left:50%;
+    width:1px; background:var(--border);
+    transform:translateX(-50%);
+  }
+  .step-row:first-child .step-line::before { top:50%; }
+  .step-row:last-child  .step-line::before { bottom:50%; }
+
+  .step-dot {
+    width:10px; height:10px; border-radius:50%;
+    border:2px solid; z-index:1; background:var(--bg2);
+    position:relative;
+  }
+
+  .step-content { flex:1; padding:12px 0 12px 16px; }
+  .step-num {
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    color:var(--text3); letter-spacing:1px; margin-bottom:4px;
+    text-transform:uppercase;
+  }
+  .step-name {
+    font-family:'JetBrains Mono', monospace; font-size:13px;
+    font-weight:600; margin-bottom:4px;
+  }
+  .step-module {
+    font-size:12px; color:var(--text3); margin-bottom:6px;
+  }
+  .step-module code {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    color:var(--purple); background:rgba(124,58,237,0.08);
+    padding:2px 6px; border-radius:4px;
+  }
+
+  /* ── LOG PREVIEW (same as architecture html) ─────────── */
+  .log-preview {
+    background:#060a14; border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; margin-top:8px;
+  }
+  .log-preview-title {
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    color:var(--text3); letter-spacing:2px; margin-bottom:8px;
+    text-transform:uppercase;
+  }
+  .log-line {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    line-height:1.9; white-space:pre-wrap; word-break:break-all;
+  }
+  .log-ts    { color:#475569; }
+  .log-info  { color:#22c55e; }
+  .log-error { color:#ef4444; }
+  .log-step  { color:#60a5fa; }
+  .log-done  { color:#a78bfa; }
+  .log-cid   { color:#f59e0b; }
+  .log-warn  { color:#f59e0b; }
+
+  /* ── SUB-AGENT TREE (inside agent step) ─────────────── */
+  .agent-tree {
+    margin-top:10px;
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:10px; padding:14px 16px;
+  }
+  .agent-tree-title {
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    color:var(--text3); letter-spacing:2px; text-transform:uppercase;
+    margin-bottom:12px;
+  }
+  .tree-item {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:7px 0; border-bottom:1px solid rgba(30,45,74,0.4);
+  }
+  .tree-item:last-child { border-bottom:none; }
+  .tree-connector {
+    font-family:'JetBrains Mono', monospace; color:var(--text3);
+    font-size:12px; min-width:24px; padding-top:2px; flex-shrink:0;
+  }
+  .tree-fn {
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    font-weight:600; min-width:220px; flex-shrink:0;
+  }
+  .tree-model {
+    font-size:11px; padding:2px 8px; border-radius:6px;
+    font-family:'JetBrains Mono', monospace; white-space:nowrap;
+    margin-right:8px; flex-shrink:0;
+  }
+  .tree-desc { font-size:12px; color:var(--text2); line-height:1.5; }
+  .tree-log  {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    color:var(--text3); margin-top:3px; display:block;
+  }
+
+  /* ── CALLS TAGS (same as architecture html) ──────────── */
+  .calls-section { margin-top:12px; }
+  .calls-title { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
+  .calls-list { display:flex; flex-wrap:wrap; gap:6px; }
+  .call-tag {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    padding:3px 10px; border-radius:6px; border:1px solid;
+  }
+  .call-tag.internal { border-color:rgba(0,212,255,0.2);   color:rgba(0,212,255,0.7);   background:rgba(0,212,255,0.05); }
+  .call-tag.bedrock  { border-color:rgba(124,58,237,0.3);  color:rgba(167,139,250,0.9); background:rgba(124,58,237,0.05); }
+  .call-tag.graph    { border-color:rgba(245,158,11,0.3);  color:rgba(245,158,11,0.9);  background:rgba(245,158,11,0.05); }
+  .call-tag.sqlite   { border-color:rgba(16,185,129,0.3);  color:rgba(16,185,129,0.9);  background:rgba(16,185,129,0.05); }
+  .call-tag.cwatch   { border-color:rgba(239,68,68,0.3);   color:rgba(239,68,68,0.9);   background:rgba(239,68,68,0.05); }
+
+  /* ── COLD START SECTION ──────────────────────────────── */
+  .coldstart-section {
+    background:#060a14; border:1px solid rgba(0,212,255,0.2);
+    border-radius:16px; padding:28px 32px; margin-bottom:48px;
+  }
+  .coldstart-log { font-family:'JetBrains Mono', monospace; font-size:13px; line-height:2; }
+
+  /* ── ERROR SECTION ───────────────────────────────────── */
+  .error-section {
+    background: rgba(239,68,68,0.04);
+    border:1px solid rgba(239,68,68,0.2);
+    border-radius:16px; padding:28px 32px; margin-bottom:48px;
+  }
+  .error-rule {
+    display:flex; align-items:flex-start; gap:14px;
+    padding:12px 0; border-bottom:1px solid rgba(239,68,68,0.1);
+  }
+  .error-rule:last-child { border-bottom:none; }
+  .error-icon { font-size:16px; flex-shrink:0; padding-top:2px; }
+  .error-title { font-size:13px; font-weight:700; color:var(--accent5); margin-bottom:4px; }
+  .error-desc  { font-size:12px; color:var(--text2); line-height:1.6; }
+
+  /* ── ROUTING TABLE ───────────────────────────────────── */
+  .route-table-wrap {
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden; margin-bottom:48px;
+  }
+  table { width:100%; border-collapse:collapse; }
+  th {
+    background:var(--bg3); padding:14px 20px; text-align:left;
+    font-size:11px; font-weight:700; letter-spacing:2px;
+    text-transform:uppercase; color:var(--text3);
+    border-bottom:1px solid var(--border);
+  }
+  td {
+    padding:14px 20px; font-size:13px;
+    border-bottom:1px solid rgba(30,45,74,0.4);
+    vertical-align:middle;
+  }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,0.02); }
+  td code {
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    color:var(--accent1); background:rgba(0,212,255,0.07);
+    padding:2px 8px; border-radius:5px;
+  }
+
+  footer {
+    border-top:1px solid var(--border);
+    padding:24px 60px; text-align:center;
+    color:var(--text3); font-size:12px;
+    font-family:'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ HEADER -->
+<header>
+  <div class="header-badge">HANDLER BREAKDOWN</div>
+  <h1>lambda_handler.py — Full Breakdown</h1>
+  <p>Every function · every step · every module call · every CloudWatch log line</p>
+  <div class="header-stats">
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">Endpoints</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Top-Level Defs</div></div>
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">Steps in /chat</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Steps in /feedback</div></div>
+    <div class="stat"><div class="stat-num">6+</div><div class="stat-label">Bedrock Calls</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Fallbacks</div></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════ ROUTING OVERVIEW -->
+<div class="section-title">Request Routing — handler(event, context)</div>
+<div class="flow-section">
+  <div class="flow-chain">
+    <div class="flow-node entry">⚡ Lambda Invoked</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node entry">handler(event, context)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node chat">parse path from event</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node chat">if path == /chat</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node agent">handle_chat()</div>
+  </div>
+  <div class="flow-chain" style="margin-top:14px;">
+    <div class="flow-node" style="opacity:0;pointer-events:none;">⚡ Lambda Invoked</div>
+    <div class="flow-arrow" style="opacity:0;">→</div>
+    <div class="flow-node" style="opacity:0;pointer-events:none;">handler(event, context)</div>
+    <div class="flow-arrow" style="opacity:0;">→</div>
+    <div class="flow-node" style="opacity:0;">parse path from event</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node chat">if path == /feedback</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node ext">handle_feedback()</div>
+  </div>
+  <div class="flow-chain" style="margin-top:14px;">
+    <div class="flow-node" style="opacity:0;pointer-events:none;">⚡ Lambda Invoked</div>
+    <div class="flow-arrow" style="opacity:0;">→</div>
+    <div class="flow-node" style="opacity:0;pointer-events:none;">handler(event, context)</div>
+    <div class="flow-arrow" style="opacity:0;">→</div>
+    <div class="flow-node" style="opacity:0;">parse path from event</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node err">unknown path</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node err">raise ValueError → HTTP 500</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ ROUTING TABLE -->
+<div class="section-title">Endpoint Routing Table</div>
+<div class="route-table-wrap" style="margin-bottom:48px;">
+  <table>
+    <thead>
+      <tr>
+        <th>HTTP Method</th>
+        <th>Path</th>
+        <th>Routes To</th>
+        <th>Required Payload Fields</th>
+        <th>Returns</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/chat</code></td>
+        <td><code>handle_chat(body, context)</code></td>
+        <td><code>question, user_id, session_id, tenant_id, user_email, token</code></td>
+        <td><code>answer, citations, intent, confidence_score, correlation_id, latency_ms</code></td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/feedback</code></td>
+        <td><code>handle_feedback(body)</code></td>
+        <td><code>correlation_id, user_id, feedback_type</code></td>
+        <td><code>feedback_id, status, correlation_id</code></td>
+      </tr>
+      <tr>
+        <td><code>ANY</code></td>
+        <td>unknown</td>
+        <td>—</td>
+        <td>—</td>
+        <td>HTTP 500 — <code>ValueError: unknown path</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ COLD START -->
+<div class="section-title">Cold Start — Module Level (runs once per container)</div>
+<div class="coldstart-section" style="margin-bottom:48px;">
+  <div class="coldstart-log">
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#00d4ff;"> | lambda_handler | ============================================================</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#00d4ff;"> | lambda_handler | [COLD START] km-agent Lambda initializing</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#10b981;"> | lambda_handler | [COLD START] Environment: dev</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#10b981;"> | lambda_handler | [COLD START] Region: us-east-1</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#a78bfa;"> | lambda_handler | [COLD START] Orchestrator Model: anthropic.claude-opus-4-5</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#60a5fa;"> | lambda_handler | [COLD START] Retrieval Model:   anthropic.claude-sonnet-4-5</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#60a5fa;"> | lambda_handler | [COLD START] Validation Model:  anthropic.claude-sonnet-4-5</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#10b981;"> | lambda_handler | [COLD START] SQLite DB initialized → /tmp/km_agent.db</span></div>
+    <div><span class="log-ts">2026-02-23T10:00:00 | </span><span class="log-info">INFO  </span><span style="color:#00d4ff;"> | lambda_handler | ============================================================</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ HANDLER CARDS -->
+<div class="section-title">Function Breakdown — 3 Definitions</div>
+<div class="handler-grid">
+
+  <!-- ── handler() ────────────────────────────────────── -->
+  <div class="handler-card full">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(0,212,255,0.1);">⚡</div>
+      <div class="card-meta">
+        <div class="card-path">def handler(event, context)</div>
+        <div class="card-role">AWS Lambda entry point — parses path, generates correlation_id, routes to handle_chat() or handle_feedback()</div>
+      </div>
+      <div class="card-badge" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;">ENTRY POINT</div>
+    </div>
+    <div class="card-body">
+      <div class="pipeline">
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent1);"></div></div>
+          <div class="step-content">
+            <div class="step-num">On Invocation</div>
+            <div class="step-name" style="color:var(--accent1);">Parse event → extract path + body</div>
+            <div class="step-module">Reads <code>event["path"]</code> and <code>event["body"]</code> from API Gateway proxy format</div>
+            <div class="log-preview">
+              <div class="log-preview-title">Log Output</div>
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-info">INFO  </span><span> | lambda_handler.handler | </span><span class="log-step">[START] handler | path=/chat | user_id=u123 | session_id=s456</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent4);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Always First</div>
+            <div class="step-name" style="color:var(--accent4);">Generate correlation_id = uuid4()</div>
+            <div class="step-module">Unique UUID that flows through every function call, every DB row, every log line</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-info">INFO  </span><span> | lambda_handler.handler | </span><span class="log-step">[STEP] correlation_id generated | </span><span class="log-cid">cid=c789-ab12-...</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--step);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Route</div>
+            <div class="step-name" style="color:var(--step);">if path == "/chat" → handle_chat(body, correlation_id)</div>
+            <div class="step-module">Passes body dict + correlation_id down — no other state passed</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent4);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Route</div>
+            <div class="step-name" style="color:var(--accent4);">if path == "/feedback" → handle_feedback(body, correlation_id)</div>
+            <div class="step-module">Separate pipeline — no agent calls needed</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent5);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Any Exception — NO FALLBACK</div>
+            <div class="step-name" style="color:var(--accent5);">raise → HTTP 500 with exact error message</div>
+            <div class="step-module">Every unhandled exception bubbles up to here → <code>message_processor.build_error_response(e)</code></div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-error">ERROR </span><span> | lambda_handler.handler | </span><span class="log-error">[FAILED] handler | </span><span class="log-cid">cid=c789</span><span class="log-error"> | error=OBOTokenError: invalid_grant</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pipeline -->
+
+      <div class="calls-section">
+        <div class="calls-title">Calls</div>
+        <div class="calls-list">
+          <span class="call-tag internal">handle_chat()</span>
+          <span class="call-tag internal">handle_feedback()</span>
+          <span class="call-tag internal">message_processor.build_error_response()</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /handler card -->
+
+  <!-- ── handle_chat() ─────────────────────────────────── -->
+  <div class="handler-card full">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(0,212,255,0.1);">💬</div>
+      <div class="card-meta">
+        <div class="card-path">def handle_chat(body, correlation_id)</div>
+        <div class="card-role">Full /chat pipeline — 7 steps from validation to response. Runs all 3 agents. Saves session + chat history. Logs every step.</div>
+      </div>
+      <div class="card-badge" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;">CHAT PIPELINE</div>
+    </div>
+    <div class="card-body">
+      <div class="pipeline">
+
+        <!-- STEP 1 -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent3);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 1</div>
+            <div class="step-name" style="color:var(--accent3);">Validate + Beautify Request</div>
+            <div class="step-module">
+              <code>message_processor.validate_chat_request(body)</code><br>
+              <code>message_processor.beautify_message(body["question"])</code>
+            </div>
+            <div class="step-module" style="margin-top:6px;">Checks required fields: question, user_id, session_id, tenant_id, user_email, token. Strips HTML, normalises whitespace. Raises exception if any field missing — no defaults.</div>
+            <div class="log-preview">
+              <div class="log-preview-title">Log Output</div>
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-info">INFO  </span><span> | lambda_handler.handle_chat | </span><span class="log-step">[START] handle_chat | </span><span class="log-cid">cid=c789</span><span> | user_id=u123</span></div>
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-info">INFO  </span><span> | message_processor.validate_chat_request | </span><span class="log-step">[DONE] fields_ok=True | raw_len=84 clean_len=82</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent3);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 2</div>
+            <div class="step-name" style="color:var(--accent3);">Save Session to SQLite</div>
+            <div class="step-module"><code>sqlite_manager.save_session(session_id, user_id, tenant_id, user_email, token_hash, ip)</code></div>
+            <div class="step-module" style="margin-top:6px;">Saves login record. Stores SHA256 hash of token — NEVER raw token. Updates last_active if session exists. Raises on DB failure.</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-info">INFO  </span><span> | db.sqlite_manager.save_session | </span><span class="log-step">[DONE] session saved | session_id=s456 | user=user@co.com</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent5);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 3</div>
+            <div class="step-name" style="color:var(--accent5);">Log Request Start → CloudWatch</div>
+            <div class="step-module"><code>cloudwatch_logger.log_request(user_id, "/chat", correlation_id)</code></div>
+            <div class="step-module" style="margin-top:6px;">Publishes login_count +1 metric. Structured JSON log event. Visible in CloudWatch KMAgent namespace immediately.</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:00:01 | </span><span class="log-info">INFO  </span><span> | monitoring.cloudwatch_logger.log_request | </span><span class="log-step">[STEP] endpoint=/chat | user_id=u123 | metric=login_count+1</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4 — AGENTS (big step) -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--purple);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 4 — Core Intelligence</div>
+            <div class="step-name" style="color:var(--purple);">Run Multi-Agent Pipeline → orchestrator_agent.run()</div>
+            <div class="step-module"><code>orchestrator_agent.run(question, session_id, correlation_id, token)</code></div>
+
+            <div class="agent-tree">
+              <div class="agent-tree-title">Agent Execution Tree (inside orchestrator_agent.run)</div>
+
+              <div class="tree-item">
+                <div class="tree-connector">├─</div>
+                <div class="tree-fn" style="color:var(--purple);">plan_task(question)</div>
+                <div>
+                  <span class="tree-model" style="background:rgba(124,58,237,0.1);color:#a78bfa;border:1px solid rgba(124,58,237,0.2);">Opus</span>
+                  <span class="tree-desc">Bedrock call — generates execution plan and delegation strategy</span>
+                  <span class="tree-log log-step">→ [STEP] plan_complete | Bedrock Opus | cid=c789</span>
+                </div>
+              </div>
+
+              <div class="tree-item">
+                <div class="tree-connector">├─</div>
+                <div class="tree-fn" style="color:var(--fn-blue);">retrieval_agent.run()</div>
+                <div>
+                  <span class="tree-model" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2);">delegates</span>
+                  <span class="tree-desc">Runs 3-tool pipeline in sequence</span>
+
+                  <div class="tree-item" style="padding-left:16px;border-top:1px solid rgba(30,45,74,0.4);margin-top:8px;">
+                    <div class="tree-connector">├─</div>
+                    <div class="tree-fn" style="color:var(--fn-blue);font-size:11px;">intent_classifier.classify()</div>
+                    <div>
+                      <span class="tree-model" style="background:rgba(0,212,255,0.07);color:#00d4ff;border:1px solid rgba(0,212,255,0.2);font-size:10px;">Sonnet</span>
+                      <span class="tree-desc" style="font-size:11px;">7-category intent classification</span>
+                      <span class="tree-log log-done">→ [DONE] intent=SOP confidence=0.94 latency_ms=480</span>
+                    </div>
+                  </div>
+
+                  <div class="tree-item" style="padding-left:16px;">
+                    <div class="tree-connector">├─</div>
+                    <div class="tree-fn" style="color:var(--fn-blue);font-size:11px;">query_enhancer.enhance()</div>
+                    <div>
+                      <span class="tree-model" style="background:rgba(0,212,255,0.07);color:#00d4ff;border:1px solid rgba(0,212,255,0.2);font-size:10px;">Sonnet</span>
+                      <span class="tree-desc" style="font-size:11px;">Generates 3 enhanced query variants</span>
+                      <span class="tree-log log-step">→ [STEP] enhanced_queries=3 | original="claims SOP" → "insurance claims standard operating procedure"</span>
+                    </div>
+                  </div>
+
+                  <div class="tree-item" style="padding-left:16px;">
+                    <div class="tree-connector">├─</div>
+                    <div class="tree-fn" style="color:var(--accent4);font-size:11px;">graph_rag_search.search()</div>
+                    <div>
+                      <span class="tree-model" style="background:rgba(245,158,11,0.07);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);font-size:10px;">Graph RAG</span>
+                      <span class="tree-desc" style="font-size:11px;">OBO token exchange → MS Graph RAG API → deduplicate</span>
+                      <span class="tree-log log-step">→ [STEP] OBO exchange ok | docs_found=8 | after_dedup=5 | latency_ms=920</span>
+                    </div>
+                  </div>
+
+                  <div class="tree-item" style="padding-left:16px;">
+                    <div class="tree-connector">└─</div>
+                    <div class="tree-fn" style="color:var(--fn-blue);font-size:11px;">synthesize_draft(docs, question)</div>
+                    <div>
+                      <span class="tree-model" style="background:rgba(0,212,255,0.07);color:#00d4ff;border:1px solid rgba(0,212,255,0.2);font-size:10px;">Sonnet</span>
+                      <span class="tree-desc" style="font-size:11px;">Drafts answer with citations from retrieved docs</span>
+                      <span class="tree-log log-done">→ [DONE] retrieval_agent | draft_len=412 citations=3</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tree-item">
+                <div class="tree-connector">├─</div>
+                <div class="tree-fn" style="color:var(--accent4);">validation_agent.validate()</div>
+                <div>
+                  <span class="tree-model" style="background:rgba(245,158,11,0.07);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Sonnet</span>
+                  <span class="tree-desc">Hallucination check + citation verify → confidence score</span>
+                  <span class="tree-log log-done">→ [DONE] result=APPROVED confidence=0.92 | cid=c789</span>
+                </div>
+              </div>
+
+              <div class="tree-item">
+                <div class="tree-connector">├─</div>
+                <div class="tree-fn" style="color:var(--purple);">evaluate_validation(result)</div>
+                <div>
+                  <span class="tree-model" style="background:rgba(124,58,237,0.1);color:#a78bfa;border:1px solid rgba(124,58,237,0.2);">Opus</span>
+                  <span class="tree-desc">APPROVE if confidence &gt; 0.85 → finalize. REJECT → retry (max 2x). After 2 retries → raise exception.</span>
+                  <span class="tree-log log-step">→ [STEP] decision=APPROVED retry_count=0 | cid=c789</span>
+                </div>
+              </div>
+
+              <div class="tree-item">
+                <div class="tree-connector">└─</div>
+                <div class="tree-fn" style="color:var(--purple);">finalize_answer(draft, citations)</div>
+                <div>
+                  <span class="tree-model" style="background:rgba(124,58,237,0.1);color:#a78bfa;border:1px solid rgba(124,58,237,0.2);">Opus</span>
+                  <span class="tree-desc">Formats final answer with citations + agent_trace JSON for return to handle_chat()</span>
+                  <span class="tree-log log-done">→ [DONE] orchestrator_agent.run | answer_len=389 citations=3 latency_ms=2050</span>
+                </div>
+              </div>
+
+            </div><!-- /agent-tree -->
+          </div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent3);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 5</div>
+            <div class="step-name" style="color:var(--accent3);">Save Chat History to SQLite</div>
+            <div class="step-module"><code>sqlite_manager.save_chat(correlation_id, session_id, user_id, question, answer, citations, intent, confidence, latency_ms, agent_trace)</code></div>
+            <div class="step-module" style="margin-top:6px;">Saves complete Q&A record including agent_trace JSON. Raises on DB failure — never silent.</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:00:03 | </span><span class="log-info">INFO  </span><span> | db.sqlite_manager.save_chat | </span><span class="log-step">[DONE] chat saved | </span><span class="log-cid">cid=c789</span><span> | intent=SOP | confidence=0.92 | latency_ms=2100</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 6 -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent5);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 6</div>
+            <div class="step-name" style="color:var(--accent5);">Log Completion → CloudWatch</div>
+            <div class="step-module"><code>cloudwatch_logger.log_completion(correlation_id, latency_ms)</code></div>
+            <div class="step-module" style="margin-top:6px;">Publishes latency_ms metric. Updates intent_distribution counter. Structured JSON event in KMAgent namespace.</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:00:03 | </span><span class="log-info">INFO  </span><span> | monitoring.cloudwatch_logger.log_completion | </span><span class="log-step">[STEP] latency_ms=2100 | intent=SOP | </span><span class="log-cid">cid=c789</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 7 -->
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--info);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 7 — Return</div>
+            <div class="step-name" style="color:var(--info);">Build + Return HTTP 200 Response</div>
+            <div class="step-module"><code>message_processor.build_chat_response(answer, citations, intent, confidence, correlation_id, latency_ms)</code></div>
+            <div class="log-preview">
+              <div class="log-preview-title">Final Response JSON</div>
+              <div class="log-line" style="color:var(--text2);">{</div>
+              <div class="log-line" style="color:var(--text2);">  <span style="color:var(--fn-blue);">"answer"</span>:          <span style="color:var(--accent3);">"The SOP for claims appeal requires..."</span>,</div>
+              <div class="log-line" style="color:var(--text2);">  <span style="color:var(--fn-blue);">"citations"</span>:       <span style="color:var(--text3);">[{"title":"Claims SOP v2.1", "url":"...", "snippet":"..."}],</span></div>
+              <div class="log-line" style="color:var(--text2);">  <span style="color:var(--fn-blue);">"intent"</span>:          <span style="color:var(--accent3);">"SOP"</span>,</div>
+              <div class="log-line" style="color:var(--text2);">  <span style="color:var(--fn-blue);">"confidence_score"</span>: <span style="color:var(--accent4);">0.92</span>,</div>
+              <div class="log-line" style="color:var(--text2);">  <span style="color:var(--fn-blue);">"correlation_id"</span>:  <span style="color:var(--accent4);">"c789-ab12-..."</span>,</div>
+              <div class="log-line" style="color:var(--text2);">  <span style="color:var(--fn-blue);">"latency_ms"</span>:      <span style="color:var(--accent4);">2100</span></div>
+              <div class="log-line" style="color:var(--text2);">}</div>
+            </div>
+            <div class="log-preview" style="margin-top:8px;">
+              <div class="log-preview-title">Log Output</div>
+              <div class="log-line"><span class="log-ts">10:00:03 | </span><span class="log-info">INFO  </span><span> | lambda_handler.handle_chat | </span><span class="log-done">[DONE] handle_chat | </span><span class="log-cid">cid=c789</span><span class="log-done"> | latency_ms=2100 | intent=SOP | HTTP 200</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pipeline -->
+
+      <div class="calls-section">
+        <div class="calls-title">Calls</div>
+        <div class="calls-list">
+          <span class="call-tag internal">message_processor</span>
+          <span class="call-tag sqlite">sqlite_manager</span>
+          <span class="call-tag cwatch">cloudwatch_logger</span>
+          <span class="call-tag internal">orchestrator_agent</span>
+          <span class="call-tag bedrock">Bedrock × 6+</span>
+          <span class="call-tag graph">MS Graph RAG</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /handle_chat card -->
+
+  <!-- ── handle_feedback() ─────────────────────────────── -->
+  <div class="handler-card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(245,158,11,0.1);">👍</div>
+      <div class="card-meta">
+        <div class="card-path">def handle_feedback(body, correlation_id)</div>
+        <div class="card-role">Feedback pipeline — validates, saves, logs. No agent calls. Linked to original chat via correlation_id.</div>
+      </div>
+      <div class="card-badge" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;">FEEDBACK</div>
+    </div>
+    <div class="card-body">
+      <div class="pipeline">
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent3);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 1</div>
+            <div class="step-name" style="color:var(--accent3);">Validate Feedback Payload</div>
+            <div class="step-module"><code>message_processor.validate_feedback_request(body)</code></div>
+            <div class="step-module" style="margin-top:6px;">Checks: correlation_id, user_id, feedback_type. Raises if any field missing.</div>
+            <div class="log-preview">
+              <div class="log-preview-title">Log Output</div>
+              <div class="log-line"><span class="log-ts">10:05:00 | </span><span class="log-info">INFO  </span><span> | lambda_handler.handle_feedback | </span><span class="log-step">[START] handle_feedback | </span><span class="log-cid">cid=c789</span><span> | type=thumbs_up</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent3);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 2</div>
+            <div class="step-name" style="color:var(--accent3);">Save Feedback to SQLite</div>
+            <div class="step-module"><code>sqlite_manager.save_feedback(feedback_id, correlation_id, user_id, feedback_type, comment)</code></div>
+            <div class="step-module" style="margin-top:6px;">Links to original Q&A via correlation_id. Raises on DB failure.</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:05:00 | </span><span class="log-info">INFO  </span><span> | db.sqlite_manager.save_feedback | </span><span class="log-step">[DONE] feedback saved | feedback_id=f001 | </span><span class="log-cid">cid=c789</span><span> | type=thumbs_up</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--accent5);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 3</div>
+            <div class="step-name" style="color:var(--accent5);">Log Feedback → CloudWatch</div>
+            <div class="step-module"><code>cloudwatch_logger.log_feedback(correlation_id, feedback_type)</code></div>
+            <div class="step-module" style="margin-top:6px;">Publishes feedback_count +1 metric. Structured JSON event.</div>
+            <div class="log-preview">
+              <div class="log-line"><span class="log-ts">10:05:00 | </span><span class="log-info">INFO  </span><span> | monitoring.cloudwatch_logger.log_feedback | </span><span class="log-step">[STEP] feedback_count+1 | type=thumbs_up | </span><span class="log-cid">cid=c789</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-line"><div class="step-dot" style="border-color:var(--info);"></div></div>
+          <div class="step-content">
+            <div class="step-num">Step 4 — Return</div>
+            <div class="step-name" style="color:var(--info);">Build + Return HTTP 200 Acknowledgment</div>
+            <div class="step-module"><code>message_processor.build_feedback_response(feedback_id, correlation_id)</code></div>
+            <div class="log-preview">
+              <div class="log-preview-title">Final Response JSON</div>
+              <div class="log-line" style="color:var(--text2);">{ <span style="color:var(--fn-blue);">"feedback_id"</span>: <span style="color:var(--accent3);">"f001"</span>, <span style="color:var(--fn-blue);">"status"</span>: <span style="color:var(--accent3);">"received"</span>, <span style="color:var(--fn-blue);">"correlation_id"</span>: <span style="color:var(--accent4);">"c789"</span> }</div>
+              <div class="log-line" style="margin-top:6px;"><span class="log-ts">10:05:00 | </span><span class="log-info">INFO  </span><span> | lambda_handler.handle_feedback | </span><span class="log-done">[DONE] feedback_id=f001 | HTTP 200</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pipeline -->
+
+      <div class="calls-section">
+        <div class="calls-title">Calls</div>
+        <div class="calls-list">
+          <span class="call-tag internal">message_processor</span>
+          <span class="call-tag sqlite">sqlite_manager</span>
+          <span class="call-tag cwatch">cloudwatch_logger</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /handle_feedback -->
+
+  <!-- ── ERROR RULES ───────────────────────────────────── -->
+  <div class="handler-card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);">🚨</div>
+      <div class="card-meta">
+        <div class="card-path">Exception Rules — Zero Fallbacks</div>
+        <div class="card-role">Every failure raises loudly. HTTP 500 with exact error. Never a fake or default answer.</div>
+      </div>
+      <div class="card-badge" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;">NO FALLBACK</div>
+    </div>
+    <div class="card-body">
+      <div class="error-section" style="margin-bottom:0;padding:16px;">
+        <div class="error-rule">
+          <div class="error-icon">💥</div>
+          <div>
+            <div class="error-title">OBO Token Failure</div>
+            <div class="error-desc">graph_rag_search.exchange_obo_token() fails → raises OBOTokenError immediately. Does NOT proceed without a valid Graph API token.</div>
+          </div>
+        </div>
+        <div class="error-rule">
+          <div class="error-icon">💥</div>
+          <div>
+            <div class="error-title">Graph RAG Returns 0 Documents</div>
+            <div class="error-desc">graph_rag_search.search() finds nothing → raises NoDocumentsError. Does NOT return an empty or hallucinated answer.</div>
+          </div>
+        </div>
+        <div class="error-rule">
+          <div class="error-icon">💥</div>
+          <div>
+            <div class="error-title">Validation Rejected After 2 Retries</div>
+            <div class="error-desc">orchestrator_agent retries up to 2 times. After 2nd REJECTED → raises MaxRetriesError. Does NOT return the rejected answer silently.</div>
+          </div>
+        </div>
+        <div class="error-rule">
+          <div class="error-icon">💥</div>
+          <div>
+            <div class="error-title">Bedrock Call Failure</div>
+            <div class="error-desc">Any boto3 bedrock-runtime exception → raises immediately. Does NOT retry silently or return a cached/default response.</div>
+          </div>
+        </div>
+        <div class="error-rule">
+          <div class="error-icon">💥</div>
+          <div>
+            <div class="error-title">SQLite Save Failure</div>
+            <div class="error-desc">sqlite_manager.save_*() fails → raises DBError. Does NOT continue silently. Data integrity required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="log-preview" style="margin-top:16px;">
+        <div class="log-preview-title">Error Log Pattern</div>
+        <div class="log-line"><span class="log-ts">10:00:02 | </span><span class="log-error">ERROR </span><span> | tools.graph_rag_search.exchange_obo_token | </span><span class="log-error">[FAILED] OBO exchange | </span><span class="log-cid">cid=c789</span><span class="log-error"> | error=invalid_grant | </span><span class="log-ts">↑ re-raised to handler → HTTP 500</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /handler-grid -->
+
+</main>
+
+<footer>
+  lambda_handler.py  ·  km-agent  ·  AWS Lambda  ·  Elements Health  ·  2026
+</footer>
+
+</body>
+</html>
