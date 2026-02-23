@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>km-agent — Folder Structure</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 60px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── WINDOW CHROME ── */
+  .terminal-window {
+    width: 100%;
+    max-width: 860px;
+    background: #161b22;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.08),
+      0 32px 64px rgba(0,0,0,0.6),
+      0 0 80px rgba(0,212,255,0.04);
+  }
+
+  .title-bar {
+    background: #21262d;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .dots { display: flex; gap: 8px; }
+  .dot {
+    width: 13px; height: 13px; border-radius: 50%;
+  }
+  .dot.red    { background: #ff5f57; }
+  .dot.yellow { background: #febc2e; }
+  .dot.green  { background: #28c840; }
+
+  .title-text {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: #8b949e;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── TERMINAL BODY ── */
+  .terminal-body {
+    padding: 28px 32px 36px;
+    background: #0d1117;
+  }
+
+  /* prompt line */
+  .prompt-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .prompt-user  { color: #3fb950; font-size: 13px; font-weight: 700; }
+  .prompt-at    { color: #8b949e; font-size: 13px; }
+  .prompt-host  { color: #58a6ff; font-size: 13px; font-weight: 700; }
+  .prompt-path  { color: #d2a8ff; font-size: 13px; }
+  .prompt-sym   { color: #8b949e; font-size: 13px; }
+  .prompt-cmd   { color: #e6edf3; font-size: 13px; }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: #58a6ff;
+    animation: blink 1.2s step-end infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── TREE ── */
+  .tree {
+    font-size: 13.5px;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .tree-line {
+    display: flex;
+    align-items: center;
+    padding: 3.5px 0;
+    transition: background 0.15s;
+    border-radius: 4px;
+    padding-left: 4px;
+    cursor: default;
+  }
+  .tree-line:hover { background: rgba(255,255,255,0.04); }
+
+  /* tree connector characters */
+  .conn {
+    color: #30363d;
+    white-space: pre;
+    letter-spacing: 0;
+    flex-shrink: 0;
+  }
+
+  /* icons */
+  .icon {
+    font-size: 13px;
+    margin-right: 7px;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+  }
+
+  /* text styles */
+  .dir-name  { color: #58a6ff; font-weight: 700; }
+  .file-name { color: #e6edf3; }
+  .file-num  {
+    color: #f0883e;
+    font-weight: 700;
+    margin-right: 6px;
+    font-size: 11px;
+    background: rgba(240,136,62,0.12);
+    border: 1px solid rgba(240,136,62,0.2);
+    border-radius: 4px;
+    padding: 1px 5px;
+    flex-shrink: 0;
+  }
+  .arrow    { color: #8b949e; margin: 0 8px; flex-shrink: 0; }
+  .comment  { color: #8b949e; font-size: 12px; }
+
+  /* layer badges */
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 4px;
+    margin-right: 8px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .badge-entry    { background: rgba(0,212,255,0.12);  color: #00d4ff; border: 1px solid rgba(0,212,255,0.2); }
+  .badge-util     { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+  .badge-db       { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+  .badge-agent    { background: rgba(167,139,250,0.12);color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
+  .badge-tool     { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+  .badge-monitor  { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+  .badge-config   { background: rgba(139,148,158,0.12);color: #8b949e; border: 1px solid rgba(139,148,158,0.2); }
+
+  /* folder row */
+  .folder-row { margin-top: 6px; }
+  .folder-row:first-child { margin-top: 0; }
+
+  /* divider between major sections */
+  .section-gap { height: 6px; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #21262d;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .stat-item { display: flex; flex-direction: column; gap: 3px; }
+  .stat-val  { font-size: 22px; font-weight: 700; color: #58a6ff; }
+  .stat-lbl  { font-size: 11px; color: #8b949e; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── LEGEND ── */
+  .legend {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #21262d;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #8b949e;
+  }
+
+  /* ── SECOND TERMINAL — env vars ── */
+  .terminal-window.env {
+    margin-top: 28px;
+  }
+
+  /* ── INFO CARDS ── */
+  .info-grid {
+    width: 100%;
+    max-width: 860px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .info-card {
+    background: #161b22;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .info-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8b949e;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .info-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .info-card li {
+    font-size: 12px;
+    color: #e6edf3;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .info-card li::before {
+    content: '▸';
+    color: #58a6ff;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── FUNCTION TABLES SECTION ─────────────────────────────── */
+  .fn-section {
+    width: 100%;
+    max-width: 860px;
+    margin-top: 40px;
+  }
+  .fn-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #8b949e;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .fn-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #21262d;
+  }
+  .file-block {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .file-block-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 20px;
+    border-bottom: 1px solid #21262d;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .file-block-header:hover { background: rgba(255,255,255,0.03); }
+  .fh-num {
+    font-size: 10px; font-weight: 700; color: #f0883e;
+    background: rgba(240,136,62,0.12);
+    border: 1px solid rgba(240,136,62,0.2);
+    border-radius: 4px; padding: 2px 7px; flex-shrink: 0;
+  }
+  .fh-path { font-size: 13px; font-weight: 700; flex: 1; }
+  .fh-badge-wrap { flex-shrink: 0; }
+  .fh-desc { font-size: 11px; color: #8b949e; flex: 2; }
+  .fh-toggle { font-size: 12px; color: #8b949e; flex-shrink: 0; transition: transform 0.2s; }
+  .file-block.open .fh-toggle { transform: rotate(90deg); }
+  .fn-table-wrap { overflow-x: auto; display: none; }
+  .file-block.open .fn-table-wrap { display: block; }
+  .fn-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .fn-table thead tr { background: #0d1117; border-bottom: 1px solid #30363d; }
+  .fn-table th {
+    padding: 9px 16px; text-align: left;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: #8b949e; white-space: nowrap;
+  }
+  .fn-table tbody tr { border-bottom: 1px solid rgba(48,54,61,0.5); transition: background 0.12s; }
+  .fn-table tbody tr:last-child { border-bottom: none; }
+  .fn-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+  .fn-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.012); }
+  .fn-table td { padding: 11px 16px; vertical-align: top; line-height: 1.6; }
+  .td-fn    { color: #93c5fd; font-weight: 600; font-size: 12px; white-space: nowrap; }
+  .td-what  { color: #e6edf3; }
+  .td-calls { color: #a78bfa; font-size: 11px; }
+  .td-log   { color: #475569; font-size: 11px; }
+  .log-i { color: #3fb950; } .log-s { color: #58a6ff; }
+  .log-d { color: #a78bfa; } .log-e { color: #ef4444; }
+  .log-c { color: #f59e0b; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ MAIN TERMINAL ══════════════════════════════════════════════ -->
+<div class="terminal-window">
+
+  <!-- title bar -->
+  <div class="title-bar">
+    <div class="dots">
+      <div class="dot red"></div>
+      <div class="dot yellow"></div>
+      <div class="dot green"></div>
+    </div>
+    <div class="title-text">bash — km-agent — 120×40</div>
+  </div>
+
+  <!-- body -->
+  <div class="terminal-body">
+
+    <!-- prompt -->
+    <div class="prompt-line">
+      <span class="prompt-user">dev</span><span class="prompt-at">@</span><span class="prompt-host">km-agent</span>
+      <span class="prompt-sym">:</span><span class="prompt-path">~/projects</span>
+      <span class="prompt-sym">$</span>
+      <span class="prompt-cmd">tree km-agent/ --dirsfirst -F</span>
+    </div>
+
+    <!-- tree output -->
+    <div class="tree">
+
+      <!-- root -->
+      <div class="tree-line folder-row">
+        <span class="icon">📁</span>
+        <span class="dir-name">km-agent/</span>
+      </div>
+
+      <!-- ── root-level files ── -->
+      <div class="tree-line">
+        <span class="conn">├── </span>
+        <span class="file-num">01</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-entry">ENTRY POINT</span>
+        <span class="file-name">lambda_handler.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">AWS Lambda entry · routes /chat + /feedback · cold start banner</span>
+      </div>
+
+      <div class="tree-line">
+        <span class="conn">├── </span>
+        <span class="file-num">02</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-util">UTILITY</span>
+        <span class="file-name">message_processor.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">validate · beautify · build all response JSON shapes</span>
+      </div>
+
+      <div class="section-gap"></div>
+
+      <!-- ── db/ ── -->
+      <div class="tree-line folder-row">
+        <span class="conn">├── </span>
+        <span class="icon">📂</span>
+        <span class="dir-name">db/</span>
+        <span class="arrow" style="margin-left:4px;">←</span>
+        <span class="comment">SQLite — all persistence · /tmp/km_agent.db</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   └── </span>
+        <span class="file-num">03</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-db">DATABASE</span>
+        <span class="file-name">sqlite_manager.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">sessions · chat_history · feedback · thread-safe Lock()</span>
+      </div>
+
+      <div class="section-gap"></div>
+
+      <!-- ── agents/ ── -->
+      <div class="tree-line folder-row">
+        <span class="conn">├── </span>
+        <span class="icon">📂</span>
+        <span class="dir-name">agents/</span>
+        <span class="arrow" style="margin-left:4px;">←</span>
+        <span class="comment">AWS Strands Framework · 3 agents · Claude via Bedrock</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   ├── </span>
+        <span class="file-num">04</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-agent">TEAM LEAD</span>
+        <span class="file-name">orchestrator_agent.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">Claude Opus · plans · delegates · retries max 2× · raises on failure</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   ├── </span>
+        <span class="file-num">05</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-agent">JUNIOR DEV</span>
+        <span class="file-name">retrieval_agent.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">Claude Sonnet · runs 3-tool pipeline · synthesises draft + citations</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   └── </span>
+        <span class="file-num">06</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-agent">SENIOR QA</span>
+        <span class="file-name">validation_agent.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">Claude Sonnet · hallucination check · APPROVED > 0.85 confidence</span>
+      </div>
+
+      <div class="section-gap"></div>
+
+      <!-- ── tools/ ── -->
+      <div class="tree-line folder-row">
+        <span class="conn">├── </span>
+        <span class="icon">📂</span>
+        <span class="dir-name">tools/</span>
+        <span class="arrow" style="margin-left:4px;">←</span>
+        <span class="comment">called by retrieval_agent · sequence: 07 → 08 → 09</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   ├── </span>
+        <span class="file-num">07</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-tool">TOOL 1</span>
+        <span class="file-name">intent_classifier.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">Bedrock Sonnet · 7 categories: SOP / Policy / Claims / HR / etc.</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   ├── </span>
+        <span class="file-num">08</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-tool">TOOL 2</span>
+        <span class="file-name">query_enhancer.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">Bedrock Sonnet · 3 enhanced query variants · intent-aware expansion</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   └── </span>
+        <span class="file-num">09</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-tool">TOOL 3</span>
+        <span class="file-name">graph_rag_search.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">OBO token → Azure AD → MS Graph RAG · SharePoint / OneDrive</span>
+      </div>
+
+      <div class="section-gap"></div>
+
+      <!-- ── monitoring/ ── -->
+      <div class="tree-line folder-row">
+        <span class="conn">├── </span>
+        <span class="icon">📂</span>
+        <span class="dir-name">monitoring/</span>
+        <span class="arrow" style="margin-left:4px;">←</span>
+        <span class="comment">structured logs + 5 custom CloudWatch metrics</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">│   └── </span>
+        <span class="file-num">10</span>
+        <span class="icon">🐍</span>
+        <span class="badge badge-monitor">MONITORING</span>
+        <span class="file-name">cloudwatch_logger.py</span>
+        <span class="arrow">←</span>
+        <span class="comment">namespace KMAgent · latency · errors · login_count · feedback</span>
+      </div>
+
+      <div class="section-gap"></div>
+
+      <!-- ── config files ── -->
+      <div class="tree-line">
+        <span class="conn">├── </span>
+        <span class="icon">📄</span>
+        <span class="badge badge-config">CONFIG</span>
+        <span class="file-name">requirements.txt</span>
+        <span class="arrow">←</span>
+        <span class="comment">boto3 · strands-agents · requests · python-dotenv</span>
+      </div>
+      <div class="tree-line">
+        <span class="conn">└── </span>
+        <span class="icon">📄</span>
+        <span class="badge badge-config">CONFIG</span>
+        <span class="file-name">.env.template</span>
+        <span class="arrow">←</span>
+        <span class="comment">all 16 env vars · Bedrock models · Azure AD · SharePoint · SQLite path</span>
+      </div>
+
+    </div><!-- /tree -->
+
+    <!-- stats bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-val">10</span>
+        <span class="stat-lbl">Python Files</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">4</span>
+        <span class="stat-lbl">Folders</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">3</span>
+        <span class="stat-lbl">Agents</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">3</span>
+        <span class="stat-lbl">Tools</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">3</span>
+        <span class="stat-lbl">SQLite Tables</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">6+</span>
+        <span class="stat-lbl">Bedrock Calls/Req</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">2</span>
+        <span class="stat-lbl">Lambda Endpoints</span>
+      </div>
+    </div>
+
+    <!-- legend -->
+    <div class="legend">
+      <div class="legend-item"><span class="badge badge-entry">ENTRY POINT</span> <span>lambda_handler.py</span></div>
+      <div class="legend-item"><span class="badge badge-util">UTILITY</span> <span>message_processor.py</span></div>
+      <div class="legend-item"><span class="badge badge-db">DATABASE</span> <span>sqlite_manager.py</span></div>
+      <div class="legend-item"><span class="badge badge-agent">AGENT</span> <span>orchestrator / retrieval / validation</span></div>
+      <div class="legend-item"><span class="badge badge-tool">TOOL</span> <span>intent / query / graph_rag</span></div>
+      <div class="legend-item"><span class="badge badge-monitor">MONITORING</span> <span>cloudwatch_logger.py</span></div>
+      <div class="legend-item"><span class="badge badge-config">CONFIG</span> <span>requirements / .env</span></div>
+    </div>
+
+  </div><!-- /terminal-body -->
+</div><!-- /terminal-window -->
+
+<!-- ═══ SECOND TERMINAL — dependency map ══════════════════════════ -->
+<div class="terminal-window env">
+
+  <div class="title-bar">
+    <div class="dots">
+      <div class="dot red"></div>
+      <div class="dot yellow"></div>
+      <div class="dot green"></div>
+    </div>
+    <div class="title-text">bash — dependency map — who calls what</div>
+  </div>
+
+  <div class="terminal-body">
+
+    <div class="prompt-line" style="margin-bottom:20px;">
+      <span class="prompt-user">dev</span><span class="prompt-at">@</span><span class="prompt-host">km-agent</span>
+      <span class="prompt-sym">:</span><span class="prompt-path">~/projects/km-agent</span>
+      <span class="prompt-sym">$</span>
+      <span class="prompt-cmd">cat CALL_CHAIN.txt</span>
+    </div>
+
+    <div class="tree" style="font-size:13px;">
+
+      <!-- handler -->
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">   </span>
+        <span style="color:#00d4ff;font-weight:700;">lambda_handler.py  [01]</span>
+        <span class="arrow">→</span>
+        <span class="comment">message_processor [02] · sqlite_manager [03] · cloudwatch_logger [10]</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">   │</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">   └─→ </span>
+        <span style="color:#a78bfa;font-weight:700;">orchestrator_agent.py  [04]</span>
+        <span class="arrow">→</span>
+        <span class="comment">AWS Bedrock (Opus) · retrieval_agent [05] · validation_agent [06]</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        │</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        ├─→ </span>
+        <span style="color:#58a6ff;font-weight:700;">retrieval_agent.py  [05]</span>
+        <span class="arrow">→</span>
+        <span class="comment">AWS Bedrock (Sonnet) · tools [07] [08] [09] in sequence</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        │      │</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        │      ├─→ </span>
+        <span style="color:#f59e0b;font-weight:700;">intent_classifier.py  [07]</span>
+        <span class="arrow">→</span>
+        <span class="comment">AWS Bedrock (Sonnet)</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        │      ├─→ </span>
+        <span style="color:#f59e0b;font-weight:700;">query_enhancer.py  [08]</span>
+        <span class="arrow">→</span>
+        <span class="comment">AWS Bedrock (Sonnet)</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        │      └─→ </span>
+        <span style="color:#ef4444;font-weight:700;">graph_rag_search.py  [09]</span>
+        <span class="arrow">→</span>
+        <span class="comment">Azure AD (OBO) → MS Graph RAG API → SharePoint / OneDrive</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        │</span>
+      </div>
+      <div class="tree-line" style="padding-top:2px;padding-bottom:2px;">
+        <span class="conn">        └─→ </span>
+        <span style="color:#fb923c;font-weight:700;">validation_agent.py  [06]</span>
+        <span class="arrow">→</span>
+        <span class="comment">AWS Bedrock (Sonnet) · returns APPROVED / REJECTED to orchestrator</span>
+      </div>
+
+      <div style="height:20px;"></div>
+
+      <!-- shared -->
+      <div class="tree-line">
+        <span class="conn">   </span>
+        <span style="color:#10b981;font-weight:700;">sqlite_manager.py  [03]</span>
+        <span class="arrow">←</span>
+        <span class="comment">called by lambda_handler on EVERY request · no agent calls it directly</span>
+      </div>
+      <div class="tree-line" style="margin-top:4px;">
+        <span class="conn">   </span>
+        <span style="color:#64748b;font-weight:700;">cloudwatch_logger.py  [10]</span>
+        <span class="arrow">←</span>
+        <span class="comment">called by lambda_handler on EVERY request · no agent calls it directly</span>
+      </div>
+      <div class="tree-line" style="margin-top:4px;">
+        <span class="conn">   </span>
+        <span style="color:#475569;font-weight:700;">message_processor.py  [02]</span>
+        <span class="arrow">←</span>
+        <span class="comment">called by lambda_handler only · pure Python · zero external calls</span>
+      </div>
+
+    </div>
+
+  </div>
+</div><!-- /second terminal -->
+
+<!-- ═══ INFO CARDS ══════════════════════════════════════════════════ -->
+<div class="info-grid">
+
+  <div class="info-card">
+    <div class="info-card-title">Files Inside Lambda</div>
+    <ul>
+      <li>lambda_handler.py [01]</li>
+      <li>message_processor.py [02]</li>
+      <li>db/sqlite_manager.py [03]</li>
+      <li>agents/orchestrator_agent.py [04]</li>
+      <li>agents/retrieval_agent.py [05]</li>
+      <li>agents/validation_agent.py [06]</li>
+      <li>tools/intent_classifier.py [07]</li>
+      <li>tools/query_enhancer.py [08]</li>
+      <li>tools/graph_rag_search.py [09]</li>
+      <li>monitoring/cloudwatch_logger.py [10]</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">External Systems Called</div>
+    <ul>
+      <li>AWS Bedrock — claude-opus-4-5 (Orchestrator)</li>
+      <li>AWS Bedrock — claude-sonnet-4-5 (Retrieval)</li>
+      <li>AWS Bedrock — claude-sonnet-4-5 (Validation)</li>
+      <li>AWS Bedrock — claude-sonnet-4-5 (Tools)</li>
+      <li>Azure AD — OBO token exchange</li>
+      <li>MS Graph RAG API — SharePoint / OneDrive</li>
+      <li>AWS CloudWatch — metrics + logs</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Zero Fallback Rules</div>
+    <ul>
+      <li>OBO token fails → raise immediately</li>
+      <li>Graph RAG returns 0 docs → raise</li>
+      <li>Validation rejects 2× → raise</li>
+      <li>Bedrock call fails → raise</li>
+      <li>SQLite save fails → raise</li>
+      <li>Never return fake / default answer</li>
+      <li>HTTP 500 with exact error message</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">SQLite Tables (3)</div>
+    <ul>
+      <li>sessions — login · token_hash · ip · last_active</li>
+      <li>chat_history — Q&A · citations · intent · confidence · latency · agent_trace</li>
+      <li>feedback — correlation_id · thumbs_up / thumbs_down · comment</li>
+    </ul>
+  </div>
+
+</div><!-- /info-grid -->
+
+<!-- ═══ FUNCTION TABLES ════════════════════════════════════════════ -->
+<div class="fn-section">
+  <div class="fn-section-title">Function Reference — click any file to expand</div>
+
+  <!-- ① lambda_handler.py -->
+  <div class="file-block open" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">01</span>
+      <span class="fh-path" style="color:#00d4ff;">lambda_handler.py</span>
+      <span class="badge badge-entry fh-badge-wrap">ENTRY POINT</span>
+      <span class="fh-desc">AWS Lambda entry · routes /chat + /feedback · cold start banner · zero fallbacks</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="color:#f0883e;font-weight:700;">1</td>
+            <td class="td-fn">handler(event, context)</td>
+            <td class="td-what">Lambda entry point. Parses path from event, generates <code style="color:#f59e0b;background:rgba(245,158,11,0.08);padding:1px 5px;border-radius:3px;">correlation_id</code> via uuid4, routes to handle_chat() or handle_feedback(). Any uncaught exception → HTTP 500 with exact error message.</td>
+            <td class="td-calls">handle_chat()<br>handle_feedback()<br>build_error_response()</td>
+            <td class="td-log"><span class="log-i">INFO</span> | <span class="log-s">[START] handler</span> | path=/chat | <span class="log-c">cid=c789</span></td>
+          </tr>
+          <tr>
+            <td style="color:#f0883e;font-weight:700;">2</td>
+            <td class="td-fn">handle_chat(body, cid)</td>
+            <td class="td-what">Full /chat pipeline — 7 steps in order: validate request → beautify message → save session → log start → run orchestrator agent → save chat history → log completion → return HTTP 200.</td>
+            <td class="td-calls">message_processor<br>sqlite_manager<br>cloudwatch_logger<br>orchestrator_agent</td>
+            <td class="td-log"><span class="log-d">[DONE]</span> handle_chat | <span class="log-c">cid=c789</span> | latency_ms=2100 | intent=SOP</td>
+          </tr>
+          <tr>
+            <td style="color:#f0883e;font-weight:700;">3</td>
+            <td class="td-fn">handle_feedback(body, cid)</td>
+            <td class="td-what">Full /feedback pipeline — 4 steps: validate feedback payload → save feedback to SQLite → log CloudWatch event → return HTTP 200 acknowledgment with feedback_id.</td>
+            <td class="td-calls">message_processor<br>sqlite_manager<br>cloudwatch_logger</td>
+            <td class="td-log"><span class="log-d">[DONE]</span> handle_feedback | feedback_id=f001 | HTTP 200</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ② message_processor.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">02</span>
+      <span class="fh-path" style="color:#10b981;">message_processor.py</span>
+      <span class="badge badge-util fh-badge-wrap">UTILITY</span>
+      <span class="fh-desc">Pure Python · validate · sanitise · build all response shapes · zero external calls</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">validate_chat_request(body)</td><td class="td-what">Checks 6 required fields: question, user_id, session_id, tenant_id, user_email, token. Raises ValueError immediately if any field is missing — never returns a default.</td><td class="td-calls">—</td><td class="td-log"><span class="log-s">[DONE]</span> validate_chat_request | fields_ok=True</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">validate_feedback_request(body)</td><td class="td-what">Checks 3 required fields: correlation_id, user_id, feedback_type. Raises ValueError if any field missing.</td><td class="td-calls">—</td><td class="td-log"><span class="log-s">[DONE]</span> validate_feedback_request | fields_ok=True</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">beautify_message(raw_text)</td><td class="td-what">Strips HTML tags, collapses multiple whitespace to single space, trims leading/trailing whitespace. Returns clean question string ready for agent pipeline.</td><td class="td-calls">—</td><td class="td-log"><span class="log-s">[DONE]</span> beautify | raw_len=84 clean_len=82</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">4</td><td class="td-fn">build_chat_response(data)</td><td class="td-what">Constructs HTTP 200 JSON body: answer, citations[], intent, confidence_score, correlation_id, latency_ms. Used as the final return from handle_chat().</td><td class="td-calls">—</td><td class="td-log">—</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">5</td><td class="td-fn">build_feedback_response(data)</td><td class="td-what">Constructs HTTP 200 JSON body: feedback_id, status="received", correlation_id. Used as the final return from handle_feedback().</td><td class="td-calls">—</td><td class="td-log">—</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">6</td><td class="td-fn">build_error_response(error)</td><td class="td-what">Constructs HTTP 500 JSON body with the exact exception message string and correlation_id. Never uses a generic fallback message — always the real error.</td><td class="td-calls">—</td><td class="td-log"><span class="log-e">ERROR</span> | <span class="log-c">cid=c789</span> | error=OBOTokenError: invalid_grant</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ③ sqlite_manager.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">03</span>
+      <span class="fh-path" style="color:#10b981;">db/sqlite_manager.py</span>
+      <span class="badge badge-db fh-badge-wrap">DATABASE</span>
+      <span class="fh-desc">All SQLite CRUD · 3 tables · thread-safe Lock() · /tmp/km_agent.db · raises on every failure</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">init_db()</td><td class="td-what">Creates all 3 tables (sessions, chat_history, feedback) if they do not exist. Called once at Lambda cold start — visible in the cold start banner log.</td><td class="td-calls">SQLite<br>/tmp/km_agent.db</td><td class="td-log"><span class="log-i">INFO</span> | [COLD START] SQLite DB initialized → /tmp/km_agent.db</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">save_session(session_id, ...)</td><td class="td-what">Inserts a new row into sessions table with user_id, tenant_id, user_email, token_hash (SHA256 — never raw token), ip_address, login_time. Updates last_active if session_id already exists.</td><td class="td-calls">SQLite sessions</td><td class="td-log"><span class="log-d">[DONE]</span> session saved | session_id=s456 | user=user@co.com</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">update_last_active(session_id)</td><td class="td-what">Updates last_active timestamp to UTC now for an existing session. Called on every /chat request so the session stays alive.</td><td class="td-calls">SQLite sessions</td><td class="td-log"><span class="log-s">[STEP]</span> last_active updated | session_id=s456</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">4</td><td class="td-fn">save_chat(correlation_id, ...)</td><td class="td-what">Inserts full Q&amp;A record into chat_history: question, answer, citations (JSON), intent, confidence_score, latency_ms, agent_trace (JSON). Raises DBError on failure — never silent.</td><td class="td-calls">SQLite chat_history</td><td class="td-log"><span class="log-d">[DONE]</span> chat saved | <span class="log-c">cid=c789</span> | intent=SOP | latency_ms=2100</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">5</td><td class="td-fn">save_feedback(feedback_id, ...)</td><td class="td-what">Inserts feedback row linked to original Q&amp;A via correlation_id: user_id, feedback_type (thumbs_up / thumbs_down), optional comment, timestamp. Raises on failure.</td><td class="td-calls">SQLite feedback</td><td class="td-log"><span class="log-d">[DONE]</span> feedback saved | feedback_id=f001 | type=thumbs_up</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">6</td><td class="td-fn">get_chat_history(session_id, limit)</td><td class="td-what">Returns the last N chat records for a given session, ordered by timestamp descending. Used by orchestrator to include conversation context in the prompt.</td><td class="td-calls">SQLite chat_history</td><td class="td-log">—</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">7</td><td class="td-fn">get_session(session_id)</td><td class="td-what">Returns the sessions row for a given session_id. Returns None if session not found. Used to validate whether to INSERT or UPDATE in save_session().</td><td class="td-calls">SQLite sessions</td><td class="td-log">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ④ orchestrator_agent.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">04</span>
+      <span class="fh-path" style="color:#a78bfa;">agents/orchestrator_agent.py</span>
+      <span class="badge badge-agent fh-badge-wrap">TEAM LEAD</span>
+      <span class="fh-desc">Claude Opus via Bedrock · plans · delegates · evaluates · retries max 2× · raises on failure</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">run(question, session_id, cid, token)</td><td class="td-what">Main orchestration loop. Calls plan_task → delegates to retrieval_agent → sends draft to validation_agent → calls evaluate_validation. Retries up to 2× on REJECTED result. After 2 failures raises MaxRetriesError — never returns a rejected answer.</td><td class="td-calls">plan_task()<br>retrieval_agent<br>validation_agent<br>evaluate_validation()<br>finalize_answer()</td><td class="td-log"><span class="log-d">[DONE]</span> orchestrator.run | answer_len=389 | retry=0 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">plan_task(question)</td><td class="td-what">Bedrock Opus call. Generates a structured execution plan: what to search for, what context to include, how to frame the delegation to retrieval_agent. Returns plan dict.</td><td class="td-calls">AWS Bedrock<br>claude-opus-4-5</td><td class="td-log"><span class="log-s">[STEP]</span> plan_task | Bedrock Opus call | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">evaluate_validation(result)</td><td class="td-what">Bedrock Opus call. Reads the validation agent's output (confidence score + reasoning). Returns APPROVE if confidence &gt; 0.85, else RETRY with reason string for the next attempt.</td><td class="td-calls">AWS Bedrock<br>claude-opus-4-5</td><td class="td-log"><span class="log-s">[STEP]</span> decision=APPROVED | retry_count=0 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">4</td><td class="td-fn">finalize_answer(draft, citations)</td><td class="td-what">Formats the approved draft answer with its citations list into the final response shape. Builds agent_trace JSON containing the full plan → retrieval → validation → approval audit trail.</td><td class="td-calls">—</td><td class="td-log"><span class="log-d">[DONE]</span> finalize_answer | citations=3 | trace_len=820</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑤ retrieval_agent.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">05</span>
+      <span class="fh-path" style="color:#58a6ff;">agents/retrieval_agent.py</span>
+      <span class="badge badge-agent fh-badge-wrap">JUNIOR DEV</span>
+      <span class="fh-desc">Claude Sonnet via Bedrock · runs 3-tool pipeline · synthesises draft answer with citations</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">run(question, plan, cid, token)</td><td class="td-what">Main retrieval entry point. Receives the execution plan from orchestrator, runs run_tool_pipeline() to retrieve documents, then calls synthesize_draft() to generate the answer. Returns draft + citations to orchestrator.</td><td class="td-calls">run_tool_pipeline()<br>synthesize_draft()</td><td class="td-log"><span class="log-d">[DONE]</span> retrieval_agent.run | draft_len=412 | citations=3 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">run_tool_pipeline(question, intent)</td><td class="td-what">Executes all 3 tools in strict sequence: intent_classifier → query_enhancer (receives intent) → graph_rag_search (receives enhanced queries). Passes outputs from each tool as inputs to the next. Returns retrieved document list.</td><td class="td-calls">intent_classifier [07]<br>query_enhancer [08]<br>graph_rag_search [09]</td><td class="td-log"><span class="log-s">[STEP]</span> tool_pipeline complete | docs_retrieved=5 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">synthesize_draft(docs, question)</td><td class="td-what">Bedrock Sonnet call. Reads the retrieved documents and the original question, synthesises a grounded draft answer with inline citations referencing the document titles and URLs. Raises if Bedrock call fails.</td><td class="td-calls">AWS Bedrock<br>claude-sonnet-4-5</td><td class="td-log"><span class="log-d">[DONE]</span> synthesize_draft | draft_len=412 | citations=3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑥ validation_agent.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">06</span>
+      <span class="fh-path" style="color:#fb923c;">agents/validation_agent.py</span>
+      <span class="badge badge-agent fh-badge-wrap">SENIOR QA</span>
+      <span class="fh-desc">Claude Sonnet via Bedrock · hallucination check · citation verify · APPROVED &gt; 0.85</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">validate(draft_answer, docs, cid)</td><td class="td-what">Main validation entry. Runs check_hallucinations() and verify_citations(), aggregates both scores, calls score_confidence(). Returns {result: APPROVED/REJECTED, confidence: float, reason: str}.</td><td class="td-calls">check_hallucinations()<br>verify_citations()<br>score_confidence()</td><td class="td-log"><span class="log-d">[DONE]</span> validate | result=APPROVED | confidence=0.92 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">check_hallucinations(answer, docs)</td><td class="td-what">Bedrock Sonnet call. Sends the draft answer and source documents to Claude. Verifies that every factual claim in the answer is explicitly supported by at least one retrieved document. Returns hallucination score 0–1.</td><td class="td-calls">AWS Bedrock<br>claude-sonnet-4-5</td><td class="td-log"><span class="log-s">[STEP]</span> hallucination_check=clean | score=0.95 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">verify_citations(answer, docs)</td><td class="td-what">Checks each citation in the answer: document title exists in retrieved docs list, URL is present and non-empty, snippet text matches the source document content. Flags mismatches and reduces score.</td><td class="td-calls">—</td><td class="td-log"><span class="log-s">[STEP]</span> citations_verified | valid=3/3 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">4</td><td class="td-fn">score_confidence(checks)</td><td class="td-what">Combines hallucination score and citation score into a single weighted confidence float. Returns APPROVED if combined score &gt; 0.85, otherwise REJECTED with a reason string describing which check failed.</td><td class="td-calls">—</td><td class="td-log"><span class="log-d">[DONE]</span> score_confidence | confidence=0.92 → APPROVED</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑦ intent_classifier.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">07</span>
+      <span class="fh-path" style="color:#86efac;">tools/intent_classifier.py</span>
+      <span class="badge badge-tool fh-badge-wrap">TOOL 1</span>
+      <span class="fh-desc">Bedrock Sonnet · 7 intent categories · called first in retrieval pipeline · raises on failure</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">classify(question, session_id, cid)</td><td class="td-what">Bedrock Sonnet call. Sends the user question to Claude with a few-shot classification prompt. Returns {intent: str, confidence: float}. Categories: SOP, Policy, Salesforce, SOR, Claims, HR, General. Raises if Bedrock fails — no default intent.</td><td class="td-calls">AWS Bedrock<br>claude-sonnet-4-5<br>build_classification_prompt()</td><td class="td-log"><span class="log-d">[DONE]</span> classify | intent=SOP | confidence=0.94 | latency_ms=480</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">build_classification_prompt(question)</td><td class="td-what">Constructs the few-shot classification prompt string. Includes 2 labelled examples per category (14 examples total), then appends the live question. Instructs model to respond with JSON only.</td><td class="td-calls">—</td><td class="td-log">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑧ query_enhancer.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">08</span>
+      <span class="fh-path" style="color:#67e8f9;">tools/query_enhancer.py</span>
+      <span class="badge badge-tool fh-badge-wrap">TOOL 2</span>
+      <span class="fh-desc">Bedrock Sonnet · intent-aware expansion · 3 enhanced query variants · raises on failure</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">enhance(question, intent, cid)</td><td class="td-what">Bedrock Sonnet call. Sends original question + classified intent to Claude. Returns a list of 3 enhanced query strings tuned for the specific intent category (e.g. SOP queries expand differently to HR queries). Raises if Bedrock fails.</td><td class="td-calls">AWS Bedrock<br>claude-sonnet-4-5<br>build_enhancement_prompt()</td><td class="td-log"><span class="log-d">[DONE]</span> enhance | queries=3 | intent=SOP | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">build_enhancement_prompt(q, intent)</td><td class="td-what">Builds the intent-aware enhancement prompt. Instructs Claude to expand acronyms, add domain-specific synonyms, rephrase for keyword search, and generate one plain keyword fallback variant. Output must be JSON array of 3 strings.</td><td class="td-calls">—</td><td class="td-log">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑨ graph_rag_search.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">09</span>
+      <span class="fh-path" style="color:#fca5a5;">tools/graph_rag_search.py</span>
+      <span class="badge badge-tool fh-badge-wrap">TOOL 3</span>
+      <span class="fh-desc">OBO token → Azure AD → MS Graph RAG → SharePoint · 0 results raises · never logs raw token</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">search(queries, user_token, cid)</td><td class="td-what">Main search entry. Calls exchange_obo_token() to get a Graph API token, then calls run_graph_rag() with all 3 enhanced queries, then deduplicate_results(). Returns top-N unique documents. Raises NoDocumentsError if 0 results — never returns empty answer.</td><td class="td-calls">exchange_obo_token()<br>run_graph_rag()<br>deduplicate_results()</td><td class="td-log"><span class="log-d">[DONE]</span> search | docs_found=8 | after_dedup=5 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">exchange_obo_token(user_token)</td><td class="td-what">Azure AD On-Behalf-Of flow. POSTs to the tenant's token endpoint with the Teams bearer token + client credentials. Returns a Graph API access token. NEVER logs the raw token at any level. Raises OBOTokenError if exchange fails.</td><td class="td-calls">Azure AD<br>OAuth2 endpoint</td><td class="td-log"><span class="log-s">[STEP]</span> OBO exchange ok | token_hash=a3f8… | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">run_graph_rag(queries, graph_token)</td><td class="td-what">POSTs all 3 enhanced queries to the Microsoft Graph RAG API endpoint. Searches indexed SharePoint and OneDrive content. Returns raw list of matched documents with title, URL, and snippet fields.</td><td class="td-calls">MS Graph RAG API</td><td class="td-log"><span class="log-s">[STEP]</span> Graph RAG returned | raw_docs=8 | queries_used=3</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">4</td><td class="td-fn">deduplicate_results(results)</td><td class="td-what">Removes duplicate documents identified by same URL. Ranks remaining documents by relevance score descending. Returns top N (configurable, default 5) unique, highest-scoring documents as the final retrieval set.</td><td class="td-calls">—</td><td class="td-log"><span class="log-d">[DONE]</span> dedup | raw=8 → unique=5 | top_score=0.91</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑩ cloudwatch_logger.py -->
+  <div class="file-block" onclick="toggle(this)">
+    <div class="file-block-header">
+      <span class="fh-num">10</span>
+      <span class="fh-path" style="color:#94a3b8;">monitoring/cloudwatch_logger.py</span>
+      <span class="badge badge-monitor fh-badge-wrap">MONITORING</span>
+      <span class="fh-desc">Structured JSON logs · 5 custom CloudWatch metrics · namespace KMAgent · every log has cid</span>
+      <span class="fh-toggle">▶</span>
+    </div>
+    <div class="fn-table-wrap">
+      <table class="fn-table">
+        <thead><tr><th>#</th><th>Function</th><th>What It Does</th><th>Calls</th><th>Log Line</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#f0883e;font-weight:700;">1</td><td class="td-fn">log_request(user_id, endpoint, cid)</td><td class="td-what">Emits a structured JSON log event for an incoming request. Publishes login_count +1 metric to CloudWatch namespace KMAgent. Called at the start of every handle_chat() and handle_feedback().</td><td class="td-calls">AWS CloudWatch<br>put_metric()</td><td class="td-log"><span class="log-i">INFO</span> | log_request | endpoint=/chat | user_id=u123 | metric=login_count+1</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">2</td><td class="td-fn">log_completion(cid, latency_ms, intent)</td><td class="td-what">Emits structured JSON log for a successful /chat completion. Publishes latency_ms metric and increments the intent_distribution counter for the classified intent. Called at end of handle_chat().</td><td class="td-calls">AWS CloudWatch<br>put_metric()</td><td class="td-log"><span class="log-i">INFO</span> | log_completion | latency_ms=2100 | intent=SOP | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">3</td><td class="td-fn">log_error(cid, error, exc_info)</td><td class="td-what">Emits ERROR level structured log with full exception stack trace. Publishes error_rate +1 metric. Always called in the except block before re-raising the exception to handler().</td><td class="td-calls">AWS CloudWatch<br>put_metric()</td><td class="td-log"><span class="log-e">ERROR</span> | log_error | <span class="log-c">cid=c789</span> | error=OBOTokenError | metric=error_rate+1</td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">4</td><td class="td-fn">log_login(user_id, session_id, cid)</td><td class="td-what">Emits a dedicated login audit log event separate from log_request. Used for security and compliance audit trails. Fires only when a new session row is created in SQLite, not on every request.</td><td class="td-calls">AWS CloudWatch<br>put_metric()</td><td class="td-log"><span class="log-i">INFO</span> | log_login | user_id=u123 | session_id=s456 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">5</td><td class="td-fn">log_feedback(cid, feedback_type)</td><td class="td-what">Emits structured log for a feedback event. Publishes feedback_count +1 metric with feedback_type as a dimension so thumbs_up and thumbs_down are tracked separately in CloudWatch.</td><td class="td-calls">AWS CloudWatch<br>put_metric()</td><td class="td-log"><span class="log-i">INFO</span> | log_feedback | type=thumbs_up | metric=feedback_count+1 | <span class="log-c">cid=c789</span></td></tr>
+          <tr><td style="color:#f0883e;font-weight:700;">6</td><td class="td-fn">put_metric(name, value, unit, dims)</td><td class="td-what">Generic CloudWatch metric publisher. All other log_* functions call this internally. Publishes to namespace=KMAgent, region from env var. Supports custom dimensions for intent, feedback_type, endpoint breakdown.</td><td class="td-calls">AWS CloudWatch<br>boto3 client</td><td class="td-log">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /fn-section -->
+
+<script>
+function toggle(block) {
+  block.classList.toggle('open');
+}
+// Open first block by default (already done via class)
+</script>
+
+</body>
+</html>
