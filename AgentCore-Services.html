@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentCore Services</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  @page { size: A4; margin: 12mm; }
+  body { font-family:'Inter',sans-serif; background:#fff; color:#1a1a2e; padding:28px 32px; max-width:900px; margin:0 auto; }
+
+  h1 { font-size:22px; font-weight:700; color:#232F3E; margin-bottom:2px; }
+  .sub { font-size:12px; color:#718096; margin-bottom:16px; border-bottom:3px solid #FF9900; padding-bottom:10px; }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  .card {
+    border:1.5px solid #E2E8F0;
+    border-radius:10px;
+    padding:14px 16px;
+    position:relative;
+    border-top:3px solid var(--accent);
+  }
+
+  .card .icon-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .card .icon-box {
+    width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    background: var(--accent); flex-shrink:0;
+  }
+  .card .icon-box svg { width:20px; height:20px; }
+  .card h2 { font-size:14px; font-weight:700; color:#232F3E; }
+  .card .tag { font-size:9px; font-weight:600; color:var(--accent); background:var(--light); padding:2px 8px; border-radius:10px; margin-left:6px; }
+
+  .card p { font-size:11.5px; color:#4A5568; line-height:1.55; margin-bottom:6px; }
+  .card .benefit { font-size:11px; color:#232F3E; font-weight:600; margin-top:4px; }
+  .card .benefit span { font-weight:400; color:#4A5568; }
+
+  .footer { margin-top:16px; padding-top:10px; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; }
+  .footer .note { font-size:10px; color:#718096; }
+  .footer .badge { font-size:10px; font-weight:600; color:#fff; background:#FF9900; padding:3px 10px; border-radius:10px; }
+
+  .card.runtime { --accent:#FF9900; --light:#FFF3E0; }
+  .card.memory { --accent:#3ECF8E; --light:#F0FBF6; }
+  .card.gateway { --accent:#7B61FF; --light:#EDE9FF; }
+  .card.identity { --accent:#DD344C; --light:#FCEDEF; }
+  .card.policy { --accent:#E8593C; --light:#FFF0ED; }
+  .card.observability { --accent:#1B9B8D; --light:#E0F5F3; }
+</style>
+</head>
+<body>
+
+<h1>AgentCore Services Present in Architecture</h1>
+<div class="sub">6 of 7 AgentCore services are used in our architecture.</div>
+
+<div class="grid">
+
+  <!-- Runtime -->
+  <div class="card runtime">
+    <div class="icon-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" fill="#fff"/><path d="M8 7v6l5-3-5-3z" fill="#FF9900"/></svg>
+      </div>
+      <h2>AgentCore Runtime</h2>
+    </div>
+    <p>Hosts our entire LangGraph orchestration (Multi-Hop, Router, Retriever, Generator, Validator) as a single deployment unit. Each user session gets its own isolated microVM with dedicated CPU, memory, and filesystem. Scales automatically based on demand.</p>
+    <div class="benefit">Benefit: <span>Zero infrastructure management. Complete session isolation between users. Auto-scaling without manual pod tuning. Supports real-time and long-running workloads up to 8 hours.</span></div>
+  </div>
+
+  <!-- Memory -->
+  <div class="card memory">
+    <div class="icon-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" fill="#fff"/><path d="M7 8h6M7 11h4" stroke="#3ECF8E" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h2>AgentCore Memory</h2>
+    </div>
+    <p>Two-tier managed memory. Short-term memory stores raw conversation events within a session. Long-term memory asynchronously extracts structured facts, summaries, and preferences using an LLM and persists them across sessions. We use the semantic strategy.</p>
+    <div class="benefit">Benefit: <span>Agent remembers context within and across sessions without custom storage code. Semantic search retrieves relevant memories in ~200ms. Extraction runs in background without blocking the user.</span></div>
+  </div>
+
+  <!-- Gateway -->
+  <div class="card gateway">
+    <div class="icon-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" fill="#fff"/><circle cx="10" cy="10" r="3" fill="none" stroke="#7B61FF" stroke-width="1.5"/><path d="M10 4v3M10 13v3M4 10h3M13 10h3" stroke="#7B61FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+      <h2>AgentCore Gateway</h2>
+      <span class="tag">MCP</span>
+    </div>
+    <p>Wraps external services (Amazon Bedrock, OpenSearch, Cohere Reranker) into MCP-compatible tools that agents can discover and use. All agent tool calls are routed through Gateway, which enables policy enforcement and automatic logging on every call.</p>
+    <div class="benefit">Benefit: <span>Centralized control over all external calls. Swap a backend service (e.g., change vector store) by updating Gateway registration, not agent code. Every call is traceable and policy-checked.</span></div>
+  </div>
+
+  <!-- Identity -->
+  <div class="card identity">
+    <div class="icon-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" fill="#fff"/><circle cx="10" cy="8" r="2.5" fill="#DD344C"/><path d="M6 15c0-2.5 1.8-4 4-4s4 1.5 4 4" fill="#DD344C"/></svg>
+      </div>
+      <h2>AgentCore Identity</h2>
+    </div>
+    <p>Authenticates users against enterprise identity providers (Okta, Microsoft Entra ID, Amazon Cognito). Generates and manages Session IDs. Handles OAuth delegation so agents can act on behalf of authenticated users with proper permissions.</p>
+    <div class="benefit">Benefit: <span>Managed auth integration with enterprise IdPs. Session ID generation ties the entire request lifecycle together (Runtime, Memory, Observability). Supports OAuth delegation for accessing user-scoped resources.</span></div>
+  </div>
+
+  <!-- Policy -->
+  <div class="card policy">
+    <div class="icon-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" fill="#fff"/><path d="M8 10l2 2 3-4" stroke="#E8593C" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>AgentCore Policy</h2>
+    </div>
+    <p>Defines guardrails in natural language that are enforced deterministically at the Gateway level. Rules execute as code, not as LLM instructions. Cannot be bypassed by creative prompting. Enforced on every tool call before it reaches the external service.</p>
+    <div class="benefit">Benefit: <span>Deterministic guardrails outside agent code. Division access control, topic boundaries, and response filtering enforced at infrastructure level. Critical for regulated enterprise environments.</span></div>
+  </div>
+
+  <!-- Observability -->
+  <div class="card observability">
+    <div class="icon-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" fill="#fff"/><path d="M5 14l3-4 3 2 4-6" stroke="#1B9B8D" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>AgentCore Observability</h2>
+    </div>
+    <p>Wraps the entire Runtime automatically. Captures full traces of every request lifecycle from Memory Retrieval through Validation. Logs latency, token usage, tool call success/failure, and error details for every step and every agent in the pipeline.</p>
+    <div class="benefit">Benefit: <span>Complete visibility into agent behavior with zero instrumentation code. Debug failed responses by pulling the exact trace: what was retrieved, generated, and why the Validator rejected it.</span></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="note"></div>
+  <div class="badge">Draft</div>
+</div>
+
+</body>
+</html>
