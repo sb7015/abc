@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corpus-Gap Analysis — UP-NS Merger Q&amp;A</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+:root{--ink:#1a1d21;--ink-soft:#4a4f57;--paper:#f7f5f0;--card:#fff;--line:#e0dcd2;--line-strong:#c9c3b5;--gold:#7a5c1e;--gold-bg:#faf4e4;--red:#8a2c1d;--red-bg:#f9ece8;--green:#2e5c3a;--green-bg:#eaf2ec;--blue:#234a6b;--blue-bg:#eaf0f5;--accent:#9a3324;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;background-image:radial-gradient(circle at 1px 1px,rgba(0,0,0,.018) 1px,transparent 0);background-size:22px 22px}
+.wrap{max-width:1080px;margin:0 auto;padding:64px 40px 100px}
+.masthead{border-bottom:3px double var(--ink);padding-bottom:28px;margin-bottom:40px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:16px}
+h1{font-family:'Newsreader',serif;font-weight:600;font-size:46px;line-height:1.05;letter-spacing:-.01em;margin-bottom:14px}
+.sub{font-family:'Newsreader',serif;font-style:italic;font-size:20px;color:var(--ink-soft)}
+.meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-top:18px;letter-spacing:.04em}
+.finding{background:var(--ink);color:#f0ede6;padding:38px 42px;margin:40px 0 48px;border-radius:2px;position:relative;overflow:hidden}
+.finding::before{content:"";position:absolute;top:0;left:0;width:5px;height:100%;background:var(--accent)}
+.finding h2{font-family:'Newsreader',serif;font-weight:500;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:#c9a86a;margin-bottom:18px}
+.finding .big{font-family:'Newsreader',serif;font-size:30px;line-height:1.3;font-weight:400}
+.finding .big strong{color:#e8c987;font-weight:600;border-bottom:2px solid rgba(232,201,135,.4)}
+.finding .fnote{margin-top:20px;font-size:13.5px;color:#b8b4a8;line-height:1.6;max-width:760px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-bottom:48px}
+.stat{background:var(--card);padding:26px 24px;text-align:center}
+.stat .n{font-family:'Newsreader',serif;font-size:42px;font-weight:600;line-height:1;color:var(--accent)}
+.stat .l{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:10px}
+.sources{background:var(--blue-bg);border:1px solid #cfdce8;border-radius:2px;padding:30px 34px;margin-bottom:52px}
+.sources h3{font-family:'Newsreader',serif;font-size:22px;font-weight:600;margin-bottom:8px;color:var(--blue)}
+.sources p{font-size:14px;color:var(--ink-soft);margin-bottom:16px}
+.sources ul{list-style:none;display:grid;gap:9px}
+.sources li{font-size:14px;padding-left:24px;position:relative}
+.sources li::before{content:"§";position:absolute;left:0;color:var(--blue);font-weight:600;font-family:'Newsreader',serif}
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;padding-bottom:10px;border-bottom:1px solid var(--line-strong)}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:2px;margin-bottom:28px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.qhead{display:flex;align-items:center;gap:18px;padding:20px 28px;background:linear-gradient(to right,#fbfaf7,#fff);border-bottom:1px solid var(--line)}
+.qnum{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:14px;color:#fff;background:var(--ink);padding:6px 11px;border-radius:2px;flex-shrink:0}
+.qtitle{font-family:'Newsreader',serif;font-size:20px;font-weight:500;flex:1;line-height:1.25}
+.qscore{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;padding:6px 12px;border-radius:20px;flex-shrink:0;letter-spacing:.04em}
+.qscore.zero{background:var(--red-bg);color:var(--red)}.qscore.low{background:var(--gold-bg);color:var(--gold)}.qscore.mid{background:var(--blue-bg);color:var(--blue)}
+.qbody{padding:8px 28px 28px}
+.block{padding:20px 0;border-bottom:1px dashed var(--line)}.block:last-child{border-bottom:none}
+.block h4{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{font-family:'IBM Plex Sans';font-size:10px;letter-spacing:.06em;background:var(--green-bg);color:var(--green);padding:2px 8px;border-radius:3px;text-transform:none;font-weight:500}
+.tag-dim{background:#f0eee9;color:var(--ink-soft)}
+.block p{font-size:14.5px;line-height:1.62}
+.gold p{font-family:'Newsreader',serif;font-size:15.5px;color:#2a2420}
+.pred p{color:var(--ink-soft);font-size:14px;background:#faf9f6;padding:14px 16px;border-left:2px solid var(--line-strong);border-radius:2px}
+.cov{font-family:'IBM Plex Sans';font-size:11px;background:var(--ink);color:#fff;padding:3px 9px;border-radius:10px;letter-spacing:.02em;text-transform:none;font-weight:500}
+table.facts{width:100%;border-collapse:collapse;margin-top:4px}
+table.facts th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-strong)}
+table.facts td{padding:9px 12px;font-size:13.5px;border-bottom:1px solid var(--line)}
+.fact-name{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+.pg{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);font-size:12px}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;padding:3px 9px;border-radius:3px;letter-spacing:.05em}
+.badge.found{background:var(--green-bg);color:var(--green)}.badge.missing{background:var(--red-bg);color:var(--red)}
+.snip{margin-top:14px;font-size:13px;font-family:'Newsreader',serif;font-style:italic;color:var(--ink-soft);background:var(--gold-bg);padding:12px 16px;border-radius:2px;border-left:2px solid #d8c48f}
+.snip-label{font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:5px}
+.gap{background:var(--red-bg);margin:0 -28px -28px;padding:22px 28px 26px;border-top:1px solid #e8d5cf}
+.gap h4{color:var(--red)}
+.gap-text{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--red);margin-bottom:10px;line-height:1.5}
+.gap-note{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+footer{margin-top:60px;padding-top:24px;border-top:3px double var(--ink);font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);letter-spacing:.04em;line-height:1.7}
+@media print{body{background:#fff}.qcard,.finding{break-inside:avoid}}
+@media(max-width:700px){.stats{grid-template-columns:1fr}.wrap{padding:36px 20px}h1{font-size:32px}.qhead{flex-wrap:wrap}}
+</style></head><body><div class="wrap">
+<div class="masthead"><div class="eyebrow">Retrieval Evaluation · Corpus-Gap Analysis</div>
+<h1>Questions the Document Cannot Answer</h1>
+<div class="sub">Why 14 of 25 evaluation questions require regulatory knowledge absent from the application filing</div>
+<div class="meta">UP-NS Merger · STB Finance Docket No. FD 36873 · Vectorless RAG Evaluation · June 2026</div></div>
+<div class="finding"><h2>Principal Finding</h2>
+<div class="big">The application document <strong>applies</strong> the governing law but does not <strong>restate</strong> it. For these 14 questions, the controlling statutes, regulations, and labor-protection precedent do not appear as text anywhere in the 7,000-page filing.</div>
+<div class="fnote">A retrieval system can only surface text that exists in the corpus. These questions test knowledge of the regulatory framework (Title 49 U.S.C., 49 C.F.R. Part 1180, the New York Dock conditions) that an applicant is expected to know — not content the application reproduces. No amount of retrieval tuning can extract a statute number, a defined benefit term, or a regulatory standard the document never prints. Closing this gap requires a dedicated regulatory knowledge layer alongside the application corpus.</div></div>
+<div class="stats"><div class="stat"><div class="n">14/25</div><div class="l">Require external law</div></div>
+<div class="stat"><div class="n">8</div><div class="l">Scored 0.00 — fact absent</div></div>
+<div class="stat"><div class="n">37</div><div class="l">Key facts not in corpus</div></div></div>
+<div class="sources"><h3>External sources required to close the gap</h3>
+<p>The following authorities are referenced by the expected answers but are not contained in the application document. Adding them as a curated knowledge layer would make these questions answerable.</p>
+<ul><li>49 C.F.R. § 1180.0(b) — KCS exemption from 2001 rules</li><li>49 C.F.R. § 1180.1(c)(2)(i) — competitive-enhancement standard</li><li>49 C.F.R. § 1180.6(a)(9) — Employee Impact Exhibit requirements</li><li>49 C.F.R. § 1180.7(b)(4) — market-share projection rule</li><li>49 U.S.C. § 11326 — statutory authority for labor protection</li><li>New York Dock conditions (360 I.C.C. 60) — STB labor-protection precedent</li><li>STB Decision No. 9 — incompleteness finding</li></ul></div>
+<div class="section-label">Question-by-question justification</div>
+
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q2</div><div class="qtitle">Why did the STB find the December 19, 2025 application incomplete?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>The Board identified two principal deficiencies. First, under 49 C.F.R. § 1180.7(b)(4), Applicants failed to provide forward-looking market-share projections; their economist (Bailey) summed UP and NS&#x27;s actual 2023 market shares, revenues, and traffic volumes and labeled that summation as the &#x27;projection,&#x27; which the Board held does not satisfy the rule because it does not reflect merger-related growth, diversions, or changes to market conditions. Second, under 49 C.F.R. § 1180.6(a)(7)(ii), Appli</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>Based on the source pages provided, **I cannot find any STB decision or finding that the December 19, 2025 application was incomplete**. 
+
+What the pages DO contain:
+
+1. **References to a December 19, 2025 filing**: Multiple pages reference an application filed on December 19, 2025 (pages 550, 616).
+
+2. **References to an &quot;Amended Application&quot;**: The pages repeatedly reference an &quot;Amended Applicat</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">3/6 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">49 C.F.R. 1180.7(b)(4)</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">forward-looking market-share projections</td><td><span class="badge found">FOUND</span></td><td class="pg">56</td></tr><tr><td class="fact-name">Bailey economist</td><td><span class="badge found">FOUND</span></td><td class="pg">2</td></tr><tr><td class="fact-name">49 C.F.R. 1180.6(a)(7)(ii)</td><td><span class="badge found">FOUND</span></td><td class="pg">6</td></tr><tr><td class="fact-name">Schedule 5.8</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Materially Burdensome Regulatory Condition</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.56):</span> &ldquo;creation of new bottlenecks. Those commitments are discussed below in Section 1180.6(b)(10), &quot;Conditions to Mitigate and Offset Merger-Related Harms,&quot; and addressed in the Joint Verified Statement of &hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.7(b)(4) (market-share projections); § 1180.6(a)(7)(ii) (Schedule 5.8); STB Decision No. 9 (incompleteness finding)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q4</div><div class="qtitle">What standard does the STB apply to a major merger between two Class I railroads under the post-2001 rules?</div><div class="qscore low">QAG 0.40</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>Under the 2001 major-merger rules, applicants must demonstrate that the transaction would not merely preserve but enhance competition. The Board recognizes that &#x27;any railroad combination,&#x27; including end-to-end combinations, &#x27;entails a risk that the merged carrier would acquire and exploit increased market power&#x27; (§ 1180.1(c)(2)(i)). Applicants are also expected under § 1180.6(a)(10) to propose conditions to mitigate and offset merger-related harms, and the Board may impose additional conditions </p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>The STB applies a **public interest standard** to major mergers between Class I railroads under the post-2001 rules, with specific requirements for **competitive enhancements** that depend on case-specific factors.
+
+## The Standard
+
+Under the Board&#x27;s 2001 *Major Rail Consolidation Procedures* decision, the STB evaluates whether a major rail merger serves the public interest. The pages confirm that</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/3 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">enhance competition (not merely preserve)</td><td><span class="badge found">FOUND</span></td><td class="pg">16</td></tr><tr><td class="fact-name">49 C.F.R. 1180.1(c)(2)(i)</td><td><span class="badge found">FOUND</span></td><td class="pg">395</td></tr><tr><td class="fact-name">49 C.F.R. 1180.6(a)(10)</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.16):</span> &ldquo;Nowhere will this transformation be more consequential than in the American heartland-the &quot;watershed&quot; markets within roughly 250 miles of Chicago, St. Louis, Memphis, and New Orleans. These are the ce&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.1(c)(2)(i) (competitive enhancement standard)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q5</div><div class="qtitle">What labor-protective conditions does the STB impose by default in a major rail merger, and what is the legal authority?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>The Board&#x27;s default labor protections are the &#x27;New York Dock&#x27; conditions imposed pursuant to 49 U.S.C. § 11326. These provide up to six years of monthly displacement and dismissal allowances measured against test-period earnings, moving and relocation allowances, real-estate loss protection, and a Section 4 implementing-agreement procedure that proceeds to binding arbitration if the carrier and union do not reach agreement. The Board May impose more stringent protections only on a showing of &#x27;un</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p># Default Labor-Protective Conditions in Major Rail Mergers
+
+## Direct Answer
+
+The STB imposes labor-protective conditions by default in major rail mergers under **49 U.S.C. § 11326(a)**, which requires the Board to impose protective arrangements for employees affected by rail transactions. The specific protective conditions are set forth in **New York Dock Railway—Control—Brooklyn Eastern Distric</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">3/11 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">New York Dock</td><td><span class="badge found">FOUND</span></td><td class="pg">545</td></tr><tr><td class="fact-name">49 U.S.C. 11326</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">six years of wage protection</td><td><span class="badge found">FOUND</span></td><td class="pg">251</td></tr><tr><td class="fact-name">displacement allowance</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">dismissal allowance</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">test-period earnings</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">relocation allowance</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">real-estate loss protection</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Section 4 implementing-agreement procedure</td><td><span class="badge found">FOUND</span></td><td class="pg">546</td></tr><tr><td class="fact-name">binding arbitration</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">unusual circumstances standard</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.545):</span> &ldquo;ts will follow the customary *New York Dock* procedures to obtain any necessary implementing agreements. However, Applicants intend to follow existing collective bargaining agreements and will seek im&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">New York Dock conditions; 49 U.S.C. § 11326 (labor protection statutory authority)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q7</div><div class="qtitle">What sections of the application govern employee-impact disclosure, and what must be disclosed?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>Section 1180.6(a)(9) requires an Employee Impact Exhibit disclosing: (1) the effect of the proposed transaction on applicant carriers&#x27; employees by class or craft; (2) the geographic points where impacts would occur; (3) the time frame of the impacts, covering at least three years after consolidation; and (4) whether any employee protection agreements have been reached. The information may be presented in the format prescribed in the regulation.</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>## Employee-Impact Disclosure Requirements
+
+**Governing Section:** Section 1180.6(a)(2)(v) of the regulations governs employee-impact disclosure in this application.
+
+**Required Disclosures:**
+
+Based on the source pages, the application must disclose the anticipated effects of the transaction on employees. The pages show that Applicants provided the following specific disclosures under this sectio</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/6 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">49 C.F.R. 1180.6(a)(9)</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Employee Impact Exhibit</td><td><span class="badge found">FOUND</span></td><td class="pg">6</td></tr><tr><td class="fact-name">class or craft</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">geographic points of impact</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">three years after consolidation</td><td><span class="badge found">FOUND</span></td><td class="pg">57</td></tr><tr><td class="fact-name">employee protection agreements reached</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.6):</span> &ldquo;\[Section 1180.6(b)(8)\] 1-90 Employee Impact Exhibit \[Section 1180.6(b)(9)\] 1-90 Conditions to Mitigate and Offset Merger-Related Harms \[Section 1180.6(b)(10)\] 1-90 Calculation of Public Benefits&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.6(a)(9) (Employee Impact Exhibit requirements)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q9</div><div class="qtitle">What is the STB&#x27;s post-approval oversight regime for a major merger?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>For at least the first five years following approval, applicants must submit annual evidence demonstrating: (1) imposed merger conditions are working as intended; (2) applicants are adhering to representations made on the record; (3) no unforeseen harms have arisen that would require new or modified conditions; and (4) projected merger benefits are being realized on schedule. Parties may comment on each annual submission, and applicants may reply. The Board retains jurisdiction throughout the ov</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>Based on the provided source pages, the STB&#x27;s post-approval oversight regime for a major merger includes the following elements:
+
+## Direct Answer
+
+The STB establishes a **time-limited oversight period** during which the merged entity must comply with specific reporting requirements, gateway commitments, and monitoring conditions. The applicants (UP-NS) have voluntarily committed to oversight mech</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/5 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">five years oversight</td><td><span class="badge found">FOUND</span></td><td class="pg">352</td></tr><tr><td class="fact-name">annual evidence submission</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Board retains jurisdiction</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">unforeseen harms</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">projected benefits on schedule</td><td><span class="badge found">FOUND</span></td><td class="pg">501</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.352):</span> &ldquo;period before the effective date of STB approval. 46 We will also apply the commitment to &quot;new traffic&quot; as modified by the Board in FD 36500.⁴⁷ Regardless of whether the customer has previously chosen&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">STB post-approval oversight rules (annual submission requirements, Board jurisdiction retention)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q10</div><div class="qtitle">Why are UP-NS applicants subject to the full 2001 major-merger rules rather than the pre-2001 framework that applied to CP-KCS?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>Section 1180.0(b) waives application of the 2001 amended rules for any consolidation involving The Kansas City Southern Railway Company, instead applying the pre-July 11, 2001 rules under which competition needed only to be preserved (not enhanced) and downstream impacts were not required to be analyzed. CP-KCS qualified for this &#x27;KCS exemption.&#x27; UP-NS does not involve KCS, so the 2001 rules apply in full — meaning Applicants must show the transaction enhances competition, must analyze downstrea</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>The UP-NS applicants are subject to the full 2001 major-merger rules rather than the pre-2001 framework that applied to CP-KCS because **the Board&#x27;s 2001 Major Rail Consolidation Procedures decision established new, more stringent rules for all future major mergers, and CP-KCS was explicitly exempted from those rules by the Board**.
+
+**Direct Answer:**
+
+The source pages do not contain the Board&#x27;s </p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">1/4 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">49 C.F.R. 1180.0(b) KCS exemption</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Kansas City Southern exemption</td><td><span class="badge found">FOUND</span></td><td class="pg">269</td></tr><tr><td class="fact-name">pre-July 11 2001 rules</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">enhances competition (not preserve)</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.269):</span> &ldquo;- 58. The late Patrick J. Ottensmeyer, legendary CEO of Kansas City Southern, saw risks with relying only on alliances. During the CP-KCS proceedings, he testified: - Unfortunately, as is often the ca&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.0(b) (KCS exemption from 2001 rules)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q12</div><div class="qtitle">What does &#x27;New York Dock&#x27; actually mean for me as an affected employee?</div><div class="qscore low">QAG 0.40</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>If you are &#x27;affected&#x27; — meaning the merger places you in a worse position with respect to compensation, rules, or working conditions — New York Dock provides up to six years of monthly displacement allowances calculated from your pre-merger test-period earnings, dismissal allowances if your position is abolished, moving and travel allowances if you are required to relocate, real-estate loss protection on the sale of your primary residence, and the right to invoke a Section 4 implementing-agreeme</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p># What &#x27;New York Dock&#x27; Actually Means for You as an Affected Employee
+
+**Direct Answer:**
+
+&quot;New York Dock&quot; refers to **employee protective conditions** that the Surface Transportation Board imposes on railroad mergers to safeguard workers whose jobs are affected. For you as an affected employee, it means:
+
+1. **Formal protection procedures** that the merged railroad must follow before implementing</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">3/8 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">New York Dock</td><td><span class="badge found">FOUND</span></td><td class="pg">545</td></tr><tr><td class="fact-name">six years</td><td><span class="badge found">FOUND</span></td><td class="pg">251</td></tr><tr><td class="fact-name">displacement allowance</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">dismissal allowance</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">relocation benefit</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">test-period earnings</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Section 4 implementing agreement</td><td><span class="badge found">FOUND</span></td><td class="pg">546</td></tr><tr><td class="fact-name">binding arbitration</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.545):</span> &ldquo;ts will follow the customary *New York Dock* procedures to obtain any necessary implementing agreements. However, Applicants intend to follow existing collective bargaining agreements and will seek im&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">New York Dock conditions (specific allowance amounts, test-period earnings, relocation benefits)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q14</div><div class="qtitle">When would any of these changes actually take effect?</div><div class="qscore low">QAG 0.40</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>The earliest the transaction could close is early 2027, contingent on STB approval. Applicants&#x27; proposed procedural schedule provides a 390-day review period from acceptance of a complete application. Even after Board approval, no operational consolidation affecting represented employees can take effect until an implementing agreement is in place — Section 4 of New York Dock requires at least 90 days&#x27; written notice followed by negotiation, and (if no agreement is reached) binding arbitration be</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>Based on the source pages provided, the timing for when changes would take effect varies by type of change:
+
+## Key Implementation Timelines:
+
+**1. Control Date/Transaction Consummation:**
+- Changes begin on &quot;the date the merger is consummated—that is, the date on which UPC exercises authority to commonly control UP and NS&quot; (page 386)
+- This is when facility status determinations (like &quot;sole-serve</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/3 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">control date</td><td><span class="badge found">FOUND</span></td><td class="pg">67</td></tr><tr><td class="fact-name">formal decision + implementing timelin</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">implementing agreement negotiation</td><td><span class="badge found">FOUND</span></td><td class="pg">541</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.67):</span> &ldquo;d NS immediately prior to the control date. Applicants will work collaboratively to facilitate transitions and redeployments where necessary to achieve the benefits of the proposed transaction. Applic&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">Control date definition; implementing agreement procedural timeline (49 C.F.R. § 1180)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q15</div><div class="qtitle">Do I have to accept a transfer to another location?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>New York Dock contains transfer-and-relocation provisions. If you are offered a comparable position in another location, you generally must accept it to preserve your full protective benefits, but you are entitled to moving expense reimbursement, real-estate loss protection on a primary residence, travel-time allowances, and other transition benefits. If you decline a comparable offer, your protective allowance may be reduced or terminated. The specific application of these rules — including wha</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>Based on the provided source pages, **you are not required to accept a transfer to another location** under the terms described in this merger filing.
+
+## Key Protections for Employees:
+
+**1. No Forced Relocations for Craft Employees:**
+The Applicants have made an &quot;unprecedented commitment&quot; that **craft employees employed by either UP or NS at the time of the merger who wish to continue their care</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/3 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">voluntary transfer acceptance</td><td><span class="badge found">FOUND</span></td><td class="pg">25</td></tr><tr><td class="fact-name">displacement allowance</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">union contract or implementing agreement</td><td><span class="badge found">FOUND</span></td><td class="pg">541</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.25):</span> &ldquo;As Dr. Israel explains in his Verified Statement, which analyzes the vertical competitive effects of the proposed transaction, vertical foreclosure theories do not apply in the context of railroad pri&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">New York Dock conditions (displacement allowance, voluntary acceptance rules)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q17</div><div class="qtitle">What are the &#x27;jobs-for-life&#x27; agreements I have heard about?</div><div class="qscore low">QAG 0.40</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>The Applicants have publicly described &#x27;jobs-for-life&#x27; agreements formalized with several unions in advance of the merger. These agreements commit that no employee in a union job at consummation will lose their union job as a result of the merger, with workforce reductions achieved through attrition. These commitments exceed the New York Dock statutory floor. Coverage is craft-by-craft and depends on whether each union has signed; SMART-TD has publicly indicated support, while BLET and BMWE have</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p># &quot;Jobs-for-Life&quot; Agreements
+
+The &quot;jobs-for-life&quot; agreements refer to **unprecedented job protection commitments** Union Pacific made with its labor unions as part of the Norfolk Southern acquisition. These agreements guarantee that **current union craft employees will have job protection for the length of their careers following the transaction**, subject to usual requirements for continued emplo</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/3 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">jobs-for-life agreements</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">SMART-TD union</td><td><span class="badge found">FOUND</span></td><td class="pg">13</td></tr><tr><td class="fact-name">collective bargaining agreement</td><td><span class="badge found">FOUND</span></td><td class="pg">541</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.13):</span> &ldquo;| | | |----------------------|-----------------------------------------------------------------------------------------------------------------| | ICC | Interstate Commerce Commission | | ICS | Incide&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">Jobs-for-life agreement terms; SMART-TD union agreement text; CBA modification rules</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q19</div><div class="qtitle">What employee data must our HR organization provide for the Employee Impact Exhibit?</div><div class="qscore mid">QAG 0.50</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>For each affected class or craft, the exhibit must report: (a) headcount impacts (positions abolished, transferred, and created); (b) the geographic points where impacts will occur; (c) the time frame of impacts, covering at least three years after consolidation; and (d) the status of any employee protection agreements reached. Data should be reported by craft (engineers, conductors, maintenance-of-way, signal, mechanical, clerical, management) and by location, in the tabular format prescribed i</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>Based on the provided source pages, your HR organization must provide the following employee data for the Employee Impact Exhibit:
+
+## Required Employee Data
+
+**1. Craft (Union) Employees:**
+- Current number of craft employees by position/function
+- Projected reductions by position over three years (pages 544-547)
+- Annual attrition rates by union (approximately 8.0% combined) (page 544)
+- Expecte</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/3 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">Employee Impact Exhibit content</td><td><span class="badge found">FOUND</span></td><td class="pg">6</td></tr><tr><td class="fact-name">49 C.F.R. 1180.6(a)(9)</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">three years after consolidation</td><td><span class="badge found">FOUND</span></td><td class="pg">57</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.6):</span> &ldquo;Nature and Terms of Proposed Transaction \[Section 1180.6(a)(7)(i)\] 1-69 Agreements \[Section 1180.6(a)(7)(ii)\] 1-69 Description of Resulting Company \[Section 1180.6(a)(7)(iii)\] 1-69 Court Order \&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.6(a)(9) (Employee Impact Exhibit specific disclosure fields)</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q20</div><div class="qtitle">What notice obligations apply before integration activities affecting employees can begin?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>Under New York Dock § 4, the carrier must give written notice to the affected union of any intended transaction that may cause the dismissal, displacement, or relocation of employees at least 90 days before the proposed effective date. The notice must include a full and adequate statement of the proposed changes, including an estimate of the number of employees affected. Separately, the Railway Labor Act § 6 may require additional notices for changes to rates of pay, rules, or working conditions</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p># Notice Obligations Before Integration Activities Affecting Employees
+
+## Direct Answer
+
+The source pages **do not contain specific legal notice obligations** that must be satisfied before integration activities affecting employees can begin. While the pages extensively discuss integration planning methodology, employee impact assessments, and labor protection commitments, they do not specify sta</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">2/3 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">New York Dock notice period</td><td><span class="badge found">FOUND</span></td><td class="pg">545</td></tr><tr><td class="fact-name">49 C.F.R. 1180.6(a)(9)</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">arbitration timeline</td><td><span class="badge found">FOUND</span></td><td class="pg">94</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.545):</span> &ldquo;Exhibit in Electronic Appendix A of the Amended Application shows the expected impacts of the transaction to craft jobs in the three-year period following Board approval of the proposed transaction. -&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">New York Dock notice requirements; 49 C.F.R. § 1180.6(a)(9) timing</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q24</div><div class="qtitle">What changed between the December 19, 2025 application and the April 30, 2026 revised application?</div><div class="qscore low">QAG 0.20</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>The revised application addresses the two deficiencies identified by the Board on January 16. First, it provides forward-looking market-share projections under § 1180.7(b)(4), reflecting the combined effects of merger-related growth, traffic diversions, and changes in market conditions — replacing the December 19 approach of summing UP and NS&#x27;s 2023 actual market shares. Second, it includes the previously omitted merger-agreement schedules under § 1180.6(a)(7)(ii), including Schedule 5.8 (&#x27;Mater</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p>Based on the source pages provided, here are the key changes between the December 19, 2025 application and the April 30, 2026 revised application:
+
+## Direct Answer
+
+The April 30, 2026 filing is an **Amended Application** that updates and refines the original December 19, 2025 application. The changes include updates to the Operating Plan, the traffic diversion study, and continued integration pla</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">3/6 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">49 C.F.R. 1180.0(b) KCS exemption</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Kansas City Southern / CP-KCS</td><td><span class="badge found">FOUND</span></td><td class="pg">269</td></tr><tr><td class="fact-name">pre-July 2001 rules</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">enhance competition requirement</td><td><span class="badge found">FOUND</span></td><td class="pg">16</td></tr><tr><td class="fact-name">New York Dock floor</td><td><span class="badge found">FOUND</span></td><td class="pg">545</td></tr><tr><td class="fact-name">49 U.S.C. 11326</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.269):</span> &ldquo;- 58. The late Patrick J. Ottensmeyer, legendary CEO of Kansas City Southern, saw risks with relying only on alliances. During the CP-KCS proceedings, he testified: - Unfortunately, as is often the ca&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.0(b) (KCS exemption); 49 U.S.C. § 11326; New York Dock; pre-2001 rule text</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+    <article class="qcard">
+      <header class="qhead"><div class="qnum">Q25</div><div class="qtitle">How do the legal standards and labor protections applicable to UP-NS differ from those that applied to the CP-KCS merger?</div><div class="qscore zero">QAG 0.00</div></header>
+      <div class="qbody">
+        <div class="block gold"><h4>Expected answer <span class="tag">golden standard</span></h4><p>CP-KCS was reviewed under the pre-July 11, 2001 merger rules pursuant to the &#x27;KCS exemption&#x27; at § 1180.0(b), which waives the 2001 amended rules for any consolidation involving Kansas City Southern. Under the pre-2001 framework, applicants needed only to preserve existing competition and were not required to analyze downstream impacts. UP-NS, by contrast, is the first proceeding involving two Class I railroads to be evaluated under the full 2001 major-merger rules, which require applicants to en</p></div>
+        <div class="block pred"><h4>What the system returned <span class="tag tag-dim">from PDF only</span></h4><p># Legal Standards and Labor Protections: UP-NS vs. CP-KCS
+
+## Direct Answer
+
+The source pages do **not** contain the substantive legal standards or labor protection requirements that applied to either the UP-NS or CP-KCS mergers. While the pages reference CP-KCS as a precedent for certain **voluntary competitive commitments** (gateway and bottleneck pricing conditions), they do not describe the un</p></div>
+        <div class="block facts-block"><h4>Fact-by-fact corpus check <span class="cov">3/5 present in document</span></h4>
+          <table class="facts"><thead><tr><th>Required fact</th><th>In document?</th><th>Page</th></tr></thead><tbody><tr><td class="fact-name">49 C.F.R. 1180.0(b) KCS exemption</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">Kansas City Southern difference</td><td><span class="badge found">FOUND</span></td><td class="pg">269</td></tr><tr><td class="fact-name">New York Dock floor</td><td><span class="badge found">FOUND</span></td><td class="pg">545</td></tr><tr><td class="fact-name">49 U.S.C. 11326</td><td><span class="badge missing">NOT FOUND</span></td><td class="pg">—</td></tr><tr><td class="fact-name">enhance competition difference</td><td><span class="badge found">FOUND</span></td><td class="pg">16</td></tr></tbody></table><div class="snip"><span class="snip-label">Best the document offers (p.269):</span> &ldquo;- 58. The late Patrick J. Ottensmeyer, legendary CEO of Kansas City Southern, saw risks with relying only on alliances. During the CP-KCS proceedings, he testified: - Unfortunately, as is often the ca&hellip;&rdquo;</div></div>
+        <div class="block gap"><h4>The gap — what is missing &amp; why</h4><p class="gap-text">49 C.F.R. § 1180.0(b) (KCS exemption); 49 U.S.C. § 11326; New York Dock; CP-KCS precedent</p>
+          <p class="gap-note">These facts are <strong>not present anywhere</strong> in the 7,000-page application. The document <em>applies</em> these rules but does not restate the underlying statute / regulation / precedent. No retrieval method can extract text the document does not contain.</p></div>
+      </div></article>
+<footer>CORPUS-GAP ANALYSIS · Generated from corpus presence-testing of 14 golden Q&amp;A pairs against 7,187 indexed text chunks.<br>
+Method: case-insensitive substring search of required golden-answer facts across the full extracted corpus. "NOT FOUND" confirmed by variant spot-checking.<br>
+Conclusion: Retrieval performance on these questions is bounded by corpus content, not system capability. Recommended remediation: regulatory knowledge-base layer (49 U.S.C. + 49 C.F.R. Part 1180 + New York Dock conditions).</footer>
+</div></body></html>
