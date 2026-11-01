@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UP-NS Rebuttal Matrix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: dark command bar with tabs; overview = KPI tiles + risk table + heatmap; brief = two-column legal brief per objection; gaps = to-do table. */
+:root{
+  --bg:#F3F5F8; --card:#FFFFFF; --ink:#16212E; --muted:#566577; --rule:#D6DDE5; --soft:#E8EDF2; --well:#F3F5F8;
+  --bar:#16212E; --bar-ink:#E9EEF3; --bar-muted:#AFBCC9; --bar-chip:#2A3A4D;
+  --accent:#9A5800; --accent-soft:#FFF6E8; --accent-line:#F2C98A; --sample:#F2B25C;
+  --ok:#1F6B3F; --ok-soft:#E6F1EA; --mid:#7A4500; --mid-soft:#FBE8C8; --bad:#8A2C06; --bad-soft:#FCDCCB; --bad-box:#FCEDE4; --bad-line:#F0B48F;
+  --h-lo:#E6F1EA; --h-mid:#F8D9A8; --h-hi:#C2410C; --h-hi-ink:#FFFFFF;
+  --f-d:"Newsreader",Georgia,"Times New Roman",serif; --f-b:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif; --f-m:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F151C; --card:#17202A; --ink:#E4EAF0; --muted:#9AA8B7; --rule:#2B3744; --soft:#222D38; --well:#111921;
+  --bar:#0A0F14; --bar-ink:#E4EAF0; --bar-muted:#8F9DAC; --bar-chip:#1E2935;
+  --accent:#F0A43A; --accent-soft:#2E2312; --accent-line:#6B4A1A; --sample:#F0A43A;
+  --ok:#6CCB91; --ok-soft:#15301F; --mid:#F2B25C; --mid-soft:#3A2A12; --bad:#F59A7C; --bad-soft:#3A1A12; --bad-box:#2A1610; --bad-line:#6B2E18;
+  --h-lo:#15301F; --h-mid:#4A3510; --h-hi:#C2410C; --h-hi-ink:#FFFFFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151C; --card:#17202A; --ink:#E4EAF0; --muted:#9AA8B7; --rule:#2B3744; --soft:#222D38; --well:#111921;
+  --bar:#0A0F14; --bar-ink:#E4EAF0; --bar-muted:#8F9DAC; --bar-chip:#1E2935;
+  --accent:#F0A43A; --accent-soft:#2E2312; --accent-line:#6B4A1A; --sample:#F0A43A;
+  --ok:#6CCB91; --ok-soft:#15301F; --mid:#F2B25C; --mid-soft:#3A2A12; --bad:#F59A7C; --bad-soft:#3A1A12; --bad-box:#2A1610; --bad-line:#6B2E18;
+  --h-lo:#15301F; --h-mid:#4A3510; --h-hi:#C2410C; --h-hi-ink:#FFFFFF; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.5}
+.in{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+.mono{font-family:var(--f-m)}
+.muted{color:var(--muted)}
+/* bar */
+.bar{background:var(--bar);color:var(--bar-ink)}
+.bar .top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding-block:18px 10px}
+.bar .t{display:flex;flex-direction:column;gap:2px;flex:1 1 300px;min-width:0}
+.eyebrow{font-family:var(--f-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--sample)}
+.bar .name{font-family:var(--f-d);font-size:26px;font-weight:600}
+.chip{font-family:var(--f-m);font-size:12px;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.chip.dark{background:var(--bar-chip);color:var(--bar-ink)}
+.chip.sample{background:var(--sample);color:#16212E;font-weight:500}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:0;cursor:pointer;padding:12px 16px;min-height:44px;border-radius:6px 6px 0 0;font:500 14px var(--f-b);background:transparent;color:var(--bar-muted)}
+.tab[aria-selected="true"]{background:var(--bg);color:var(--ink)}
+.tab:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:28px 64px;display:grid;gap:24px}
+/* cards */
+.card{background:var(--card);border:1px solid var(--rule);border-radius:8px;min-width:0}
+.card-h{padding:16px 18px;border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:space-between;align-items:baseline}
+.card-h h2,.sec h2{font-family:var(--f-d);font-size:21px;font-weight:600}
+.pad{padding:18px 20px;display:grid;gap:10px;align-content:start}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{padding:14px 16px;display:grid;gap:4px}
+.lbl{font-family:var(--f-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--f-d);font-size:34px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.row{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.grow{flex:999 1 620px;min-width:0}
+.side{flex:1 1 360px;min-width:0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;padding:9px 12px;font:500 11px var(--f-m);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--well)}
+td{padding:12px;vertical-align:top;border-top:1px solid var(--rule)}
+.risk{min-width:720px}
+.linkbtn{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:600 15px var(--f-b);color:var(--ink);min-height:24px}
+.linkbtn:hover{color:var(--accent);text-decoration:underline}
+.pill{font:500 12px var(--f-m);padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-block}
+.p-Strong{background:var(--ok-soft);color:var(--ok)}
+.p-Partial{background:var(--mid-soft);color:var(--mid)}
+.p-Gap{background:var(--bad-soft);color:var(--bad)}
+.p-High{background:var(--ink);color:var(--card)}
+.p-Medium{background:var(--soft);color:var(--ink)}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-muted{background:var(--soft);color:var(--muted)}
+.heat{border-collapse:separate;border-spacing:4px;min-width:360px;font-size:12.5px}
+.heat th{background:none;text-align:center;padding:4px}
+.heat th:first-child{text-align:left}
+.heat td{border:0;padding:8px 4px;text-align:center;border-radius:4px;font:12px var(--f-m)}
+.heat td.t{text-align:left;font:13px var(--f-b);padding-right:6px}
+.h-lo{background:var(--h-lo)} .h-mid{background:var(--h-mid)} .h-hi{background:var(--h-hi);color:var(--h-hi-ink)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding:0 18px 16px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+/* brief */
+.picker{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pick{cursor:pointer;min-height:44px;padding:8px 14px;border-radius:999px;font:13px var(--f-m);background:var(--card);color:var(--ink);border:1px solid var(--rule)}
+.pick[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.brief-h{padding:20px 22px;display:grid;gap:12px}
+.brief-h h1{font-family:var(--f-d);font-size:clamp(24px,3.4vw,32px);font-weight:600;line-height:1.15}
+.plain{font-size:17px;max-width:75ch}
+.quote{background:var(--well);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;display:grid;gap:4px}
+.quote .q{font:13px/1.55 var(--f-m)}
+.ev{border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.ev-h{background:var(--well);padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.ev-b{padding:12px;display:grid;gap:8px}
+.ev-b .q{font:13px/1.55 var(--f-m);border-left:3px solid var(--accent);padding-left:10px}
+.noev{border:1px dashed var(--bad-line);background:var(--bad-box);border-radius:6px;padding:12px 14px;font-size:14px;color:var(--bad)}
+.draft{font-family:var(--f-d);font-size:17px;line-height:1.6;max-width:75ch}
+.twin{display:flex;flex-wrap:wrap;gap:18px}
+.twin>*{flex:1 1 280px}
+.gapbox{background:var(--bad-box);border-color:var(--bad-line)}
+.gapbox h3{color:var(--bad)}
+.board{background:var(--accent-soft);border-color:var(--accent-line)}
+.board h3{color:var(--accent)}
+.pad h3{font-size:15px;font-weight:600}
+.rule{font:12px/1.55 var(--f-m);background:var(--well);border-radius:6px;padding:10px 12px}
+.test{font:12.5px var(--f-m);color:var(--accent)}
+.people{display:flex;flex-wrap:wrap;gap:6px}
+.people span{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--soft)}
+.cons{min-width:560px}
+.audit-btn{background:none;border:0;padding:6px 0;text-align:left;cursor:pointer;font:600 15px var(--f-b);color:var(--ink);display:flex;justify-content:space-between;align-items:center;min-height:44px;width:100%}
+.audit{display:grid;gap:6px;font:12.5px var(--f-m);color:var(--muted)}
+.stack{display:grid;gap:18px;align-content:start}
+.gaps{min-width:820px}
+.foot{font-size:12.5px;color:var(--muted);max-width:90ch}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="in">
+    <div class="top">
+      <div class="t"><span class="eyebrow">Docket FD 36873 · UP–NS control</span><span class="name">Rebuttal matrix</span></div>
+      <span class="chip dark">Rebuttal due 16 Feb 2027</span>
+      <span class="chip sample">Sample data · mockup</span>
+      <button type="button" class="chip dark" id="themeBtn" style="border:0;cursor:pointer;min-height:32px">Dark mode</button>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+  </div>
+</div>
+<main class="in" id="app" aria-live="polite"></main>
+<div class="in" style="padding-bottom:40px">
+  <p class="foot">Mockup. Quotes and page references come from public filings in STB docket FD 36873 (BNSF-46, UP-94/NS-93, the Amended Application, Decision No. 37). Counts, scores, heatmap values, ratings, drafts, recommended actions and audit entries are illustrative; the agent has not run yet.</p>
+</div>
+
+<script>
+(function(){
+const DATA = [
+  {
+    id:'G17', group:'Group 17', priority:'High', rating:'Partial',
+    title:'CGP raises rates instead of lowering them',
+    raisedShort:'BNSF, CN, CPKC + shippers',
+    raised:['BNSF (BNSF-46 p.15)','CN (CN-15 p.26)','CPKC','Shipper letters'],
+    firstCite:'BNSF-46 p.15', testShort:'1180.1(c)(2)(iv)',
+    plain:'BNSF says Committed Gateway Pricing does not bring prices down. It sets rates at the 70th percentile of UP-NS rates, so shippers paying less today would see their prices rise, and UP-NS could push the benchmark up over time.',
+    quote:'"For CGP-eligible shippers, CGP locks in an above-market 70th-percentile rate structure, with the logical result that prices for any shipper that currently pays below-70th percentile rates will immediately bump-up to the CGP rate."',
+    test:'49 CFR 1180.1(c)(2)(iv) · Enhanced competition',
+    testPlain:'UP-NS must show the merger and its conditions enhance competition, not just preserve it. CGP is their main competition-enhancing condition, so this objection goes to the heart of approval.',
+    ruleText:'(iv) Enhanced competition. To offset harms that would not otherwise be mitigated, applicants should explain how the transaction and conditions they propose would enhance competition.',
+    board:'In Decision No. 21 (28 May 2026) the Board found parts of the Revised Application "unclear or underdeveloped", including enhanced competition, and ordered supplements. Decision No. 37 (18 Sept 2026) left these merits questions open for the 18 Nov comments.',
+    evidence:[
+      {where:'Amended Application · App. Vol. 2, p.247 · Israel VS ¶148', tag:'PDF p.923', quote:'"Committed Gateway Pricing accomplishes this by using UP/NS rates—rates that reflect the benefits of improved pricing incentives and cost reductions generated by the merger—to determine the rates that may be used by CSX and BNSF to set through rates for eligible traffic."', why:'CGP rates are built from merger-reduced UP-NS rates, which undercuts the claim that they are "above-market".'},
+      {where:'UP-94/NS-93 · Applicants’ Response, p.26', tag:'filed 26 Aug 2026', quote:'"Some eligible shippers may not benefit from CGP, but none will be harmed because they are not required to use CGP: they can continue to use traditional Rule 11, contract, and joint rate options."', why:'CGP is optional, so no shipper is forced onto the CGP rate. This answers the "immediately bump-up" part directly.'}
+    ],
+    draft:'BNSF’s claim that CGP "locks in an above-market" rate misreads both how CGP rates are set and how they apply. CGP rates are derived from UP/NS rates that reflect merger cost reductions and incorporate rates on routes with existing competition from CSX and BNSF (App. Vol. 2 at 247, Israel VS ¶148). And CGP is an option, not a mandate: eligible shippers "are not required to use CGP" and keep their Rule 11, contract and joint-rate options (UP-94/NS-93 at 26). No shipper’s rate rises because CGP exists.',
+    strengthWhy:'Answers "above-market" and "immediately bump-up" with verified evidence. Does not yet answer BNSF’s ratchet argument: that raising rates for non-CGP shippers pushes the 70th-percentile benchmark up.',
+    gap:'Evidence that the 70th-percentile benchmark cannot be pushed up by raising non-CGP rates.',
+    action:'Ask the economic expert team for an analysis using the CGP simulation model (Israel Appendix C, Amended Application PDF p.991). Owner: UP-NS economics team.',
+    consDraft:'CGP rates reflect merger cost reductions and competitive routes.',
+    consEarlier:'"70th-percentile rate cap … appropriately balanc[ing] competitive enhancement with differential pricing" (UP-80/NS-78 at 10, as quoted by BNSF).',
+    consResult:'Consistent',
+    vsReply:'In UP-94/NS-93 UP-NS cited App. Vol. 2 at 247, 249, 251 and Israel VS ¶¶148, 152–53, 157. The agent found p.247 ¶148. Pages 249 and 251 are listed as missed, for tuning.',
+    next:'BNSF also argues CGP covers "less than 1% of all rail traffic" (BNSF-46 p.16). See Group 04.',
+    audit:['Navigator · TOC picked Israel VS §V (PDF p.922–), CGP framework (p.354, p.378)','BM25 · "70th percentile" NEAR "CGP": 14 hits','Vector · top match chunk 5012 (¶148)','Reader · 4 quotes copied · Verifier · 2 kept, 2 dropped (not on cited page)','Drafter · bake-off winner · Consistency · runner-up model']
+  },
+  {
+    id:'G04', group:'Group 04', priority:'High', rating:'Partial',
+    title:'CGP covers too little traffic to matter',
+    raisedShort:'BNSF, CN', raised:['BNSF (BNSF-46 p.16)','CN (CN-15 pp.25–26)'],
+    firstCite:'BNSF-46 p.16', testShort:'1180.1(c)(2)(iv)',
+    plain:'BNSF says CGP applies to a tiny share of traffic, so even if it helps, it cannot offset the competitive harm of a railroad with over half the market. They say the expansion adds only 0.6% of traffic.',
+    quote:'"That proposal—which UP/NS asked the Board and stakeholders to believe would enhance competition—applied to ‘less than 1% of all rail traffic.’"',
+    test:'49 CFR 1180.1(c)(2)(iv) · Enhanced competition',
+    testPlain:'Enhancement has to be meaningful relative to the harm. A condition that reaches very little traffic is weak proof of enhanced competition.',
+    ruleText:'(iv) Enhanced competition. To offset harms that would not otherwise be mitigated, applicants should explain how the transaction and conditions they propose would enhance competition.',
+    board:'Decision No. 21 cited CN’s point that CGP applied to less than 1% of traffic when it ordered supplements on enhanced competition.',
+    evidence:[
+      {where:'UP-80/NS-78 at 20, as quoted in BNSF-46 p.16', tag:'cross-check original', quote:'"double[s] the number of carloads of traffic eligible for CGP, from 133,890 to 257,971 carloads"', why:'Shows the July supplement nearly doubled eligible carloads. The original filing should be cited directly, not through BNSF’s quotation.'}
+    ],
+    draft:'The July supplement expanded CGP to nearly double the eligible carloads, from 133,890 to 257,971 (UP-80/NS-78 at 20). [Attorney to add: the competitive significance of this traffic, measured by sole-served facilities reached rather than share of total rail traffic.]',
+    strengthWhy:'Shows growth in coverage but does not answer the share argument. The comparison BNSF uses (share of all rail traffic) is still unanswered.',
+    gap:'A measure of CGP’s reach that fits the legal test, such as sole-served facilities or shippers gaining a new option.',
+    action:'Pull the eligible-facility counts from the July supplements and workpapers; ask counsel whether share of total traffic is the right yardstick.',
+    consDraft:'CGP coverage roughly doubled after the July supplement.', consEarlier:'Same figures as UP-80/NS-78 at 20.', consResult:'Consistent',
+    vsReply:'UP-94/NS-93 Section III.B argues CGP will "substantially enhance rail-to-rail competition". Detailed page comparison pending.',
+    next:'Opponents will tie low coverage to the 50% market-share argument. See Group 02.',
+    audit:['Navigator · TOC picked July supplement UP-80/NS-78, Israel Supp. VS','BM25 · "CGP" NEAR "carloads": 9 hits','Reader · 1 quote, via BNSF citation (flagged: verify in original)']
+  },
+  {
+    id:'G02', group:'Group 02', priority:'High', rating:'Gap',
+    title:'Merged railroad would hold about half the market',
+    raisedShort:'BNSF, CPKC, shipper groups', raised:['BNSF (BNSF-46 p.3)','CPKC','Joint shipper associations'],
+    firstCite:'BNSF-46 p.3', testShort:'1180.1(c) public interest',
+    plain:'BNSF says the combined UP-NS would have about 50% of the U.S. freight rail market, a level it says is associated with a presumption of competitive harm.',
+    quote:'"The merged entity would be an industry goliath, with a 50% market share of the domestic U.S. freight rail market and 53% of Class I Merchandise Gross Ton Miles"',
+    test:'49 CFR 1180.1(c) · Public interest balance',
+    testPlain:'The Board approves only when public benefits outweigh anticompetitive effects. A very large market share is the opponents’ headline harm.',
+    ruleText:'(c) … mergers serve the public interest only when substantial and demonstrable gains in important public benefits … outweigh any anticompetitive effects, potential service disruptions, or other merger-related harms.',
+    board:'Decision No. 21 asked for more on market share projections and downstream merger impacts.',
+    evidence:[],
+    draft:'[No draft: no verified evidence yet. The agent does not draft without verified citations.]',
+    strengthWhy:'The evidence search returned candidate sections, but no quote passed verification for this specific market-share measure.',
+    gap:'A verified UP-NS response to the 50% / 53% figures, such as an end-to-end (non-overlapping) network argument or a different market definition.',
+    action:'Rerun the search on the market-impact sections of the Amended Application; if still nothing, flag to counsel as a must-answer item for 16 Feb.',
+    consDraft:'(no draft yet)', consEarlier:'(not checked)', consResult:'Pending',
+    vsReply:'UP-94/NS-93 Section I.C.1 says the merger "will not harm competition". Page-level comparison pending.',
+    next:'Expect DOJ and state attorneys general to cite these figures in their December comments.',
+    audit:['Navigator · TOC picked market impact analyses, Vol. 2','Reader · 3 quotes · Verifier · 0 kept','Retry · 1 · still 0 kept → marked Gap']
+  },
+  {
+    id:'G23', group:'Group 23', priority:'Medium', rating:'Strong',
+    title:'Single-line benefits could be had without a merger',
+    raisedShort:'CPKC, BNSF', raised:['CPKC (transit time analysis)','BNSF'],
+    firstCite:'CPKC comments', testShort:'1180.1(c) alternatives',
+    plain:'Opponents say interline partnerships could deliver the same faster service, so the merger is not needed for its benefits.',
+    quote:'[Sample: exact CPKC wording to be extracted by the agent]',
+    test:'49 CFR 1180.1(c) · Benefits achievable by other means',
+    testPlain:'The Board will consider whether claimed benefits could be realized by means other than the merger, such as joint marketing or interline partnerships.',
+    ruleText:'… the Board will consider whether the benefits claimed by applicants could be realized by means other than the proposed consolidation.',
+    board:'No specific flag in the decisions reviewed so far.',
+    evidence:[
+      {where:'UP-94/NS-93 · Section IV.B', tag:'filed 26 Aug 2026', quote:'Section heading: "CPKC’s Transit Time Analysis Actually Highlights the Benefits of Single-Line Service."', why:'UP-NS has already answered this argument head-on; the draft can build on that section.'}
+    ],
+    draft:'[Sample] CPKC’s own transit-time analysis shows the advantage of single-line service rather than undermining it (UP-94/NS-93, Section IV.B).',
+    strengthWhy:'UP-NS addressed this directly in its August response, so the rebuttal is mostly a matter of updating citations.',
+    gap:'None critical. Refresh with any new CPKC data filed on 18 Nov.',
+    action:'Re-run after the 18 Nov filings arrive.',
+    consDraft:'Single-line service needs one integrated railroad.',
+    consEarlier:'UP-94/NS-93 Section IV.A: "The Benefits of Single-Line Service Require a Single, Integrated Railroad."',
+    consResult:'Consistent',
+    vsReply:'Matches the structure of UP-NS’s actual Section IV.',
+    next:'Opponents may cite joint marketing agreements as a cheaper alternative.',
+    audit:['Navigator · TOC picked UP-94/NS-93 §IV','Verifier · 1 kept']
+  }
+];
+const TILES=[
+  ['Objection groups','412','from 501 opponent filings','var(--ink)'],
+  ['Strong','180','answered with verified evidence','var(--ok)'],
+  ['Partial','150','answered in part','var(--mid)'],
+  ['Gap','82','no verified answer yet','var(--bad)'],
+  ['Contradictions','6','draft vs earlier UP-NS filings','var(--ink)']
+];
+const HEAT_COLS=['BNSF','CPKC','CN','CSX','Shippers'];
+const HEAT=[
+  ['Enhanced competition',[70,55,60,45,50]],
+  ['Market share / harm',[80,65,40,55,60]],
+  ['Service disruption',[30,35,25,40,55]],
+  ['Benefits w/o merger',[20,15,10,25,20]],
+  ['Labor and safety',[10,15,10,20,30]]
+];
+const state={view:'overview',sel:'G17',audit:false};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pill=(t,cls)=>`<span class="pill p-${cls||t}">${esc(t)}</span>`;
+
+function tabs(){
+  const t=[['overview','Overview'],['detail','Objection brief'],['gaps','Gap list']];
+  document.getElementById('tabs').innerHTML=t.map(([k,l])=>`<button type="button" role="tab" class="tab" data-tab="${k}" aria-selected="${state.view===k}">${l}</button>`).join('');
+}
+function overview(){
+  const tiles=TILES.map(([l,v,s,c])=>`<div class="card tile"><span class="lbl">${l}</span><span class="big" style="color:${c}">${v}</span><span class="muted" style="font-size:13px">${s}</span></div>`).join('');
+  const rows=DATA.map(o=>`<tr>
+    <td>${pill(o.priority)}</td>
+    <td><button type="button" class="linkbtn" data-open="${o.id}">${esc(o.title)}</button><div class="muted" style="font-size:13px">${o.group} · ${esc(o.firstCite)}</div></td>
+    <td style="font-size:13px">${esc(o.raisedShort)}</td>
+    <td class="mono" style="font-size:13px">${esc(o.testShort)}</td>
+    <td>${pill(o.rating)}</td></tr>`).join('');
+  const heat=HEAT.map(([t,v])=>`<tr><td class="t">${t}</td>${v.map(x=>`<td class="${x>=60?'h-hi':x>=35?'h-mid':'h-lo'}">${x}%</td>`).join('')}</tr>`).join('');
+  return `<div class="tiles">${tiles}</div>
+  <div class="row">
+    <div class="card grow">
+      <div class="card-h"><h2>Top risks, highest priority first</h2><span class="muted" style="font-size:13px">Select an objection to open its brief</span></div>
+      <div class="scroll"><table class="risk"><thead><tr><th>Priority</th><th>Objection</th><th>Raised by</th><th>Legal test</th><th>Rating</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>
+    <div class="card side">
+      <div class="card-h" style="display:grid;gap:2px"><h2>Where we are weak</h2><span class="muted" style="font-size:13px">Share of objections rated Partial or Gap, by legal test and party</span></div>
+      <div class="scroll" style="padding:12px 14px"><table class="heat"><thead><tr><th></th>${HEAT_COLS.map(c=>`<th class="mono" style="font-size:11px;color:var(--muted)">${c}</th>`).join('')}</tr></thead><tbody>${heat}</tbody></table></div>
+      <div class="legend"><span><span class="sw h-lo"></span>mostly covered</span><span><span class="sw h-mid"></span>some gaps</span><span><span class="sw h-hi"></span>mostly gaps</span></div>
+    </div>
+  </div>`;
+}
+function detail(){
+  const o=DATA.find(x=>x.id===state.sel)||DATA[0];
+  const picker=DATA.map(x=>`<button type="button" class="pick" data-open="${x.id}" aria-pressed="${x.id===o.id}">${x.group}</button>`).join('');
+  const ev=o.evidence.length?o.evidence.map(e=>`<div class="ev"><div class="ev-h"><span class="mono" style="font-size:12px">${esc(e.where)}</span><span style="display:flex;gap:6px;flex-wrap:wrap">${pill('✓ verified on page','ok')}${pill(e.tag,'muted')}</span></div><div class="ev-b"><span class="q">${esc(e.quote)}</span><span style="font-size:14px"><strong>Why it helps: </strong>${esc(e.why)}</span></div></div>`).join('')
+    :`<div class="noev">No verified passage in the applicant filings answers this point yet. See the gap and recommended action.</div>`;
+  const consCls=o.consResult==='Consistent'?'ok':'muted';
+  return `<div class="picker"><span class="muted" style="font-size:13px">Objection</span>${picker}</div>
+  <div class="card brief-h">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span class="mono muted" style="font-size:12px">${o.group}</span>${pill(o.priority)}${pill(o.rating)}</div>
+    <h1>${esc(o.title)}</h1>
+    <p class="plain">${esc(o.plain)}</p>
+    <div class="quote"><span class="mono muted" style="font-size:11.5px">Opponent's words · ${esc(o.firstCite)}</span><span class="q">${esc(o.quote)}</span></div>
+  </div>
+  <div class="row">
+    <div class="grow stack">
+      <div class="card pad"><h2 style="font-family:var(--f-d);font-size:21px;font-weight:600">Our evidence, and why it answers the point</h2>${ev}</div>
+      <div class="card pad"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline"><h2 style="font-family:var(--f-d);font-size:21px;font-weight:600">Draft rebuttal</h2><span class="muted" style="font-size:12.5px">For attorney review · not legal advice</span></div><p class="draft">${esc(o.draft)}</p></div>
+      <div class="twin">
+        <div class="card pad"><h3>Strength: ${pill(o.rating)}</h3><p style="font-size:14px">${esc(o.strengthWhy)}</p></div>
+        <div class="card pad gapbox"><h3>Gap and recommended action</h3><p style="font-size:14px"><strong>Missing: </strong>${esc(o.gap)}</p><p style="font-size:14px"><strong>Action: </strong>${esc(o.action)}</p></div>
+      </div>
+      <div class="card pad"><h2 style="font-family:var(--f-d);font-size:21px;font-weight:600">Consistency with earlier UP-NS filings</h2>
+        <div class="scroll"><table class="cons"><thead><tr><th>Draft says</th><th>Earlier UP-NS statement</th><th>Result</th></tr></thead><tbody><tr><td>${esc(o.consDraft)}</td><td>${esc(o.consEarlier)}</td><td>${pill(o.consResult,consCls)}</td></tr></tbody></table></div>
+      </div>
+      <div class="card pad" style="padding-block:8px 14px">
+        <button type="button" class="audit-btn" id="auditBtn" aria-expanded="${state.audit}"><span>Audit trail: how the agent got here</span><span class="mono muted">${state.audit?'Hide':'Show'}</span></button>
+        ${state.audit?`<div class="audit">${o.audit.map(a=>`<span>${esc(a)}</span>`).join('')}</div>`:''}
+      </div>
+    </div>
+    <div class="side stack">
+      <div class="card pad"><h3>Who raised it</h3><div class="people">${o.raised.map(p=>`<span>${esc(p)}</span>`).join('')}</div></div>
+      <div class="card pad"><h3>Why it matters legally</h3><span class="test">${esc(o.test)}</span><p style="font-size:14px">${esc(o.testPlain)}</p><span class="rule">${esc(o.ruleText)}</span></div>
+      <div class="card pad board"><h3>What the Board has said</h3><p style="font-size:14px">${esc(o.board)}</p></div>
+      <div class="card pad"><h3>Compared with UP-NS's actual reply</h3><p style="font-size:14px">${esc(o.vsReply)}</p></div>
+      <div class="card pad"><h3>Likely next attack</h3><p style="font-size:14px">${esc(o.next)}</p></div>
+    </div>
+  </div>`;
+}
+function gaps(){
+  const rows=DATA.filter(o=>o.rating!=='Strong').map(o=>`<tr><td><button type="button" class="linkbtn" data-open="${o.id}">${esc(o.title)}</button></td><td>${pill(o.rating)}</td><td>${esc(o.gap)}</td><td>${esc(o.action)}</td></tr>`).join('');
+  return `<div class="card"><div class="card-h" style="display:grid;gap:2px"><h2>Gap list: the team's to-do</h2><span class="muted" style="font-size:13px">Every Partial or Gap with what is missing and who should close it</span></div>
+  <div class="scroll"><table class="gaps"><thead><tr><th>Objection</th><th>Rating</th><th>What is missing</th><th>Recommended action</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function render(){
+  tabs();
+  const app=document.getElementById('app');
+  app.innerHTML=state.view==='overview'?overview():state.view==='detail'?detail():gaps();
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab]'); if(t){state.view=t.dataset.tab;render();return;}
+  const o=e.target.closest('[data-open]'); if(o){state.sel=o.dataset.open;state.view='detail';state.audit=false;render();window.scrollTo({top:0,behavior:'smooth'});return;}
+  if(e.target.closest('#auditBtn')){state.audit=!state.audit;render();return;}
+  const tb=e.target.closest('#themeBtn');
+  if(tb){const r=document.documentElement;const dark=r.getAttribute('data-theme')!=='dark';r.setAttribute('data-theme',dark?'dark':'light');tb.textContent=dark?'Light mode':'Dark mode';}
+});
+render();
+})();
+</script>
+</body>
+</html>
